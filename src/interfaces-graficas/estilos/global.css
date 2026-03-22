@@ -1,0 +1,42 @@
+:root {
+  --cor-primaria: #1e3a5f;
+  --cor-secundaria: #2d5a87;
+  --cor-acento: #e8a838;
+  --cor-sucesso: #28a745;
+  --cor-erro: #dc3545;
+  --cor-info: #17a2b8;
+  --cor-fundo: #f8f9fa;
+  --cor-borda: #dee2e6;
+  --cor-texto: #212529;
+  --cor-texto-secundario: #6c757d;
+  --sombra: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --sombra-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --raio-borda: 0.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
