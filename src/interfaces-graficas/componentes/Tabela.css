@@ -1,0 +1,35 @@
+.tabela__wrapper {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.tabela th {
+  font-weight: 600;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-secundario);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabela tbody tr:hover {
+  background-color: var(--cor-fundo);
+}
+
+.tabela__carregando,
+.tabela__vazia {
+  padding: 2rem;
+  text-align: center;
+  color: var(--cor-texto-secundario);
+}
