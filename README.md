@@ -1,4 +1,4 @@
-# Celidone Frontend
+# TCC Frontend
 
 Sistema de Locação de Trajes a Rigor - Frontend Electron
 
@@ -47,12 +47,12 @@ src/
 ### Pré-requisitos
 
 - Node.js 18+
-- Backend Celidone rodando em http://localhost:8080
+- Backend TCC rodando em http://localhost:8080
 
 ### Instalação
 
 ```bash
-cd celidone-frontend
+cd tcc-frontend
 npm install
 ```
 

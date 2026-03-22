@@ -3,7 +3,7 @@ const electron = require("electron");
 const path = require("path");
 const log = require("electron-log");
 log.initialize();
-log.info("Aplicação Celidone iniciada");
+log.info("Aplicação TCC iniciada");
 electron.app.commandLine.appendSwitch("disable-gpu-cache");
 process.on("uncaughtException", (erro) => {
   log.error("Erro não tratado:", erro);
@@ -60,9 +60,9 @@ function criarMenu() {
       label: "Ajuda",
       submenu: [
         {
-          label: "Sobre o Celidone",
+          label: "Sobre o TCC",
           click: () => {
-            electron.shell.openExternal("https://github.com/anomalyco/celidone");
+            electron.shell.openExternal("https://github.com/anomalyco/tcc");
           }
         }
       ]
@@ -77,7 +77,7 @@ function criarJanela() {
     height: JANELA_ALTURA,
     minWidth: 800,
     minHeight: 600,
-    title: "Celidone - Sistema de Locação de Trajes",
+    title: "TCC - Sistema de Locação de Trajes",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,

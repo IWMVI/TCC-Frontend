@@ -3,7 +3,7 @@ import { join } from 'path';
 import log from 'electron-log';
 
 log.initialize();
-log.info('Aplicação Celidone iniciada');
+log.info('Aplicação TCC iniciada');
 
 app.commandLine.appendSwitch('disable-gpu-cache');
 
@@ -66,9 +66,9 @@ function criarMenu(): void {
       label: 'Ajuda',
       submenu: [
         {
-          label: 'Sobre o Celidone',
+          label: 'Sobre o TCC',
           click: () => {
-            shell.openExternal('https://github.com/anomalyco/celidone');
+            shell.openExternal('https://github.com/anomalyco/tcc');
           },
         },
       ],
@@ -85,7 +85,7 @@ function criarJanela(): void {
     height: JANELA_ALTURA,
     minWidth: 800,
     minHeight: 600,
-    title: 'Celidone - Sistema de Locação de Trajes',
+    title: 'TCC - Sistema de Locação de Trajes',
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,

@@ -42,7 +42,7 @@ export function Dashboard() {
       <div className="dashboard__info">
         <Card titulo="Sobre o Sistema">
           <p>
-            O <strong>Celidone</strong> é um sistema de gestão de locação de trajes a rigor,
+            O <strong>TCC</strong> é um sistema de gestão de locação de trajes a rigor,
             desenvolvido como projeto de Trabalho de Conclusão de Curso (TCC) da FATEC.
           </p>
           <p>

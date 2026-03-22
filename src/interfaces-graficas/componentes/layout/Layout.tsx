@@ -12,7 +12,7 @@ export function Layout() {
     <div className="layout">
       <aside className="layout__sidebar">
         <div className="layout__logo">
-          <h1>Celidone</h1>
+          <h1>TCC</h1>
           <span>Sistema de Locação</span>
         </div>
         <nav className="layout__nav">

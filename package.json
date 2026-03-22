@@ -1,5 +1,5 @@
 {
-  "name": "celidone-frontend",
+  "name": "tcc-frontend",
   "version": "1.0.0",
   "description": "Sistema de Locação de Trajes a Rigor - Frontend Electron",
   "main": "dist-electron/main.js",
@@ -39,8 +39,8 @@
     "vite-plugin-electron-renderer": "^0.14.6"
   },
   "build": {
-    "appId": "br.edu.fateczl.celidone",
-    "productName": "Celidone",
+    "appId": "br.edu.fateczl.tcc",
+    "productName": "TCC",
     "directories": {
       "output": "release"
     },

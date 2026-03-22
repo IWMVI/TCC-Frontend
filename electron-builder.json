@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "br.edu.fateczl.celidone",
-  "productName": "Celidone",
+  "appId": "br.edu.fateczl.tcc",
+  "productName": "TCC",
   "directories": {
     "output": "release",
     "buildResources": "build"
