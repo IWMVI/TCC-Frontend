@@ -2,6 +2,20 @@
 
 Sistema de Locação de Trajes a Rigor - Frontend Electron
 
+## Sumário
+
+- [Tecnologias](#tecnologias)
+- [Arquitetura](#arquitetura-clean-architecture)
+- [Princípios Aplicados](#princípios-aplicados)
+- [Como Executar](#como-executar)
+- [Testes](#testes)
+- [Qualidade de Código](#qualidade-de-código)
+- [CI/CD](#cicd)
+- [Scripts Disponíveis](#scripts-disponíveis)
+- [Configuração da API](#configuração-da-api)
+
+---
+
 ## Tecnologias
 
 - **Electron 33+** - Runtime desktop
@@ -11,6 +25,8 @@ Sistema de Locação de Trajes a Rigor - Frontend Electron
 - **React Router** - Roteamento
 - **Axios** - Cliente HTTP
 - **Zod** - Validação
+
+---
 
 ## Arquitetura (Clean Architecture)
 
@@ -34,6 +50,8 @@ src/
     └── estilos/              # CSS
 ```
 
+---
+
 ## Princípios Aplicados
 
 - **S** - Single Responsibility (cada módulo tem uma responsabilidade)
@@ -41,6 +59,8 @@ src/
 - **L** - Liskov Substitution (interfaces bem definidas)
 - **I** - Interface Segregation (contratos focados)
 - **D** - Dependency Inversion (dependências de abstrações)
+
+---
 
 ## Como Executar
 
@@ -75,6 +95,92 @@ npm run build
 
 O executável será gerado em `release/`.
 
+---
+
+## Testes
+
+O projeto utiliza **Jest** com **React Testing Library**.
+
+### Executar Testes
+
+```bash
+# Executar testes
+npm run test
+
+# Executar em modo watch
+npm run test:watch
+
+# Executar com coverage
+npm run test:coverage
+```
+
+### Configuração
+
+- `jest.config.ts` - Configuração principal
+- `src/setupTests.ts` - Setup com jest-dom
+- `src/__mocks__/` - Mocks para arquivos estáticos
+
+### Cobertura
+
+O projeto possui threshold mínimo de **50%** de cobertura. O relatório é gerado em `coverage/`.
+
+---
+
+## Qualidade de Código
+
+### ESLint
+
+```bash
+# Verificar erros
+npm run lint
+
+# Corrigir automaticamente
+npm run lint:fix
+```
+
+### Prettier
+
+```bash
+# Formatar código
+npm run prettier
+
+# Verificar formatação
+npm run prettier:check
+```
+
+### TypeScript
+
+```bash
+# Verificar tipos
+npm run typecheck
+```
+
+---
+
+## CI/CD
+
+O projeto possui workflows do GitHub Actions em `.github/workflows/`:
+
+### Pipelines
+
+1. **ci.yml** - Pipeline principal
+   - Lint + TypeScript check
+   - Testes com coverage
+   - Build Vite
+   - Build Electron App
+
+2. **code-quality.yml** - Análise de qualidade
+   - ESLint
+   - TypeScript
+
+### Executores
+
+- Ubuntu latest
+- Node.js 20
+- Cache de dependências
+
+---
+
 ## Estrutura de Diretórios do Electron
 
 ```
@@ -90,6 +196,8 @@ electron/
 - `sandbox: true` - Sandboxed renderer
 - `contextBridge` - Exposição segura de APIs
 
+---
+
 ## Scripts Disponíveis
 
 | Script | Descrição |
@@ -99,7 +207,15 @@ electron/
 | `npm run build` | Build de produção |
 | `npm run build:vite` | Apenas build Vite |
 | `npm run lint` | Verificar código |
+| `npm run lint:fix` | Corrigir código |
 | `npm run typecheck` | Verificar tipos |
+| `npm run test` | Executar testes |
+| `npm run test:watch` | Testes em modo watch |
+| `npm run test:coverage` | Testes com coverage |
+| `npm run prettier` | Formatar código |
+| `npm run prettier:check` | Verificar formatação |
+
+---
 
 ## Configuração da API
 
