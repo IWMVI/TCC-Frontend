@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Botao, Card, Tabela, Modal, Busca } from '../../componentes';
-import { useClientes } from '../../contextos/ContextoClientes';
-import { ListarClientesUseCase, DeletarClienteUseCase } from '../../../application/clientes';
-import { ClienteApiRepositorio } from '../../../infrastructure/api';
-import { ClienteResponse } from '../../../domain/entidades';
-import { mascararCpfCnpj, mascararCelular } from '../../utils/formatacoes';
+import { Botao, Card, Tabela, Modal, Busca } from '../../../componentes';
+import { useClientes } from '../../../contextos/ContextoClientes';
+import { ListarClientesUseCase, DeletarClienteUseCase } from '../../../../application/clientes';
+import { ClienteApiRepositorio } from '../../../../infrastructure/api';
+import { ClienteResponse } from '../../../../domain/entidades';
+import { mascararCpfCnpj, mascararCelular } from '../../../utils/formatacoes';
 import './ListarClientes.css';
 
 const clienteRepositorio = new ClienteApiRepositorio();

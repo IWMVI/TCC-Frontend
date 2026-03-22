@@ -1,65 +1,47 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Botao, Card, CampoFormulario } from '../../componentes';
-import { BuscarClientePorIdUseCase, AtualizarClienteUseCase } from '../../../application/clientes';
-import { ClienteApiRepositorio } from '../../../infrastructure/api';
-import { ClienteRequest, SiglaEstado } from '../../../domain/entidades';
-import { mascararCpfCnpj, mascararCelular, mascararCep } from '../../utils/formatacoes';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Botao, Card, CampoFormulario } from '../../../componentes';
+import { ClienteRequest, SiglaEstado } from '../../../../domain/entidades';
+import { mascararCpfCnpj, mascararCelular, mascararCep } from '../../../utils/formatacoes';
 import './FormularioCliente.css';
 
-const clienteRepositorio = new ClienteApiRepositorio();
-const buscarClienteUseCase = new BuscarClientePorIdUseCase(clienteRepositorio);
-const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepositorio);
+interface FormularioClienteProps {
+  titulo: string;
+  descricao: string;
+  initialData?: Partial<ClienteRequest>;
+  estaEnviando: boolean;
+  erro: string | null;
+  onSubmit: (dados: ClienteRequest) => Promise<void>;
+}
 
-export function EditarCliente() {
-  const { id } = useParams<{ id: string }>();
+const estados = Object.values(SiglaEstado);
+
+export function FormularioCliente({
+  titulo,
+  descricao,
+  initialData,
+  estaEnviando,
+  erro,
+  onSubmit,
+}: FormularioClienteProps) {
   const navigate = useNavigate();
-  const [estaEnviando, setEstaEnviando] = useState(false);
-  const [estaCarregando, setEstaCarregando] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
 
-  const [nome, setNome] = useState('');
-  const [cpfCnpj, setCpfCnpj] = useState('');
-  const [email, setEmail] = useState('');
-  const [celular, setCelular] = useState('');
-  const [cep, setCep] = useState('');
-  const [logradouro, setLogradouro] = useState('');
-  const [numero, setNumero] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState<SiglaEstado>(SiglaEstado.SP);
-  const [complemento, setComplemento] = useState('');
-
-  const estados = Object.values(SiglaEstado);
-
-  useEffect(() => {
-    async function carregarCliente() {
-      if (!id) return;
-      try {
-        const cliente = await buscarClienteUseCase.executar(parseInt(id, 10));
-        setNome(cliente.nome);
-        setCpfCnpj(mascararCpfCnpj(cliente.cpfCnpj));
-        setEmail(cliente.email);
-        setCelular(mascararCelular(cliente.celular));
-        setCep(mascararCep(cliente.endereco.cep));
-        setLogradouro(cliente.endereco.logradouro);
-        setNumero(cliente.endereco.numero);
-        setBairro(cliente.endereco.bairro);
-        setCidade(cliente.endereco.cidade);
-        setEstado(cliente.endereco.estado);
-        setComplemento(cliente.endereco.complemento || '');
-      } catch {
-        setErro('Cliente não encontrado');
-      } finally {
-        setEstaCarregando(false);
-      }
-    }
-    carregarCliente();
-  }, [id]);
+  const [nome, setNome] = useState(initialData?.nome || '');
+  const [cpfCnpj, setCpfCnpj] = useState(initialData?.cpfCnpj || '');
+  const [email, setEmail] = useState(initialData?.email || '');
+  const [celular, setCelular] = useState(initialData?.celular || '');
+  const [cep, setCep] = useState(initialData?.endereco?.cep || '');
+  const [logradouro, setLogradouro] = useState(initialData?.endereco?.logradouro || '');
+  const [numero, setNumero] = useState(initialData?.endereco?.numero || '');
+  const [bairro, setBairro] = useState(initialData?.endereco?.bairro || '');
+  const [cidade, setCidade] = useState(initialData?.endereco?.cidade || '');
+  const [estado, setEstado] = useState<SiglaEstado>(
+    (initialData?.endereco?.estado as SiglaEstado) || SiglaEstado.SP
+  );
+  const [complemento, setComplemento] = useState(initialData?.endereco?.complemento || '');
 
   function handleCepChange(valor: string) {
-    const mascarado = mascararCep(valor);
-    setCep(mascarado);
+    setCep(mascararCep(valor));
   }
 
   function handleCepBlur() {
@@ -98,9 +80,6 @@ export function EditarCliente() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!id) return;
-    setErro(null);
-    setEstaEnviando(true);
 
     const dados: ClienteRequest = {
       nome,
@@ -118,29 +97,14 @@ export function EditarCliente() {
       },
     };
 
-    try {
-      await atualizarClienteUseCase.executar(parseInt(id, 10), dados);
-      navigate('/clientes');
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao atualizar cliente');
-    } finally {
-      setEstaEnviando(false);
-    }
-  }
-
-  if (estaCarregando) {
-    return (
-      <div className="formulario-cliente">
-        <p className="formulario-cliente__carregando">Carregando...</p>
-      </div>
-    );
+    await onSubmit(dados);
   }
 
   return (
     <div className="formulario-cliente">
       <header className="formulario-cliente__header">
-        <h1>Editar Cliente</h1>
-        <p>Atualize os dados do cliente</p>
+        <h1>{titulo}</h1>
+        <p>{descricao}</p>
       </header>
 
       <Card titulo="Dados do Cliente">
