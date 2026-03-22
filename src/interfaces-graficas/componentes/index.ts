@@ -1,7 +1,5 @@
-export { Layout } from './Layout';
-export { Botao } from './Botao';
-export { Card } from './Card';
-export { Tabela } from './Tabela';
-export { CampoFormulario } from './CampoFormulario';
-export { Modal } from './Modal';
-export { Busca } from './Busca';
+export { Botao } from './base';
+export { CampoFormulario, Busca } from './form';
+export { Layout, Card } from './layout';
+export { Modal } from './feedback';
+export { Tabela } from './data';
