@@ -98,7 +98,6 @@ function criarJanela() {
     const urlDev = process.env.VITE_DEV_SERVER_URL || "http://localhost:5173";
     log.info(`Carregando URL de desenvolvimento: ${urlDev}`);
     janelaPrincipal.loadURL(urlDev);
-    janelaPrincipal.webContents.openDevTools();
   } else {
     const caminhoProducao = path.join(__dirname, "../dist/index.html");
     log.info(`Carregando arquivo de produção: ${caminhoProducao}`);
