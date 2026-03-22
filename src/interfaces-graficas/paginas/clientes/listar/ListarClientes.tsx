@@ -25,7 +25,7 @@ export function ListarClientes() {
     try {
       const clientes = await listarClientesUseCase.executar(busca);
       dispatch({ tipo: 'SET_CLIENTES', payload: clientes });
-    } catch (erro) {
+    } catch (_erro) {
       dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar clientes' });
     } finally {
       dispatch({ tipo: 'SET_CARREGANDO', payload: false });
@@ -64,7 +64,7 @@ export function ListarClientes() {
       await deletarClienteUseCase.executar(clienteParaExcluir.id);
       dispatch({ tipo: 'REMOVER_CLIENTE', payload: clienteParaExcluir.id });
       fecharModal();
-    } catch (erro) {
+    } catch (_erro) {
       dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir cliente' });
     } finally {
       setEstaExcluindo(false);
