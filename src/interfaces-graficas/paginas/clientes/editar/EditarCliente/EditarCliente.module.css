@@ -1,0 +1,5 @@
+.formulario-cliente__carregando {
+  text-align: center;
+  padding: 2rem;
+  color: var(--cor-texto-secundario);
+}

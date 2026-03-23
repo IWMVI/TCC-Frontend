@@ -1,0 +1,1 @@
+export { EditarCliente } from './EditarCliente';
