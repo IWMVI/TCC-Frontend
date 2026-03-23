@@ -1,10 +1,10 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from './interfaces-graficas/componentes/layout/Layout';
-import { Dashboard } from './interfaces-graficas/paginas/dashboard/Dashboard';
-import { ListarClientes } from './interfaces-graficas/paginas/clientes/listar/ListarClientes';
-import { CriarCliente } from './interfaces-graficas/paginas/clientes/criar/CriarCliente';
-import { EditarCliente } from './interfaces-graficas/paginas/clientes/editar/EditarCliente';
-import { ProvedorClientes } from './interfaces-graficas/contextos';
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {Layout} from './interfaces-graficas/componentes/layout/Layout';
+import {Dashboard} from './interfaces-graficas/paginas/dashboard/Dashboard';
+import {ListarClientes} from './interfaces-graficas/paginas/clientes/listar/ListarClientes';
+import {CriarCliente} from './interfaces-graficas/paginas/clientes/criar/CriarCliente';
+import {EditarCliente} from './interfaces-graficas/paginas/clientes/editar/EditarCliente';
+import {ProvedorClientes} from './interfaces-graficas/contextos';
 
 function App() {
   return (
