@@ -1,0 +1,36 @@
+.card {
+  background-color: white;
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.card__header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--cor-borda);
+  background-color: var(--cor-fundo);
+}
+
+.card__titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cor-texto);
+}
+
+.card__corpo {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .card__header {
+    padding: 1rem 1.5rem;
+  }
+
+  .card__titulo {
+    font-size: 1.125rem;
+  }
+
+  .card__corpo {
+    padding: 1.5rem;
+  }
+}
