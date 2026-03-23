@@ -1,0 +1,1 @@
+export { CampoFormulario } from './CampoFormulario';
