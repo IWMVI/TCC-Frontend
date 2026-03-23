@@ -1,6 +1,10 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
-import { join } from 'path';
+import {app, BrowserWindow, Menu, shell} from 'electron';
+import {dirname, join} from 'path';
+import {fileURLToPath} from 'url';
 import log from 'electron-log';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 log.initialize();
 log.info('Aplicação TCC iniciada');
@@ -25,9 +29,7 @@ function criarMenu(): void {
   const menu = Menu.buildFromTemplate([
     {
       label: 'Arquivo',
-      submenu: [
-        { role: 'quit', label: 'Sair' },
-      ],
+      submenu: [{role: 'quit', label: 'Sair'}],
     },
     {
       label: 'Editar',
@@ -105,7 +107,7 @@ function criarJanela(): void {
   });
 
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-  
+
   if (isDev) {
     const urlDev = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
     log.info(`Carregando URL de desenvolvimento: ${urlDev}`);

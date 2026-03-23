@@ -1,13 +1,15 @@
-"use strict";
-const electron = require("electron");
-const path = require("path");
-const log = require("electron-log");
+import { app, BrowserWindow, Menu, shell } from "electron";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import log from "electron-log";
+const __filename$1 = fileURLToPath(import.meta.url);
+const __dirname$1 = dirname(__filename$1);
 log.initialize();
 log.info("Aplicação TCC iniciada");
-electron.app.commandLine.appendSwitch("disable-gpu-cache");
+app.commandLine.appendSwitch("disable-gpu-cache");
 process.on("uncaughtException", (erro) => {
   log.error("Erro não tratado:", erro);
-  electron.app.exit(1);
+  app.exit(1);
 });
 process.on("unhandledRejection", (motivo) => {
   log.error("Rejeição não tratada:", motivo);
@@ -16,12 +18,10 @@ let janelaPrincipal = null;
 const JANELA_LARGURA = 1200;
 const JANELA_ALTURA = 800;
 function criarMenu() {
-  const menu = electron.Menu.buildFromTemplate([
+  const menu = Menu.buildFromTemplate([
     {
       label: "Arquivo",
-      submenu: [
-        { role: "quit", label: "Sair" }
-      ]
+      submenu: [{ role: "quit", label: "Sair" }]
     },
     {
       label: "Editar",
@@ -62,24 +62,24 @@ function criarMenu() {
         {
           label: "Sobre o TCC",
           click: () => {
-            electron.shell.openExternal("https://github.com/anomalyco/tcc");
+            shell.openExternal("https://github.com/anomalyco/tcc");
           }
         }
       ]
     }
   ]);
-  electron.Menu.setApplicationMenu(menu);
+  Menu.setApplicationMenu(menu);
 }
 function criarJanela() {
   log.info("Criando janela principal");
-  janelaPrincipal = new electron.BrowserWindow({
+  janelaPrincipal = new BrowserWindow({
     width: JANELA_LARGURA,
     height: JANELA_ALTURA,
     minWidth: 800,
     minHeight: 600,
     title: "TCC - Sistema de Locação de Trajes",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: join(__dirname$1, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true
@@ -93,37 +93,37 @@ function criarJanela() {
   janelaPrincipal.on("closed", () => {
     janelaPrincipal = null;
   });
-  const isDev = process.env.NODE_ENV === "development" || !electron.app.isPackaged;
+  const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
   if (isDev) {
     const urlDev = process.env.VITE_DEV_SERVER_URL || "http://localhost:5173";
     log.info(`Carregando URL de desenvolvimento: ${urlDev}`);
     janelaPrincipal.loadURL(urlDev);
   } else {
-    const caminhoProducao = path.join(__dirname, "../dist/index.html");
+    const caminhoProducao = join(__dirname$1, "../dist/index.html");
     log.info(`Carregando arquivo de produção: ${caminhoProducao}`);
     janelaPrincipal.loadFile(caminhoProducao);
   }
   janelaPrincipal.webContents.setWindowOpenHandler(({ url }) => {
-    electron.shell.openExternal(url);
+    shell.openExternal(url);
     return { action: "deny" };
   });
 }
-electron.app.whenReady().then(() => {
+app.whenReady().then(() => {
   log.info("App está pronto");
   criarMenu();
   criarJanela();
-  electron.app.on("activate", () => {
-    if (electron.BrowserWindow.getAllWindows().length === 0) {
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
       criarJanela();
     }
   });
 });
-electron.app.on("window-all-closed", () => {
+app.on("window-all-closed", () => {
   log.info("Todas as janelas foram fechadas");
   if (process.platform !== "darwin") {
-    electron.app.quit();
+    app.quit();
   }
 });
-electron.app.on("before-quit", () => {
+app.on("before-quit", () => {
   log.info("Aplicação encerrando");
 });
