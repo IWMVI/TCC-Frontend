@@ -1,0 +1,1 @@
+export { Alugueis } from './Alugueis';
