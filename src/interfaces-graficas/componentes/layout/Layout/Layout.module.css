@@ -130,32 +130,52 @@
 }
 
 @media (min-width: 768px) {
-  .layout {
-    flex-direction: row;
-  }
-
-  .layout__sidebar {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 250px;
-    height: 100vh;
-    flex-shrink: 0;
-  }
-
-  .layout__principal {
-    width: calc(100% - 250px);
-  }
-
-  .layout__header {
-    display: none;
-  }
-
-  .layout__overlay {
-    display: none;
-  }
-
   .layout__conteudo {
     padding: 2rem;
   }
+}
+
+.menu {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  flex-wrap: wrap;
+}
+
+.menuCard {
+  flex: 1;
+  min-width: 160px;
+  height: 110px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  text-decoration: none;
+  color: var(--foreground);
+
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.menuCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.icon {
+  font-size: 1.8rem;
+}
+
+/* estado ativo */
+.ativo {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
