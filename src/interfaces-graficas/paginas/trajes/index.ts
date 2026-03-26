@@ -1,0 +1,1 @@
+export { Trajes } from './Trajes';
