@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { FormularioCliente } from '../../componentes';
-import {
-  BuscarClientePorIdUseCase,
-  AtualizarClienteUseCase,
-} from '../../../../../application/clientes';
-import { ClienteApiRepositorio } from '../../../../../infrastructure/api';
-import { ClienteRequest } from '../../../../../domain/entidades';
-import { mascararCpfCnpj, mascararCelular, mascararCep } from '../../../../utils/formatacoes';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {FormularioCliente} from '../../componentes';
+import {AtualizarClienteUseCase, BuscarClientePorIdUseCase,} from '../../../../../application/clientes';
+import {ClienteApiRepositorio} from '../../../../../infrastructure/api';
+import {ClienteRequest,} from '../../../../../domain/entidades';
+import {mascararCelular, mascararCep, mascararCpfCnpj} from '../../../../utils/formatacoes';
 import styles from './EditarCliente.module.css';
 
 const clienteRepositorio = new ClienteApiRepositorio();
@@ -16,21 +13,55 @@ const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepositorio);
 
 export function EditarCliente() {
   const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
   const [estaEnviando, setEstaEnviando] = useState(false);
   const [estaCarregando, setEstaCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
-  const [initialData, setInitialData] = useState<Partial<ClienteRequest>>();
+    const [initialData, setInitialData] = useState<
+        Partial<ClienteRequest> & { medidas?: Record<string, number>; medidaId?: number }
+    >();
 
   useEffect(() => {
     async function carregarCliente() {
       if (!id) return;
       try {
         const cliente = await buscarClienteUseCase.executar(parseInt(id, 10));
+          const medidas = await clienteRepositorio.buscarMedidas(parseInt(id, 10));
+
+          let medidasFormatadas: Record<string, number> = {};
+          let medidaId: number | undefined;
+          if (medidas) {
+              const medida = medidas;
+              medidaId = medida.id;
+              if ('cintura' in medida) {
+                  medidasFormatadas = {
+                      cintura: Math.round(medida.cintura * 100),
+                      manga: Math.round(medida.manga * 100),
+                      ...('alturaBusto' in medida && {
+                          alturaBusto: Math.round(medida.alturaBusto * 100),
+                          raioBusto: Math.round(medida.raioBusto * 100),
+                          corpo: Math.round(medida.corpo * 100),
+                          ombro: Math.round(medida.ombro * 100),
+                          decote: Math.round(medida.decote * 100),
+                          quadril: Math.round(medida.quadril * 100),
+                          comprimentoVestido: Math.round(medida.comprimentoVestido * 100),
+                      }),
+                      ...('colarinho' in medida && {
+                          colarinho: Math.round(medida.colarinho * 100),
+                          barra: Math.round(medida.barra * 100),
+                          torax: Math.round(medida.torax * 100),
+                      }),
+                  };
+              }
+          }
+
         setInitialData({
           nome: cliente.nome,
           cpfCnpj: mascararCpfCnpj(cliente.cpfCnpj),
           email: cliente.email,
           celular: mascararCelular(cliente.celular),
+            sexo:
+                cliente.sexo === 'MASCULINO' || cliente.sexo === 'FEMININO' ? cliente.sexo : undefined,
           endereco: {
             cep: mascararCep(cliente.endereco.cep),
             logradouro: cliente.endereco.logradouro,
@@ -40,6 +71,8 @@ export function EditarCliente() {
             estado: cliente.endereco.estado,
             complemento: cliente.endereco.complemento || '',
           },
+            medidas: medidasFormatadas,
+            medidaId,
         });
       } catch {
         setErro('Cliente não encontrado');
@@ -50,13 +83,14 @@ export function EditarCliente() {
     carregarCliente();
   }, [id]);
 
-  async function handleSubmit(dados: ClienteRequest) {
+    async function handleSubmit(dados: ClienteRequest): Promise<void> {
     if (!id) return;
     setErro(null);
     setEstaEnviando(true);
 
     try {
       await atualizarClienteUseCase.executar(parseInt(id, 10), dados);
+        navigate('/clientes/listar');
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao atualizar cliente');
     } finally {
@@ -75,11 +109,11 @@ export function EditarCliente() {
   return (
     <FormularioCliente
       titulo="Editar Cliente"
-      descricao="Atualize os dados do cliente"
       initialData={initialData}
       estaEnviando={estaEnviando}
       erro={erro}
       onSubmit={handleSubmit}
+      clienteId={id ? parseInt(id, 10) : undefined}
     />
   );
 }

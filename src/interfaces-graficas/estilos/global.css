@@ -137,6 +137,10 @@
   }
 }
 
-html {
+html,
+body,
+#root {
+    height: 100%;
+    overflow: hidden;
   font-size: var(--font-size);
 }

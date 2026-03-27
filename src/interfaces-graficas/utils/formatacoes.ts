@@ -1,22 +1,22 @@
 export function mascararCpfCnpj(valor: string): string {
-  const numeros = valor.replace(/\D/g, '');
-  
+  const numeros = valor.replace(/\D/g, '').slice(0, 14);
+
   if (numeros.length <= 11) {
     return numeros
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        .replaceAll(/^(\d{3})(\d)/, '$1.$2')
+        .replaceAll(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
   }
-  
+
   return numeros
-    .replace(/(\d{2})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1/$2')
-    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+      .replaceAll(/^(\d{2})(\d)/, '$1.$2')
+      .replaceAll(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replaceAll(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
+      .replaceAll(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d{1,2})$/, '$1.$2.$3/$4-$5');
 }
 
 export function mascararCelular(valor: string): string {
-  const numeros = valor.replace(/\D/g, '');
+  const numeros = valor.replaceAll(/\D/g, '');
   return numeros
     .replace(/(\d{2})(\d)/, '($1) $2')
     .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
@@ -39,7 +39,7 @@ export function mascararTelefone(valor: string): string {
 }
 
 export function removerFormatacao(valor: string): string {
-  return valor.replace(/\D/g, '');
+  return valor.replaceAll(/\D/g, '');
 }
 
 export function formatarData(data: string): string {
