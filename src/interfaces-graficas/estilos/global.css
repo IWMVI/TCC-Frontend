@@ -1,44 +1,32 @@
-/* ================= DARK VARIANT ================= */
-@custom-variant dark (&:is(.dark *));
-
-/* ================= CÓDIGO 2 (INALTERADO) ================= */
 :root {
-  /* Base neutra (igual ao estilo do Código 1) */
-  --cor-primaria: #030213;          /* quase preto */
-  --cor-secundaria: #2a2a30;        /* cinza escuro */
-  --cor-acento: #e9ebef;            /* cinza claro (accent suave) */
+  --font-size: 16px;
 
-  /* Estados (seguindo o padrão do Código 1) */
-  --cor-sucesso: #22c55e;           /* verde moderno */
-  --cor-erro: #d4183d;              /* igual ao destructive do código 1 */
-  --cor-info: #3b82f6;              /* azul limpo moderno */
+  /* Colors */
+  --cor-primaria: #030213;
+  --cor-secundaria: #2a2a30;
+  --cor-acento: #e9ebef;
 
-  /* Fundo e texto */
+  --cor-sucesso: #22c55e;
+  --cor-erro: #d4183d;
+  --cor-info: #3b82f6;
+
   --cor-fundo: #ffffff;
   --cor-borda: rgba(0, 0, 0, 0.1);
 
-  --cor-texto: #030213;             /* igual ao foreground */
-  --cor-texto-secundario: #717182;  /* muted-foreground */
+  --cor-texto: #030213;
+  --cor-texto-secundario: #717182;
 
-  /* Sombras (mais suaves, estilo moderno) */
   --sombra: 0 1px 2px rgba(0, 0, 0, 0.05);
   --sombra-lg: 0 8px 20px rgba(0, 0, 0, 0.08);
 
-  /* Borda */
   --raio-borda: 0.625rem;
 
-  /* Breakpoints mantidos */
   --ponto-interrupcao-sm: 576px;
   --ponto-interrupcao-md: 768px;
   --ponto-interrupcao-lg: 992px;
   --ponto-interrupcao-xl: 1200px;
-}
 
-/* ================= CÓDIGO 1 (MAPEADO PARA O 2) ================= */
-:root {
-  --font-size: 16px;
-
-  /* MAPEAMENTO DIRETO */
+  /* Mapeamento para variáveisshadcn */
   --background: var(--cor-fundo);
   --foreground: var(--cor-texto);
 
@@ -72,16 +60,13 @@
 
   --radius: var(--raio-borda);
 
-  /* sombras vindas do código 2 */
   --shadow-sm: var(--sombra);
   --shadow-lg: var(--sombra-lg);
 
-  /* sidebar */
   --sidebar: #ffffff;
   --sidebar-foreground: var(--cor-texto);
 }
 
-/* ================= DARK MODE ================= */
 .dark {
   --background: #121212;
   --foreground: #ffffff;
@@ -102,45 +87,22 @@
   --sidebar-foreground: #ffffff;
 }
 
-/* ================= THEME ================= */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-
-  --color-destructive: var(--destructive);
-
-  --color-border: var(--border);
-
-  --shadow-sm: var(--shadow-sm);
-  --shadow-lg: var(--shadow-lg);
-
-  --radius-lg: var(--radius);
+* {
+  box-sizing: border-box;
 }
 
-/* ================= BASE ================= */
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    box-sizing: border-box;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.5;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
 }
 
 html,
 body,
 #root {
-    height: 100%;
-    overflow: hidden;
+  height: 100%;
+  overflow: hidden;
   font-size: var(--font-size);
 }
