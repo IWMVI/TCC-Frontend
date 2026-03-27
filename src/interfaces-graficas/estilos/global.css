@@ -1,62 +1,108 @@
 :root {
-  --cor-primaria: #1e3a5f;
-  --cor-secundaria: #2d5a87;
-  --cor-acento: #e8a838;
-  --cor-sucesso: #28a745;
-  --cor-erro: #dc3545;
-  --cor-info: #17a2b8;
-  --cor-fundo: #f8f9fa;
-  --cor-borda: #dee2e6;
-  --cor-texto: #212529;
-  --cor-texto-secundario: #6c757d;
-  --sombra: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --sombra-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --raio-borda: 0.5rem;
+  --font-size: 16px;
+
+  /* Colors */
+  --cor-primaria: #030213;
+  --cor-secundaria: #2a2a30;
+  --cor-acento: #e9ebef;
+
+  --cor-sucesso: #22c55e;
+  --cor-erro: #d4183d;
+  --cor-info: #3b82f6;
+
+  --cor-fundo: #ffffff;
+  --cor-borda: rgba(0, 0, 0, 0.1);
+
+  --cor-texto: #030213;
+  --cor-texto-secundario: #717182;
+
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sombra-lg: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+  --raio-borda: 0.625rem;
 
   --ponto-interrupcao-sm: 576px;
   --ponto-interrupcao-md: 768px;
   --ponto-interrupcao-lg: 992px;
   --ponto-interrupcao-xl: 1200px;
+
+  /* Mapeamento para variáveisshadcn */
+  --background: var(--cor-fundo);
+  --foreground: var(--cor-texto);
+
+  --card: #ffffff;
+  --card-foreground: var(--cor-texto);
+
+  --popover: #ffffff;
+  --popover-foreground: var(--cor-texto);
+
+  --primary: var(--cor-primaria);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--cor-secundaria);
+  --secondary-foreground: #ffffff;
+
+  --accent: var(--cor-acento);
+  --accent-foreground: #000000;
+
+  --destructive: var(--cor-erro);
+  --destructive-foreground: #ffffff;
+
+  --muted: #ececf0;
+  --muted-foreground: var(--cor-texto-secundario);
+
+  --border: var(--cor-borda);
+
+  --input: transparent;
+  --input-background: #f3f3f5;
+
+  --ring: var(--cor-acento);
+
+  --radius: var(--raio-borda);
+
+  --shadow-sm: var(--sombra);
+  --shadow-lg: var(--sombra-lg);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--cor-texto);
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #ffffff;
+
+  --card: #1e1e1e;
+  --card-foreground: #ffffff;
+
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+
+  --secondary: #2d5a87;
+
+  --border: #333;
+
+  --muted-foreground: #aaa;
+
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #ffffff;
 }
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
+  background-color: var(--background);
+  color: var(--foreground);
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: var(--cor-fundo);
-  color: var(--cor-texto);
   line-height: 1.5;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-}
-
-input,
-select,
-textarea {
-  font-family: inherit;
-}
-
-@media (min-width: 768px) {
-  body {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 767px) {
-  body {
-    font-size: 14px;
-  }
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+  font-size: var(--font-size);
 }

@@ -1,56 +1,49 @@
-import { Card } from '../../../componentes';
+import {ClipboardList, Shirt, Users} from 'lucide-react';
+import {CardNavegacao} from '../../../componentes/base/CardNavegacao';
 import styles from './Dashboard.module.css';
+
+const ITENS_NAVEGACAO = [
+    {
+        rota: '/clientes',
+        titulo: 'Clientes',
+        descricao: 'Visualizar e cadastrar clientes',
+        icone: <Users size={40} strokeWidth={1.5} aria-hidden="true"/>,
+    },
+    {
+        rota: '/trajes',
+        titulo: 'Trajes',
+        descricao: 'Controle o estoque de trajes',
+        icone: <Shirt size={40} strokeWidth={1.5} aria-hidden="true"/>,
+    },
+    {
+        rota: '/alugueis',
+        titulo: 'Aluguéis',
+        descricao: 'Gerencie os contratos e devoluções',
+        icone: <ClipboardList size={40} strokeWidth={1.5} aria-hidden="true"/>,
+    },
+] as const;
 
 export function Dashboard() {
   return (
     <div className={styles.dashboard}>
-      <header className={styles.dashboard__header}>
-        <h1>Dashboard</h1>
-        <p>Bem-vindo ao sistema de locação de trajes a rigor</p>
-      </header>
+        <section className={styles.dashboard__boas_vindas}>
+            <h1 className={styles.dashboard__titulo}>Bem-vindo(a), Funcionário!</h1>
+            <p className={styles.dashboard__subtitulo}>
+                Gerencie os trajes, cadastros de clientes e aluguéis de forma prática.
+            </p>
+        </section>
 
-      <div className={styles.dashboard__cards}>
-        <Card titulo="Clientes" className={styles['dashboard__card']}>
-          <div className={styles['dashboard__card-content']}>
-            <span className={styles['dashboard__numero']}>0</span>
-            <span className={styles['dashboard__label']}>Total de clientes</span>
-          </div>
-        </Card>
-
-        <Card titulo="Trajes" className={styles['dashboard__card']}>
-          <div className={styles['dashboard__card-content']}>
-            <span className={styles['dashboard__numero']}>0</span>
-            <span className={styles['dashboard__label']}>Trajes disponíveis</span>
-          </div>
-        </Card>
-
-        <Card titulo="Aluguéis" className={styles['dashboard__card']}>
-          <div className={styles['dashboard__card-content']}>
-            <span className={styles['dashboard__numero']}>0</span>
-            <span className={styles['dashboard__label']}>Aluguéis ativos</span>
-          </div>
-        </Card>
-
-        <Card titulo="Receita" className={styles['dashboard__card']}>
-          <div className={styles['dashboard__card-content']}>
-            <span className={styles['dashboard__numero']}>R$ 0,00</span>
-            <span className={styles['dashboard__label']}>Receita do mês</span>
-          </div>
-        </Card>
-      </div>
-
-      <div className={styles.dashboard__info}>
-        <Card titulo="Sobre o Sistema">
-          <p>
-            O <strong>TCC</strong> é um sistema de gestão de locação de trajes a rigor, desenvolvido
-            como projeto de Trabalho de Conclusão de Curso (TCC) da FATEC.
-          </p>
-          <p>
-            Este aplicativo permite gerenciar clientes, trajes e aluguéis de forma eficiente e
-            organizada.
-          </p>
-        </Card>
-      </div>
+        <section className={styles.dashboard__cards} aria-label="Módulos do sistema">
+            {ITENS_NAVEGACAO.map((item) => (
+                <CardNavegacao
+                    key={item.rota}
+                    rota={item.rota}
+                    titulo={item.titulo}
+                    descricao={item.descricao}
+                    icone={item.icone}
+                />
+            ))}
+        </section>
     </div>
   );
 }

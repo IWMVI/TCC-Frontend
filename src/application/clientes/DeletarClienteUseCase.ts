@@ -1,8 +1,8 @@
-import { IClienteRepositorio } from '../../domain/interfaces';
+import { IClienteRepository } from '../../domain/interfaces';
 import { RecursoNaoEncontrado } from '../../domain/erros';
 
 export class DeletarClienteUseCase {
-  constructor(private readonly clienteRepositorio: IClienteRepositorio) {}
+  constructor(private readonly clienteRepositorio: IClienteRepository) {}
 
   async executar(id: number): Promise<void> {
     try {

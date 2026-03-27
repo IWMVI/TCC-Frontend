@@ -53,6 +53,7 @@ export interface ClienteRequest {
   cpfCnpj: string;
   email: string;
   celular: string;
+  sexo?: 'MASCULINO' | 'FEMININO' | 'NEUTRO';
   endereco: {
     cep: string;
     logradouro: string;
@@ -70,6 +71,53 @@ export interface ClienteResponse {
   cpfCnpj: string;
   email: string;
   celular: string;
+    sexo?: string;
   endereco: Endereco;
   dataCadastro: string;
+}
+
+export interface MedidaFemininaRequest {
+    clienteId: number;
+    cintura: number;
+    manga: number;
+    alturaBusto: number;
+    raioBusto: number;
+    corpo: number;
+    ombro: number;
+    decote: number;
+    quadril: number;
+    comprimentoVestido: number;
+}
+
+export interface MedidaMasculinaRequest {
+    clienteId: number;
+    cintura: number;
+    manga: number;
+    colarinho: number;
+    barra: number;
+    torax: number;
+}
+
+export interface MedidaFemininaResponse {
+    id: number;
+    clienteId: number;
+    cintura: number;
+    manga: number;
+    alturaBusto: number;
+    raioBusto: number;
+    corpo: number;
+    ombro: number;
+    decote: number;
+    quadril: number;
+    comprimentoVestido: number;
+}
+
+export interface MedidaMasculinaResponse {
+    id: number;
+    clienteId: number;
+    cintura: number;
+    manga: number;
+    colarinho: number;
+    barra: number;
+    torax: number;
 }
