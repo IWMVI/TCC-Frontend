@@ -15,8 +15,8 @@ export interface IClienteRepositorio {
   deletar(id: number): Promise<void>;
 
   buscarMedidas(
-      clienteId: number
-  ): Promise<MedidaFemininaResponse | MedidaMasculinaResponse | null>;
+    clienteId: number
+  ): Promise<MedidaFemininaResponse[] | MedidaMasculinaResponse[] | null>;
 
   atualizarMedidasFeminina(dados: MedidaFemininaRequest, id: number): Promise<void>;
 

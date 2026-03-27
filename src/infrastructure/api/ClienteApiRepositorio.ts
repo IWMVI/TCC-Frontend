@@ -1,5 +1,5 @@
 import axios, {AxiosError, AxiosInstance} from 'axios';
-import {IClienteRepositorio} from '../../domain/interfaces';
+import {IClienteRepositorio} from '@domain/interfaces';
 import {
     ClienteRequest,
     ClienteResponse,
@@ -7,77 +7,77 @@ import {
     MedidaFemininaResponse,
     MedidaMasculinaRequest,
     MedidaMasculinaResponse,
-} from '../../domain/entidades';
-import {FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado} from '../../domain/erros';
+} from '@domain/entidades';
+import {FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado} from '@domain/erros';
 
 const API_BASE_URL = 'http://localhost:8080';
 
 export class ClienteApiRepositorio implements IClienteRepositorio {
-  private readonly clienteApi: AxiosInstance;
+    private readonly clienteApi: AxiosInstance;
 
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.clienteApi = axios.create({
-      baseURL: baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 10000,
-    });
-  }
-
-  async listar(busca?: string): Promise<ClienteResponse[]> {
-    try {
-      const params = busca ? { busca } : undefined;
-      const resposta = await this.clienteApi.get<ClienteResponse[]>('/clientes', { params });
-      return resposta.data;
-    } catch (error_) {
-        this.tratarErro(error_, 'Erro ao listar clientes');
+    constructor(baseUrl: string = API_BASE_URL) {
+        this.clienteApi = axios.create({
+            baseURL: baseUrl,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+        });
     }
-  }
 
-  async buscarPorId(id: number): Promise<ClienteResponse> {
-    try {
-      const resposta = await this.clienteApi.get<ClienteResponse>(`/clientes/${id}`);
-      return resposta.data;
-    } catch (error_) {
-        if (error_ instanceof AxiosError && error_.response?.status === 404) {
-            throw new RecursoNaoEncontrado('Cliente', id);
+    async listar(busca?: string): Promise<ClienteResponse[]> {
+        try {
+            const params = busca ? {busca} : undefined;
+            const resposta = await this.clienteApi.get<ClienteResponse[]>('/clientes', {params});
+            return resposta.data;
+        } catch (error_) {
+            this.tratarErro(error_, 'Erro ao listar clientes');
         }
-        this.tratarErro(error_, 'Erro ao buscar cliente');
     }
-  }
 
-  async criar(dados: ClienteRequest): Promise<ClienteResponse> {
-    try {
-      const resposta = await this.clienteApi.post<ClienteResponse>('/clientes', dados);
-      return resposta.data;
-    } catch (error_) {
-        this.tratarErro(error_, 'Erro ao criar cliente');
-    }
-  }
-
-  async atualizar(id: number, dados: ClienteRequest): Promise<ClienteResponse> {
-    try {
-      const resposta = await this.clienteApi.put<ClienteResponse>(`/clientes/${id}`, dados);
-      return resposta.data;
-    } catch (error_) {
-        if (error_ instanceof AxiosError && error_.response?.status === 404) {
-            throw new RecursoNaoEncontrado('Cliente', id);
+    async buscarPorId(id: number): Promise<ClienteResponse> {
+        try {
+            const resposta = await this.clienteApi.get<ClienteResponse>(`/clientes/${id}`);
+            return resposta.data;
+        } catch (error_) {
+            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+                throw new RecursoNaoEncontrado('Cliente', id);
+            }
+            this.tratarErro(error_, 'Erro ao buscar cliente');
         }
-        this.tratarErro(error_, 'Erro ao atualizar cliente');
     }
-  }
 
-  async deletar(id: number): Promise<void> {
-    try {
-      await this.clienteApi.delete(`/clientes/${id}`);
-    } catch (error_) {
-        if (error_ instanceof AxiosError && error_.response?.status === 404) {
-            throw new RecursoNaoEncontrado('Cliente', id);
+    async criar(dados: ClienteRequest): Promise<ClienteResponse> {
+        try {
+            const resposta = await this.clienteApi.post<ClienteResponse>('/clientes', dados);
+            return resposta.data;
+        } catch (error_) {
+            this.tratarErro(error_, 'Erro ao criar cliente');
         }
-        this.tratarErro(error_, 'Erro ao deletar cliente');
     }
-  }
+
+    async atualizar(id: number, dados: ClienteRequest): Promise<ClienteResponse> {
+        try {
+            const resposta = await this.clienteApi.put<ClienteResponse>(`/clientes/${id}`, dados);
+            return resposta.data;
+        } catch (error_) {
+            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+                throw new RecursoNaoEncontrado('Cliente', id);
+            }
+            this.tratarErro(error_, 'Erro ao atualizar cliente');
+        }
+    }
+
+    async deletar(id: number): Promise<void> {
+        try {
+            await this.clienteApi.delete(`/clientes/${id}`);
+        } catch (error_) {
+            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+                throw new RecursoNaoEncontrado('Cliente', id);
+            }
+            this.tratarErro(error_, 'Erro ao deletar cliente');
+        }
+    }
 
     async criarMedidaFeminina(dados: MedidaFemininaRequest): Promise<void> {
         try {
@@ -97,21 +97,16 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
 
     async buscarMedidas(
         clienteId: number
-    ): Promise<MedidaFemininaResponse | MedidaMasculinaResponse | null> {
+    ): Promise<MedidaFemininaResponse[] | MedidaMasculinaResponse[] | null> {
         try {
             const resposta = await this.clienteApi.get<
-                MedidaFemininaResponse | MedidaMasculinaResponse[]
+                MedidaFemininaResponse[] | MedidaMasculinaResponse[]
             >('/medidas', {params: {clienteId}});
-            const data = resposta.data;
-            if (Array.isArray(data) && data.length > 0) {
-                return data[0];
-            }
-            if (!Array.isArray(data)) {
-                return data;
-            }
-            return null;
+
+            return resposta.data;
         } catch (error_) {
             this.tratarErro(error_, 'Erro ao buscar medidas');
+            return null;
         }
     }
 
@@ -131,14 +126,14 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         }
     }
 
-  private tratarErro(erro: unknown, mensagemPadrao: string): never {
-    if (erro instanceof AxiosError) {
-      if (!erro.response) {
-        throw new FalhaConexao();
-      }
-      const detalhes = erro.response.data?.message || erro.message;
-      throw new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, erro.response.status);
+    private tratarErro(erro: unknown, mensagemPadrao: string): never {
+        if (erro instanceof AxiosError) {
+            if (!erro.response) {
+                throw new FalhaConexao();
+            }
+            const detalhes = erro.response.data?.message || erro.message;
+            throw new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, erro.response.status);
+        }
+        throw new FalhaRequisicao(mensagemPadrao);
     }
-    throw new FalhaRequisicao(mensagemPadrao);
-  }
 }
