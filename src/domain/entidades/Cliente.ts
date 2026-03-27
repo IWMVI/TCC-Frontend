@@ -53,7 +53,7 @@ export interface ClienteRequest {
   cpfCnpj: string;
   email: string;
   celular: string;
-    sexo?: 'MASCULINO' | 'FEMININO';
+  sexo?: 'MASCULINO' | 'FEMININO' | 'NEUTRO';
   endereco: {
     cep: string;
     logradouro: string;

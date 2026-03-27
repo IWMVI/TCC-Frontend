@@ -2,49 +2,17 @@ import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {FormularioCliente} from '../../componentes';
 import {AtualizarClienteUseCase, BuscarClientePorIdUseCase} from '@application/clientes';
-import {ClienteApiRepositorio} from '@infrastructure/api';
-import {ClienteRequest, Endereco, MedidaFemininaResponse, MedidaMasculinaResponse,} from '@domain/entidades';
+import {ClienteApiRepository} from '@infrastructure/api';
+import {ClienteRequest, Endereco, MedidaFemininaResponse, MedidaMasculinaResponse} from '@domain/entidades';
 import {mascararCelular, mascararCep, mascararCpfCnpj} from '../../../../utils/formatacoes';
 import styles from './EditarCliente.module.css';
 
-const clienteRepositorio = new ClienteApiRepositorio();
+const clienteRepositorio = new ClienteApiRepository();
 const buscarClienteUseCase = new BuscarClientePorIdUseCase(clienteRepositorio);
 const atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepositorio);
 
-function formatarMedidas(medida: MedidaFemininaResponse | MedidaMasculinaResponse): {
-    medidas: Record<string, number>;
-    medidaId: number;
-} {
-    const medidasFormatadas: Record<string, number> = {
-        cintura: Math.round(medida.cintura * 100),
-        manga: Math.round(medida.manga * 100),
-    };
-
-    if ('alturaBusto' in medida) {
-        Object.assign(medidasFormatadas, {
-            alturaBusto: Math.round(medida.alturaBusto * 100),
-            raioBusto: Math.round(medida.raioBusto * 100),
-            corpo: Math.round(medida.corpo * 100),
-            ombro: Math.round(medida.ombro * 100),
-            decote: Math.round(medida.decote * 100),
-            quadril: Math.round(medida.quadril * 100),
-            comprimentoVestido: Math.round(medida.comprimentoVestido * 100),
-        });
-    }
-
-    if ('colarinho' in medida) {
-        Object.assign(medidasFormatadas, {
-            colarinho: Math.round(medida.colarinho * 100),
-            barra: Math.round(medida.barra * 100),
-            torax: Math.round(medida.torax * 100),
-        });
-    }
-
-    return {medidas: medidasFormatadas, medidaId: medida.id};
-}
-
-function normalizarSexo(sexo?: string): 'MASCULINO' | 'FEMININO' | undefined {
-    return sexo === 'MASCULINO' || sexo === 'FEMININO' ? sexo : undefined;
+function normalizarSexo(sexo?: string): 'MASCULINO' | 'FEMININO' | 'NEUTRO' | undefined {
+    return sexo === 'MASCULINO' || sexo === 'FEMININO' || sexo === 'NEUTRO' ? sexo : undefined;
 }
 
 function formatarEndereco(endereco: Endereco) {
@@ -62,9 +30,42 @@ function formatarEndereco(endereco: Endereco) {
 function buscarDadosMedidas(medidas: MedidaFemininaResponse[] | MedidaMasculinaResponse[] | null) {
     if (!medidas || medidas.length === 0)
         return {medidas: {} as Record<string, number>, medidaId: undefined};
-    const primeiro = medidas[0];
-    const resultado = formatarMedidas(primeiro);
-    return {medidas: resultado.medidas, medidaId: resultado.medidaId};
+    
+    const medidasFormatadas: Record<string, number> = {};
+    let medidaId: number | undefined;
+
+    // Para pessoa jurídica, podemos ter múltiplas medidas (feminina e masculina)
+    // Precisamos mesclar todas as medidas
+    medidas.forEach((medida, index) => {
+        // Adiciona cintura e manga (comuns a ambos)
+        medidasFormatadas.cintura = Math.round(medida.cintura * 100);
+        medidasFormatadas.manga = Math.round(medida.manga * 100);
+
+        // Adiciona campos femininos se existirem
+        if ('alturaBusto' in medida) {
+            medidasFormatadas.alturaBusto = Math.round(medida.alturaBusto * 100);
+            medidasFormatadas.raioBusto = Math.round(medida.raioBusto * 100);
+            medidasFormatadas.corpo = Math.round(medida.corpo * 100);
+            medidasFormatadas.ombro = Math.round(medida.ombro * 100);
+            medidasFormatadas.decote = Math.round(medida.decote * 100);
+            medidasFormatadas.quadril = Math.round(medida.quadril * 100);
+            medidasFormatadas.comprimentoVestido = Math.round(medida.comprimentoVestido * 100);
+        }
+
+        // Adiciona campos masculinos se existirem
+        if ('colarinho' in medida) {
+            medidasFormatadas.colarinho = Math.round(medida.colarinho * 100);
+            medidasFormatadas.barra = Math.round(medida.barra * 100);
+            medidasFormatadas.torax = Math.round(medida.torax * 100);
+        }
+
+        // Usa o ID da primeira medida como referência
+        if (index === 0) {
+            medidaId = medida.id;
+        }
+    });
+
+    return {medidas: medidasFormatadas, medidaId};
 }
 
 export function EditarCliente() {

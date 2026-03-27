@@ -1,5 +1,5 @@
-import axios, {AxiosError, AxiosInstance} from 'axios';
-import {IClienteRepositorio} from '@domain/interfaces';
+import axios, {AxiosInstance} from 'axios';
+import {IClienteRepository} from '@domain/interfaces';
 import {
     ClienteRequest,
     ClienteResponse,
@@ -12,7 +12,18 @@ import {FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado} from '@domain/erros
 
 const API_BASE_URL = 'http://localhost:8080';
 
-export class ClienteApiRepositorio implements IClienteRepositorio {
+export interface PaginacaoResultado<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+}
+
+export class ClienteApiRepository implements IClienteRepository {
     private readonly clienteApi: AxiosInstance;
 
     constructor(baseUrl: string = API_BASE_URL) {
@@ -25,13 +36,33 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         });
     }
 
-    async listar(busca?: string): Promise<ClienteResponse[]> {
+    async listar(
+        busca?: string,
+        pagina?: number,
+        tamanho?: number
+    ): Promise<PaginacaoResultado<ClienteResponse>> {
         try {
-            const params = busca ? {busca} : undefined;
-            const resposta = await this.clienteApi.get<ClienteResponse[]>('/clientes', {params});
+            const params: Record<string, string | number> = {};
+            if (busca) params.busca = busca;
+            if (pagina !== undefined) params.pagina = pagina;
+            if (tamanho !== undefined) params.tamanho = tamanho;
+
+            const resposta = await this.clienteApi.get<PaginacaoResultado<ClienteResponse>>(
+                '/clientes',
+                {params}
+            );
             return resposta.data;
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao listar clientes');
+            throw this.criarErro(error_, 'Erro ao listar clientes');
+        }
+    }
+
+    async listarTodos(): Promise<ClienteResponse[]> {
+        try {
+            const resposta = await this.clienteApi.get<ClienteResponse[]>('/clientes/todos');
+            return resposta.data;
+        } catch (error_) {
+            throw this.criarErro(error_, 'Erro ao listar clientes');
         }
     }
 
@@ -40,10 +71,10 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
             const resposta = await this.clienteApi.get<ClienteResponse>(`/clientes/${id}`);
             return resposta.data;
         } catch (error_) {
-            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
-            this.tratarErro(error_, 'Erro ao buscar cliente');
+            throw this.criarErro(error_, 'Erro ao buscar cliente');
         }
     }
 
@@ -52,7 +83,7 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
             const resposta = await this.clienteApi.post<ClienteResponse>('/clientes', dados);
             return resposta.data;
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao criar cliente');
+            throw this.criarErro(error_, 'Erro ao criar cliente');
         }
     }
 
@@ -61,10 +92,10 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
             const resposta = await this.clienteApi.put<ClienteResponse>(`/clientes/${id}`, dados);
             return resposta.data;
         } catch (error_) {
-            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
-            this.tratarErro(error_, 'Erro ao atualizar cliente');
+            throw this.criarErro(error_, 'Erro ao atualizar cliente');
         }
     }
 
@@ -72,10 +103,10 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         try {
             await this.clienteApi.delete(`/clientes/${id}`);
         } catch (error_) {
-            if (error_ instanceof AxiosError && error_.response?.status === 404) {
+            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
-            this.tratarErro(error_, 'Erro ao deletar cliente');
+            throw this.criarErro(error_, 'Erro ao deletar cliente');
         }
     }
 
@@ -83,7 +114,7 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         try {
             await this.clienteApi.post('/medidas/feminina', dados);
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao salvar medidas femininas');
+            throw this.criarErro(error_, 'Erro ao salvar medidas femininas');
         }
     }
 
@@ -91,7 +122,7 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         try {
             await this.clienteApi.post('/medidas/masculina', dados);
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao salvar medidas masculinas');
+            throw this.criarErro(error_, 'Erro ao salvar medidas masculinas');
         }
     }
 
@@ -105,8 +136,7 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
 
             return resposta.data;
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao buscar medidas');
-            return null;
+            throw this.criarErro(error_, 'Erro ao buscar medidas');
         }
     }
 
@@ -114,7 +144,7 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         try {
             await this.clienteApi.put(`/medidas/feminina/${id}`, dados);
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao atualizar medidas femininas');
+            throw this.criarErro(error_, 'Erro ao atualizar medidas femininas');
         }
     }
 
@@ -122,18 +152,18 @@ export class ClienteApiRepositorio implements IClienteRepositorio {
         try {
             await this.clienteApi.put(`/medidas/masculina/${id}`, dados);
         } catch (error_) {
-            this.tratarErro(error_, 'Erro ao atualizar medidas masculinas');
+            throw this.criarErro(error_, 'Erro ao atualizar medidas masculinas');
         }
     }
 
-    private tratarErro(erro: unknown, mensagemPadrao: string): never {
-        if (erro instanceof AxiosError) {
-            if (!erro.response) {
-                throw new FalhaConexao();
+    private criarErro(erro: unknown, mensagemPadrao: string): Error {
+        if ((erro as any)?.isAxiosError) {
+            if (!(erro as any).response) {
+                return new FalhaConexao(mensagemPadrao);
             }
-            const detalhes = erro.response.data?.message || erro.message;
-            throw new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, erro.response.status);
+            const detalhes = (erro as any).response.data?.message || (erro as any).message;
+            return new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, (erro as any).response.status);
         }
-        throw new FalhaRequisicao(mensagemPadrao);
+        return new FalhaRequisicao(mensagemPadrao);
     }
 }

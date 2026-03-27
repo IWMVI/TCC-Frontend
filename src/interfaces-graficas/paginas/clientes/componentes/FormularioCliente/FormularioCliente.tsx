@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Botao } from '../../../../componentes/base/Botao';
 import { ClienteRequest, SiglaEstado } from '../../../../../domain/entidades';
-import { ClienteApiRepositorio } from '../../../../../infrastructure/api';
+import { ClienteApiRepository } from '../../../../../infrastructure/api';
 import {
   mascararCelular,
   mascararCep,
@@ -11,7 +11,7 @@ import {
 } from '../../../../utils/formatacoes';
 import styles from './FormularioCliente.module.css';
 
-const medidaApi = new ClienteApiRepositorio();
+const medidaApi = new ClienteApiRepository();
 
 type Sexo = 'masculino' | 'feminino';
 type TipoPessoa = 'fisica' | 'juridica';
@@ -78,7 +78,7 @@ interface Erros {
 interface FormularioClienteProps {
   titulo: string;
   initialData?: Partial<ClienteRequest> & {
-    sexo?: 'MASCULINO' | 'FEMININO';
+    sexo?: 'MASCULINO' | 'FEMININO' | 'NEUTRO';
     medidas?: Record<string, number>;
     medidaId?: number;
   };
@@ -103,7 +103,7 @@ export function FormularioCliente({
       ? 'masculino'
       : initialData?.sexo === 'FEMININO'
         ? 'feminino'
-        : 'feminino'
+        : 'feminino' // NEUTRO ou undefined -> feminino como default
   );
   const [tipoPessoa, setTipoPessoa] = useState<TipoPessoa>(
     initialData?.cpfCnpj && initialData.cpfCnpj.replaceAll(/\D/g, '').length === 14
@@ -222,7 +222,7 @@ export function FormularioCliente({
       cpfCnpj: cpfCnpj.replaceAll(/\D/g, ''),
       email,
       celular: celular.replaceAll(/\D/g, ''),
-      sexo: tipoPessoa === 'juridica' ? undefined : sexo === 'masculino' ? 'MASCULINO' : 'FEMININO',
+      sexo: tipoPessoa === 'juridica' ? 'NEUTRO' : sexo === 'masculino' ? 'MASCULINO' : 'FEMININO',
       endereco: {
         cep: cep.replaceAll(/\D/g, ''),
         logradouro,
@@ -241,13 +241,105 @@ export function FormularioCliente({
     const medidaId = initialData?.medidaId;
     const idParaMedidas = clienteIdSalvo ?? clienteId;
 
-    if (idParaMedidas && temMedidas && tipoPessoa !== 'juridica') {
+    if (idParaMedidas && temMedidas) {
       const centToDecimal = (c: number) => parseFloat((c / 100).toFixed(2));
       try {
-        if (sexo === 'feminino') {
-          if (medidaId) {
-            await medidaApi.atualizarMedidasFeminina(
-              {
+        // Para pessoa jurídica, verifica cada tipo de medida separadamente
+        // Para pessoa física, usa o sexo para determinar qual tipo salvar
+        if (tipoPessoa === 'juridica') {
+          // Verifica se há medidas femininas preenchidas (exceto cintura e manga que são comuns)
+          const temMedidasFemininas =
+            ['alturaBusto', 'raioBusto', 'corpo', 'ombro', 'decote', 'quadril', 'comprimentoVestido'].some(
+              (c) => (medidas[c] ?? 0) > 0
+            );
+
+          // Verifica se há medidas masculinas preenchidas (exceto cintura e manga que são comuns)
+          const temMedidasMasculinas =
+            ['colarinho', 'barra', 'torax'].some((c) => (medidas[c] ?? 0) > 0);
+
+          // Salva medidas femininas se houver campos específicos preenchidos
+          if (temMedidasFemininas || temMedidasMasculinas) {
+            // Se há medidas femininas OU se há apenas medidas comuns (cintura/manga), salva como feminina
+            if (temMedidasFemininas || (medidas['cintura'] ?? 0) > 0 || (medidas['manga'] ?? 0) > 0) {
+              if (medidaId) {
+                await medidaApi.atualizarMedidasFeminina(
+                  {
+                    clienteId: idParaMedidas,
+                    cintura: centToDecimal(medidas['cintura'] ?? 0),
+                    manga: centToDecimal(medidas['manga'] ?? 0),
+                    alturaBusto: centToDecimal(medidas['alturaBusto'] ?? 0),
+                    raioBusto: centToDecimal(medidas['raioBusto'] ?? 0),
+                    corpo: centToDecimal(medidas['corpo'] ?? 0),
+                    ombro: centToDecimal(medidas['ombro'] ?? 0),
+                    decote: centToDecimal(medidas['decote'] ?? 0),
+                    quadril: centToDecimal(medidas['quadril'] ?? 0),
+                    comprimentoVestido: centToDecimal(medidas['comprimentoVestido'] ?? 0),
+                  },
+                  medidaId
+                );
+              } else {
+                await medidaApi.criarMedidaFeminina({
+                  clienteId: idParaMedidas,
+                  cintura: centToDecimal(medidas['cintura'] ?? 0),
+                  manga: centToDecimal(medidas['manga'] ?? 0),
+                  alturaBusto: centToDecimal(medidas['alturaBusto'] ?? 0),
+                  raioBusto: centToDecimal(medidas['raioBusto'] ?? 0),
+                  corpo: centToDecimal(medidas['corpo'] ?? 0),
+                  ombro: centToDecimal(medidas['ombro'] ?? 0),
+                  decote: centToDecimal(medidas['decote'] ?? 0),
+                  quadril: centToDecimal(medidas['quadril'] ?? 0),
+                  comprimentoVestido: centToDecimal(medidas['comprimentoVestido'] ?? 0),
+                });
+              }
+            }
+          }
+
+          // Salva medidas masculinas se houver campos específicos preenchidos
+          if (temMedidasMasculinas) {
+            if (medidaId) {
+              await medidaApi.atualizarMedidasMasculina(
+                {
+                  clienteId: idParaMedidas,
+                  cintura: centToDecimal(medidas['cintura'] ?? 0),
+                  manga: centToDecimal(medidas['manga'] ?? 0),
+                  colarinho: centToDecimal(medidas['colarinho'] ?? 0),
+                  barra: centToDecimal(medidas['barra'] ?? 0),
+                  torax: centToDecimal(medidas['torax'] ?? 0),
+                },
+                medidaId
+              );
+            } else {
+              await medidaApi.criarMedidaMasculina({
+                clienteId: idParaMedidas,
+                cintura: centToDecimal(medidas['cintura'] ?? 0),
+                manga: centToDecimal(medidas['manga'] ?? 0),
+                colarinho: centToDecimal(medidas['colarinho'] ?? 0),
+                barra: centToDecimal(medidas['barra'] ?? 0),
+                torax: centToDecimal(medidas['torax'] ?? 0),
+              });
+            }
+          }
+        } else {
+          // Pessoa física: salva baseado no sexo
+          if (sexo === 'feminino') {
+            if (medidaId) {
+              await medidaApi.atualizarMedidasFeminina(
+                {
+                  clienteId: idParaMedidas,
+                  cintura: centToDecimal(medidas['cintura'] ?? 0),
+                  manga: centToDecimal(medidas['manga'] ?? 0),
+                  alturaBusto: centToDecimal(medidas['alturaBusto'] ?? 0),
+                  raioBusto: centToDecimal(medidas['raioBusto'] ?? 0),
+                  corpo: centToDecimal(medidas['corpo'] ?? 0),
+                  ombro: centToDecimal(medidas['ombro'] ?? 0),
+                  decote: centToDecimal(medidas['decote'] ?? 0),
+                  quadril: centToDecimal(medidas['quadril'] ?? 0),
+                  comprimentoVestido: centToDecimal(medidas['comprimentoVestido'] ?? 0),
+                },
+                medidaId
+              );
+            } else {
+              await medidaApi.criarMedidaFeminina({
                 clienteId: idParaMedidas,
                 cintura: centToDecimal(medidas['cintura'] ?? 0),
                 manga: centToDecimal(medidas['manga'] ?? 0),
@@ -258,45 +350,31 @@ export function FormularioCliente({
                 decote: centToDecimal(medidas['decote'] ?? 0),
                 quadril: centToDecimal(medidas['quadril'] ?? 0),
                 comprimentoVestido: centToDecimal(medidas['comprimentoVestido'] ?? 0),
-              },
-              medidaId
-            );
+              });
+            }
           } else {
-            await medidaApi.criarMedidaFeminina({
-              clienteId: idParaMedidas,
-              cintura: centToDecimal(medidas['cintura'] ?? 0),
-              manga: centToDecimal(medidas['manga'] ?? 0),
-              alturaBusto: centToDecimal(medidas['alturaBusto'] ?? 0),
-              raioBusto: centToDecimal(medidas['raioBusto'] ?? 0),
-              corpo: centToDecimal(medidas['corpo'] ?? 0),
-              ombro: centToDecimal(medidas['ombro'] ?? 0),
-              decote: centToDecimal(medidas['decote'] ?? 0),
-              quadril: centToDecimal(medidas['quadril'] ?? 0),
-              comprimentoVestido: centToDecimal(medidas['comprimentoVestido'] ?? 0),
-            });
-          }
-        } else {
-          if (medidaId) {
-            await medidaApi.atualizarMedidasMasculina(
-              {
+            if (medidaId) {
+              await medidaApi.atualizarMedidasMasculina(
+                {
+                  clienteId: idParaMedidas,
+                  cintura: centToDecimal(medidas['cintura'] ?? 0),
+                  manga: centToDecimal(medidas['manga'] ?? 0),
+                  colarinho: centToDecimal(medidas['colarinho'] ?? 0),
+                  barra: centToDecimal(medidas['barra'] ?? 0),
+                  torax: centToDecimal(medidas['torax'] ?? 0),
+                },
+                medidaId
+              );
+            } else {
+              await medidaApi.criarMedidaMasculina({
                 clienteId: idParaMedidas,
                 cintura: centToDecimal(medidas['cintura'] ?? 0),
                 manga: centToDecimal(medidas['manga'] ?? 0),
                 colarinho: centToDecimal(medidas['colarinho'] ?? 0),
                 barra: centToDecimal(medidas['barra'] ?? 0),
                 torax: centToDecimal(medidas['torax'] ?? 0),
-              },
-              medidaId
-            );
-          } else {
-            await medidaApi.criarMedidaMasculina({
-              clienteId: idParaMedidas,
-              cintura: centToDecimal(medidas['cintura'] ?? 0),
-              manga: centToDecimal(medidas['manga'] ?? 0),
-              colarinho: centToDecimal(medidas['colarinho'] ?? 0),
-              barra: centToDecimal(medidas['barra'] ?? 0),
-              torax: centToDecimal(medidas['torax'] ?? 0),
-            });
+              });
+            }
           }
         }
       } catch {

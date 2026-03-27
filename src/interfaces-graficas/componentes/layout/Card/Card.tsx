@@ -12,7 +12,9 @@ export function Card({ titulo, children, className = '' }: CardProps) {
       <div className={styles.card__header}>
         <h2 className={styles.card__titulo}>{titulo}</h2>
       </div>
-      <div className={styles.card__corpo}>{children}</div>
+      <div className={styles.card__conteudo}>
+        <div className={styles.card__corpo}>{children}</div>
+      </div>
     </div>
   );
 }

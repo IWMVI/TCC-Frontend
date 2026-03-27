@@ -1,1 +1,1 @@
-export type { IClienteRepositorio } from './IClienteRepositorio';
+export type { IClienteRepository } from './IClienteRepository';
