@@ -1,9 +1,9 @@
-import { IClienteRepositorio } from '../../domain/interfaces';
+import { IClienteRepository } from '../../domain/interfaces';
 import { ClienteRequest, ClienteResponse } from '../../domain/entidades';
 import { RecursoNaoEncontrado } from '../../domain/erros';
 
 export class AtualizarClienteUseCase {
-  constructor(private readonly clienteRepositorio: IClienteRepositorio) {}
+  constructor(private readonly clienteRepositorio: IClienteRepository) {}
 
   async executar(id: number, dados: ClienteRequest): Promise<ClienteResponse> {
     try {

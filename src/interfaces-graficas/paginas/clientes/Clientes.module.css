@@ -1,0 +1,64 @@
+.clientes {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.clientes__voltar {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    color: #444;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.clientes__voltar:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.clientes__cabecalho {
+    text-align: center;
+}
+
+.clientes__titulo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.4rem;
+}
+
+.clientes__subtitulo {
+    font-size: 0.875rem;
+    color: #888;
+    margin: 0;
+}
+
+.clientes__cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 560px;
+}
+
+@media (max-width: 480px) {
+    .clientes__cards {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+    }
+}

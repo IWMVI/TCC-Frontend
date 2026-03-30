@@ -1,1 +1,1 @@
-export { ClienteApiRepositorio } from './ClienteApiRepositorio';
+export { ClienteApiRepository } from './ClienteApiRepository';

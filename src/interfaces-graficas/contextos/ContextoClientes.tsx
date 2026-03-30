@@ -6,6 +6,11 @@ interface EstadoClientes {
   clienteSelecionado: ClienteResponse | null;
   estaCarregando: boolean;
   erro: string | null;
+  // Paginação
+  paginaAtual: number;
+  totalPaginas: number;
+  totalRegistros: number;
+  tamanhoPagina: number;
 }
 
 type AcaoClientes =
@@ -15,13 +20,18 @@ type AcaoClientes =
   | { tipo: 'ATUALIZAR_CLIENTE'; payload: ClienteResponse }
   | { tipo: 'REMOVER_CLIENTE'; payload: number }
   | { tipo: 'SET_CARREGANDO'; payload: boolean }
-  | { tipo: 'SET_ERRO'; payload: string | null };
+  | { tipo: 'SET_ERRO'; payload: string | null }
+  | { tipo: 'SET_PAGINACAO'; payload: { totalPaginas: number; totalRegistros: number; tamanhoPagina: number; paginaAtual: number } };
 
 const estadoInicial: EstadoClientes = {
   clientes: [],
   clienteSelecionado: null,
   estaCarregando: false,
   erro: null,
+  paginaAtual: 0,
+  totalPaginas: 0,
+  totalRegistros: 0,
+  tamanhoPagina: 10,
 };
 
 function clientesReducer(estado: EstadoClientes, acao: AcaoClientes): EstadoClientes {
@@ -48,6 +58,14 @@ function clientesReducer(estado: EstadoClientes, acao: AcaoClientes): EstadoClie
       return { ...estado, estaCarregando: acao.payload };
     case 'SET_ERRO':
       return { ...estado, erro: acao.payload };
+    case 'SET_PAGINACAO':
+      return {
+        ...estado,
+        totalPaginas: acao.payload.totalPaginas,
+        totalRegistros: acao.payload.totalRegistros,
+        tamanhoPagina: acao.payload.tamanhoPagina,
+        paginaAtual: acao.payload.paginaAtual,
+      };
     default:
       return estado;
   }

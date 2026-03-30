@@ -38,6 +38,10 @@
   background-color: var(--cor-fundo);
 }
 
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .tabela__acoes {
   display: flex;
   gap: 0.375rem;

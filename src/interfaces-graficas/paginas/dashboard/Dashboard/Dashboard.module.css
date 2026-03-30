@@ -1,113 +1,44 @@
-.dashboard__header {
-  margin-bottom: 1.5rem;
-}
-
-.dashboard__header h1 {
-  font-size: 1.5rem;
-  color: var(--cor-texto);
-  margin-bottom: 0.25rem;
-}
-
-.dashboard__header p {
-  color: var(--cor-texto-secundario);
-  font-size: 0.875rem;
-}
-
-.dashboard__cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.dashboard__card-content {
+.dashboard {
+    flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 2rem;
+    overflow: hidden;
+}
+
+/* ── Boas-vindas ── */
+.dashboard__boas_vindas {
   text-align: center;
-  padding: 0.75rem;
 }
 
-.dashboard__numero {
-  font-size: 2rem;
+.dashboard__titulo {
+    font-size: 1.25rem;
   font-weight: 700;
-  color: var(--cor-primaria);
-  line-height: 1;
-  margin-bottom: 0.25rem;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem;
 }
 
-.dashboard__label {
-  font-size: 0.75rem;
-  color: var(--cor-texto-secundario);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.dashboard__info {
-  max-width: 100%;
-}
-
-.dashboard__info p {
-  margin-bottom: 1rem;
-  line-height: 1.6;
+.dashboard__subtitulo {
   font-size: 0.875rem;
+    color: #888888;
+    margin: 0;
 }
 
-.dashboard__info p:last-child {
-  margin-bottom: 0;
-}
-
-@media (min-width: 576px) {
-  .dashboard__cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .dashboard__numero {
-    font-size: 2.25rem;
-  }
-
-  .dashboard__label {
-    font-size: 0.8125rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .dashboard__header {
-    margin-bottom: 2rem;
-  }
-
-  .dashboard__header h1 {
-    font-size: 1.75rem;
-  }
-
-  .dashboard__header p {
-    font-size: 1rem;
-  }
-
-  .dashboard__cards {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+/* ── Cards ── */
+.dashboard__cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
+    width: 100%;
+    max-width: 780px;
+}
 
-  .dashboard__card-content {
-    padding: 1rem;
-  }
-
-  .dashboard__numero {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .dashboard__label {
-    font-size: 0.875rem;
-  }
-
-  .dashboard__info {
-    max-width: 600px;
-  }
-
-  .dashboard__info p {
-    font-size: 1rem;
+@media (max-width: 640px) {
+    .dashboard__cards {
+        grid-template-columns: 1fr;
+        max-width: 320px;
   }
 }
