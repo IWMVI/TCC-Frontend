@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Botao } from '../../../../componentes/base/Botao';
 import { ClienteRequest, SiglaEstado } from '../../../../../domain/entidades';
@@ -10,7 +10,6 @@ import {
   mascararTelefone,
 } from '../../../../utils/formatacoes';
 import { formatarMedida } from './formatacoes';
-export { formatarMedida } from './formatacoes';
 import styles from './FormularioCliente.module.css';
 
 const medidaApi = new ClienteApiRepository();
@@ -129,10 +128,26 @@ export function FormularioCliente({
   const [erros, setErros] = useState<Erros>({});
   const [tentouSalvar, setTentouSalvar] = useState(false);
 
+  function validar(): Erros {
+    const e: Erros = {};
+    if (!cpfCnpj.trim()) e.cpfCnpj = 'CPF/CNPJ obrigatório';
+    if (!nome.trim()) e.nome = 'Nome obrigatório';
+    if (!email.trim()) e.email = 'E-mail obrigatório';
+    if (!celular.trim()) e.celular = 'Celular obrigatório';
+    if (!cep.trim()) e.cep = 'CEP obrigatório';
+    if (!logradouro.trim()) e.logradouro = 'Endereço obrigatório';
+    if (!numero.trim()) e.numero = 'Número obrigatório';
+    if (!cidade.trim()) e.cidade = 'Cidade obrigatória';
+    if (!bairro.trim()) e.bairro = 'Bairro obrigatório';
+    return e;
+  }
+
+  const validarFormulario = useCallback(validar, [cpfCnpj, nome, email, celular, cep, logradouro, numero, cidade, bairro]);
+
   // Revalida em tempo real após primeira tentativa de salvar
   useEffect(() => {
-    if (tentouSalvar) setErros(validar());
-  }, [cpfCnpj, nome, email, celular, cep, logradouro, numero, cidade, bairro, tentouSalvar]);
+    if (tentouSalvar) setErros(validarFormulario());
+  }, [validarFormulario, tentouSalvar]);
 
   // Inicializa medidas a partir do initialData
   useEffect(() => {
@@ -193,24 +208,10 @@ export function FormularioCliente({
     }
   }
 
-  function validar(): Erros {
-    const e: Erros = {};
-    if (!cpfCnpj.trim()) e.cpfCnpj = 'CPF/CNPJ obrigatório';
-    if (!nome.trim()) e.nome = 'Nome obrigatório';
-    if (!email.trim()) e.email = 'E-mail obrigatório';
-    if (!celular.trim()) e.celular = 'Celular obrigatório';
-    if (!cep.trim()) e.cep = 'CEP obrigatório';
-    if (!logradouro.trim()) e.logradouro = 'Endereço obrigatório';
-    if (!numero.trim()) e.numero = 'Número obrigatório';
-    if (!cidade.trim()) e.cidade = 'Cidade obrigatória';
-    if (!bairro.trim()) e.bairro = 'Bairro obrigatório';
-    return e;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTentouSalvar(true);
-    const novosErros = validar();
+    const novosErros = validarFormulario();
     setErros(novosErros);
     if (Object.keys(novosErros).length > 0) return;
 

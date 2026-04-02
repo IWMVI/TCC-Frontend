@@ -54,7 +54,7 @@ export function ListarClientes() {
 
   useEffect(() => {
     carregarClientes();
-  }, []);
+  }, [carregarClientes]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
