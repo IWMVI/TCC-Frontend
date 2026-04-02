@@ -9,6 +9,8 @@ import {
   mascararCpfCnpj,
   mascararTelefone,
 } from '../../../../utils/formatacoes';
+import { formatarMedida } from './formatacoes';
+export { formatarMedida } from './formatacoes';
 import styles from './FormularioCliente.module.css';
 
 const medidaApi = new ClienteApiRepository();
@@ -57,11 +59,6 @@ const MEDIDAS_PESSOA_JURIDICA: Medida[] = [
 ];
 
 const ESTADOS = Object.values(SiglaEstado);
-
-function formatarMedida(c: number): string {
-  const s = String(c ?? 0).padStart(3, '0');
-  return `${s.slice(0, -2)},${s.slice(-2)}`;
-}
 
 interface Erros {
   cpfCnpj?: string;
@@ -248,19 +245,29 @@ export function FormularioCliente({
         // Para pessoa física, usa o sexo para determinar qual tipo salvar
         if (tipoPessoa === 'juridica') {
           // Verifica se há medidas femininas preenchidas (exceto cintura e manga que são comuns)
-          const temMedidasFemininas =
-            ['alturaBusto', 'raioBusto', 'corpo', 'ombro', 'decote', 'quadril', 'comprimentoVestido'].some(
-              (c) => (medidas[c] ?? 0) > 0
-            );
+          const temMedidasFemininas = [
+            'alturaBusto',
+            'raioBusto',
+            'corpo',
+            'ombro',
+            'decote',
+            'quadril',
+            'comprimentoVestido',
+          ].some((c) => (medidas[c] ?? 0) > 0);
 
           // Verifica se há medidas masculinas preenchidas (exceto cintura e manga que são comuns)
-          const temMedidasMasculinas =
-            ['colarinho', 'barra', 'torax'].some((c) => (medidas[c] ?? 0) > 0);
+          const temMedidasMasculinas = ['colarinho', 'barra', 'torax'].some(
+            (c) => (medidas[c] ?? 0) > 0
+          );
 
           // Salva medidas femininas se houver campos específicos preenchidos
           if (temMedidasFemininas || temMedidasMasculinas) {
             // Se há medidas femininas OU se há apenas medidas comuns (cintura/manga), salva como feminina
-            if (temMedidasFemininas || (medidas['cintura'] ?? 0) > 0 || (medidas['manga'] ?? 0) > 0) {
+            if (
+              temMedidasFemininas ||
+              (medidas['cintura'] ?? 0) > 0 ||
+              (medidas['manga'] ?? 0) > 0
+            ) {
               if (medidaId) {
                 await medidaApi.atualizarMedidasFeminina(
                   {

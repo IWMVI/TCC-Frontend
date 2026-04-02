@@ -187,6 +187,200 @@ describe('ClienteApiRepository', () => {
     });
   });
 
+  describe('listarTodos', () => {
+    it('deve listar todos os clientes sem paginação', async () => {
+      const mockClientes: ClienteResponse[] = [mockClienteResponse];
+      const mockGet = jest.fn().mockResolvedValue({ data: mockClientes });
+      (repositorio as any).clienteApi = { get: mockGet };
+
+      const resultado = await repositorio.listarTodos();
+
+      expect(resultado).toEqual(mockClientes);
+      expect(mockGet).toHaveBeenCalledWith('/clientes/todos');
+    });
+
+    it('deve lançar erro ao falhar na listagem de todos', async () => {
+      (repositorio as any).clienteApi = {
+        get: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.listarTodos()).rejects.toThrow(FalhaRequisicao);
+    });
+  });
+
+  describe('criarMedidaFeminina', () => {
+    const medidaFeminina = {
+      clienteId: 1,
+      cintura: 70,
+      manga: 60,
+      alturaBusto: 35,
+      raioBusto: 45,
+      corpo: 65,
+      ombro: 40,
+      decote: 35,
+      quadril: 80,
+      comprimentoVestido: 140,
+    };
+
+    it('deve criar medida feminina com sucesso', async () => {
+      const mockPost = jest.fn().mockResolvedValue({});
+      (repositorio as any).clienteApi = { post: mockPost };
+
+      await repositorio.criarMedidaFeminina(medidaFeminina);
+
+      expect(mockPost).toHaveBeenCalledWith('/medidas/feminina', medidaFeminina);
+    });
+
+    it('deve lançar erro ao falhar na criação de medidas femininas', async () => {
+      (repositorio as any).clienteApi = {
+        post: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.criarMedidaFeminina(medidaFeminina)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('criarMedidaMasculina', () => {
+    const medidaMasculina = {
+      clienteId: 1,
+      cintura: 80,
+      manga: 65,
+      colarinho: 40,
+      barra: 85,
+      torax: 95,
+    };
+
+    it('deve criar medida masculina com sucesso', async () => {
+      const mockPost = jest.fn().mockResolvedValue({});
+      (repositorio as any).clienteApi = { post: mockPost };
+
+      await repositorio.criarMedidaMasculina(medidaMasculina);
+
+      expect(mockPost).toHaveBeenCalledWith('/medidas/masculina', medidaMasculina);
+    });
+
+    it('deve lançar erro ao falhar na criação de medidas masculinas', async () => {
+      (repositorio as any).clienteApi = {
+        post: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.criarMedidaMasculina(medidaMasculina)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('buscarMedidas', () => {
+    const mockMedidasFemininas = [
+      {
+        id: 1,
+        clienteId: 1,
+        cintura: 70,
+        manga: 60,
+        alturaBusto: 35,
+        raioBusto: 45,
+        corpo: 65,
+        ombro: 40,
+        decote: 35,
+        quadril: 80,
+        comprimentoVestido: 140,
+      },
+    ];
+
+    it('deve buscar medidas de um cliente quando existem', async () => {
+      const mockGet = jest.fn().mockResolvedValue({ data: mockMedidasFemininas });
+      (repositorio as any).clienteApi = { get: mockGet };
+
+      const resultado = await repositorio.buscarMedidas(1);
+
+      expect(resultado).toEqual(mockMedidasFemininas);
+      expect(mockGet).toHaveBeenCalledWith('/medidas', { params: { clienteId: 1 } });
+    });
+
+    it('deve retornar null quando cliente não tem medidas', async () => {
+      const mockGet = jest.fn().mockResolvedValue({ data: null });
+      (repositorio as any).clienteApi = { get: mockGet };
+
+      const resultado = await repositorio.buscarMedidas(1);
+
+      expect(resultado).toBeNull();
+    });
+
+    it('deve lançar erro ao falhar na busca de medidas', async () => {
+      (repositorio as any).clienteApi = {
+        get: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.buscarMedidas(1)).rejects.toThrow(FalhaRequisicao);
+    });
+  });
+
+  describe('atualizarMedidasFeminina', () => {
+    const medidaAtualizada = {
+      clienteId: 1,
+      cintura: 72,
+      manga: 61,
+      alturaBusto: 36,
+      raioBusto: 46,
+      corpo: 66,
+      ombro: 41,
+      decote: 36,
+      quadril: 82,
+      comprimentoVestido: 142,
+    };
+
+    it('deve atualizar medida feminina com sucesso', async () => {
+      const mockPut = jest.fn().mockResolvedValue({});
+      (repositorio as any).clienteApi = { put: mockPut };
+
+      await repositorio.atualizarMedidasFeminina(medidaAtualizada, 1);
+
+      expect(mockPut).toHaveBeenCalledWith('/medidas/feminina/1', medidaAtualizada);
+    });
+
+    it('deve lançar erro ao falhar na atualização de medidas femininas', async () => {
+      (repositorio as any).clienteApi = {
+        put: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.atualizarMedidasFeminina(medidaAtualizada, 1)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('atualizarMedidasMasculina', () => {
+    const medidaAtualizada = {
+      clienteId: 1,
+      cintura: 82,
+      manga: 66,
+      colarinho: 41,
+      barra: 86,
+      torax: 96,
+    };
+
+    it('deve atualizar medida masculina com sucesso', async () => {
+      const mockPut = jest.fn().mockResolvedValue({});
+      (repositorio as any).clienteApi = { put: mockPut };
+
+      await repositorio.atualizarMedidasMasculina(medidaAtualizada, 1);
+
+      expect(mockPut).toHaveBeenCalledWith('/medidas/masculina/1', medidaAtualizada);
+    });
+
+    it('deve lançar erro ao falhar na atualização de medidas masculinas', async () => {
+      (repositorio as any).clienteApi = {
+        put: jest.fn().mockRejectedValue(criarAxiosError500()),
+      };
+
+      await expect(repositorio.atualizarMedidasMasculina(medidaAtualizada, 1)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
   describe('deletar', () => {
     it('deve deletar cliente com sucesso', async () => {
       const mockDelete = jest.fn().mockResolvedValue({});

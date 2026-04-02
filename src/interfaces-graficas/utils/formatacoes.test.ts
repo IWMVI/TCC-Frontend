@@ -64,6 +64,10 @@ describe('mascararTelefone', () => {
   it('deve retornar string vazia quando entrada for vazia', () => {
     expect(mascararTelefone('')).toBe('');
   });
+
+  it('deve formatar como celular quando número tem mais de 10 dígitos', () => {
+    expect(mascararTelefone('11999999999')).toBe('(11) 99999-9999');
+  });
 });
 
 describe('mascararCep', () => {

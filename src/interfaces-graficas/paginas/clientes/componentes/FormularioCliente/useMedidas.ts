@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface Medida {
   campo: string;
@@ -46,9 +46,11 @@ export function useMedidas(
   isPessoaJuridica: boolean = false
 ) {
   const [medidas, setMedidas] = useState<Record<string, number>>({});
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (initialMedidas) {
+    if (initialMedidas && !initializedRef.current) {
+      initializedRef.current = true;
       setMedidas(initialMedidas);
     }
   }, [initialMedidas]);
