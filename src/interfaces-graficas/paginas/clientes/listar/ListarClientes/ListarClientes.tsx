@@ -43,7 +43,7 @@ export function ListarClientes() {
             paginaAtual: resultado.number,
           },
         });
-      } catch (_erro) {
+      } catch {
         dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar clientes' });
       } finally {
         dispatch({ tipo: 'SET_CARREGANDO', payload: false });
@@ -54,7 +54,7 @@ export function ListarClientes() {
 
   useEffect(() => {
     carregarClientes();
-  }, []);
+  }, [carregarClientes]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -84,7 +84,7 @@ export function ListarClientes() {
       fecharModal();
       // Recarrega a lista após exclusão
       carregarClientes(termoBusca || undefined, estado.paginaAtual);
-    } catch (_erro) {
+    } catch {
       dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir cliente' });
     } finally {
       setEstaExcluindo(false);

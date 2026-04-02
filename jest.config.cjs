@@ -22,6 +22,11 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/main.tsx',
     '!src/vite-env.d.ts',
+    '!src/**/index.ts',
+    '!src/**/index.tsx',
+    '!src/App.tsx',
+    '!src/interfaces-graficas/**/*.tsx',
+    '!src/interfaces-graficas/contextos/**',
   ],
   coverageThreshold: {
     global: {

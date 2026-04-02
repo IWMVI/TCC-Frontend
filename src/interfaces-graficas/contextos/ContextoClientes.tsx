@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { ClienteResponse } from '../../domain/entidades';
 
