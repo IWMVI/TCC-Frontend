@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "dev:electron": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder --publish=never",
     "build:vite": "tsc && vite build",
     "preview": "vite preview",
     "electron": "electron .",
@@ -79,6 +79,11 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "linux": {
+      "category": "Utility",
+      "target": ["AppImage"]
+    },
+    "publish": null
   }
 }
