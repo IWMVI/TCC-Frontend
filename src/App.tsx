@@ -3,6 +3,7 @@ import {Layout} from './interfaces-graficas/componentes/layout/Layout';
 import {Dashboard} from './interfaces-graficas/paginas/dashboard/Dashboard';
 import {Clientes} from './interfaces-graficas/paginas/clientes/Clientes';
 import {ListarClientes} from './interfaces-graficas/paginas/clientes/listar/ListarClientes';
+import {ListarClientesExcluidos} from './interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos';
 import {CriarCliente} from './interfaces-graficas/paginas/clientes/criar/CriarCliente';
 import {EditarCliente} from './interfaces-graficas/paginas/clientes/editar/EditarCliente';
 import {Trajes} from './interfaces-graficas/paginas/trajes/Trajes';
@@ -18,6 +19,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="clientes" element={<Clientes/>}/>
           <Route path="clientes/listar" element={<ListarClientes/>}/>
+          <Route path="clientes/excluidos" element={<ListarClientesExcluidos/>}/>
           <Route path="clientes/novo" element={<CriarCliente />} />
           <Route path="clientes/:id/editar" element={<EditarCliente />} />
           <Route path="trajes" element={<Trajes />} />
