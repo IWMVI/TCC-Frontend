@@ -1,4 +1,4 @@
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosInstance, isAxiosError} from 'axios';
 import {IClienteRepository} from '@domain/interfaces';
 import {
     ClienteRequest,
@@ -71,7 +71,7 @@ export class ClienteApiRepository implements IClienteRepository {
             const resposta = await this.clienteApi.get<ClienteResponse>(`/clientes/${id}`);
             return resposta.data;
         } catch (error_) {
-            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
+            if (isAxiosError(error_) && error_.response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
             throw this.criarErro(error_, 'Erro ao buscar cliente');
@@ -92,7 +92,7 @@ export class ClienteApiRepository implements IClienteRepository {
             const resposta = await this.clienteApi.put<ClienteResponse>(`/clientes/${id}`, dados);
             return resposta.data;
         } catch (error_) {
-            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
+            if (isAxiosError(error_) && error_.response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
             throw this.criarErro(error_, 'Erro ao atualizar cliente');
@@ -103,7 +103,7 @@ export class ClienteApiRepository implements IClienteRepository {
         try {
             await this.clienteApi.delete(`/clientes/${id}`);
         } catch (error_) {
-            if ((error_ as any)?.isAxiosError && (error_ as any).response?.status === 404) {
+            if (isAxiosError(error_) && error_.response?.status === 404) {
                 throw new RecursoNaoEncontrado('Cliente', id);
             }
             throw this.criarErro(error_, 'Erro ao deletar cliente');
@@ -157,12 +157,12 @@ export class ClienteApiRepository implements IClienteRepository {
     }
 
     private criarErro(erro: unknown, mensagemPadrao: string): Error {
-        if ((erro as any)?.isAxiosError) {
-            if (!(erro as any).response) {
+        if (isAxiosError(erro)) {
+            if (!erro.response) {
                 return new FalhaConexao(mensagemPadrao);
             }
-            const detalhes = (erro as any).response.data?.message || (erro as any).message;
-            return new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, (erro as any).response.status);
+            const detalhes = erro.response.data?.message || erro.message;
+            return new FalhaRequisicao(`${mensagemPadrao}: ${detalhes}`, erro.response.status);
         }
         return new FalhaRequisicao(mensagemPadrao);
     }

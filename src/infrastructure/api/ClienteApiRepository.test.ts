@@ -1,7 +1,20 @@
-import { AxiosError } from 'axios';
+import { AxiosInstance } from 'axios';
 import { ClienteApiRepository, PaginacaoResultado } from './ClienteApiRepository';
 import { ClienteRequest, ClienteResponse, SiglaEstado } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
+
+// Tipo para mock seguro de AxiosError com propriedades extras necessárias para testes
+interface MockAxiosError extends Error {
+  isAxiosError?: boolean;
+  response?: {
+    status: number;
+    statusText: string;
+    data: { message: string };
+    headers: Record<string, string>;
+    config?: Record<string, unknown>;
+  };
+  code?: string;
+}
 
 describe('ClienteApiRepository', () => {
   const baseUrl = 'http://localhost:8080';
@@ -40,10 +53,10 @@ describe('ClienteApiRepository', () => {
     empty: false,
   };
 
-  function criarAxiosError404(): AxiosError {
-    const error = new Error('Request failed with status code 404') as AxiosError;
-    (error as any).isAxiosError = true;
-    (error as any).response = {
+  function criarAxiosError404(): MockAxiosError {
+    const error = new Error('Request failed with status code 404') as MockAxiosError;
+    error.isAxiosError = true;
+    error.response = {
       status: 404,
       statusText: 'Not Found',
       data: { message: 'Cliente não encontrado' },
@@ -53,17 +66,17 @@ describe('ClienteApiRepository', () => {
     return error;
   }
 
-  function criarAxiosErrorNetwork(): AxiosError {
-    const error = new Error('Network Error') as AxiosError;
-    (error as any).isAxiosError = true;
+  function criarAxiosErrorNetwork(): MockAxiosError {
+    const error = new Error('Network Error') as MockAxiosError;
+    error.isAxiosError = true;
     error.code = 'ECONNREFUSED';
     return error;
   }
 
-  function criarAxiosError500(): AxiosError {
-    const error = new Error('Request failed with status code 500') as AxiosError;
-    (error as any).isAxiosError = true;
-    (error as any).response = {
+  function criarAxiosError500(): MockAxiosError {
+    const error = new Error('Request failed with status code 500') as MockAxiosError;
+    error.isAxiosError = true;
+    error.response = {
       status: 500,
       statusText: 'Internal Server Error',
       data: { message: 'Erro interno' },
@@ -76,7 +89,7 @@ describe('ClienteApiRepository', () => {
   describe('listar', () => {
     it('deve listar clientes com paginação quando sucesso', async () => {
       const mockGet = jest.fn().mockResolvedValue({ data: mockPaginacao });
-      (repositorio as any).clienteApi = { get: mockGet };
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { get: mockGet } as unknown as unknown as AxiosInstance;
 
       const resultado = await repositorio.listar(undefined, 0, 10);
 
@@ -87,17 +100,17 @@ describe('ClienteApiRepository', () => {
     });
 
     it('deve lançar FalhaConexao quando não houver resposta', async () => {
-      (repositorio as any).clienteApi = {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
         get: jest.fn().mockRejectedValue(criarAxiosErrorNetwork()),
-      };
+      } as unknown as unknown as AxiosInstance;
 
       await expect(repositorio.listar()).rejects.toThrow(FalhaConexao);
     });
 
     it('deve lançar FalhaRequisicao quando erro na resposta', async () => {
-      (repositorio as any).clienteApi = {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
         get: jest.fn().mockRejectedValue(criarAxiosError500()),
-      };
+      } as unknown as unknown as AxiosInstance;
 
       await expect(repositorio.listar()).rejects.toThrow(FalhaRequisicao);
     });
@@ -106,7 +119,7 @@ describe('ClienteApiRepository', () => {
   describe('buscarPorId', () => {
     it('deve buscar cliente por ID quando existir', async () => {
       const mockGet = jest.fn().mockResolvedValue({ data: mockClienteResponse });
-      (repositorio as any).clienteApi = { get: mockGet };
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { get: mockGet } as unknown as unknown as AxiosInstance;
 
       const resultado = await repositorio.buscarPorId(1);
 
@@ -115,9 +128,9 @@ describe('ClienteApiRepository', () => {
     });
 
     it('deve lançar RecursoNaoEncontrado quando cliente não existir (404)', async () => {
-      (repositorio as any).clienteApi = {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
         get: jest.fn().mockRejectedValue(criarAxiosError404()),
-      };
+      } as unknown as unknown as AxiosInstance;
 
       await expect(repositorio.buscarPorId(999)).rejects.toThrow(RecursoNaoEncontrado);
     });
@@ -141,7 +154,7 @@ describe('ClienteApiRepository', () => {
 
     it('deve criar cliente com sucesso', async () => {
       const mockPost = jest.fn().mockResolvedValue({ data: mockClienteResponse });
-      (repositorio as any).clienteApi = { post: mockPost };
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { post: mockPost } as unknown as unknown as AxiosInstance;
 
       const resultado = await repositorio.criar(clienteRequest);
 
@@ -168,7 +181,7 @@ describe('ClienteApiRepository', () => {
 
     it('deve atualizar cliente com sucesso', async () => {
       const mockPut = jest.fn().mockResolvedValue({ data: mockClienteResponse });
-      (repositorio as any).clienteApi = { put: mockPut };
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { put: mockPut } as unknown as unknown as AxiosInstance;
 
       const resultado = await repositorio.atualizar(1, clienteRequest);
 
@@ -177,9 +190,9 @@ describe('ClienteApiRepository', () => {
     });
 
     it('deve lançar RecursoNaoEncontrado quando cliente não existir (404)', async () => {
-      (repositorio as any).clienteApi = {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
         put: jest.fn().mockRejectedValue(criarAxiosError404()),
-      };
+      } as unknown as unknown as AxiosInstance;
 
       await expect(repositorio.atualizar(999, clienteRequest)).rejects.toThrow(
         RecursoNaoEncontrado
@@ -187,10 +200,204 @@ describe('ClienteApiRepository', () => {
     });
   });
 
+  describe('listarTodos', () => {
+    it('deve listar todos os clientes sem paginação', async () => {
+      const mockClientes: ClienteResponse[] = [mockClienteResponse];
+      const mockGet = jest.fn().mockResolvedValue({ data: mockClientes });
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { get: mockGet } as unknown as unknown as AxiosInstance;
+
+      const resultado = await repositorio.listarTodos();
+
+      expect(resultado).toEqual(mockClientes);
+      expect(mockGet).toHaveBeenCalledWith('/clientes/todos');
+    });
+
+    it('deve lançar erro ao falhar na listagem de todos', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        get: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.listarTodos()).rejects.toThrow(FalhaRequisicao);
+    });
+  });
+
+  describe('criarMedidaFeminina', () => {
+    const medidaFeminina = {
+      clienteId: 1,
+      cintura: 70,
+      manga: 60,
+      alturaBusto: 35,
+      raioBusto: 45,
+      corpo: 65,
+      ombro: 40,
+      decote: 35,
+      quadril: 80,
+      comprimentoVestido: 140,
+    };
+
+    it('deve criar medida feminina com sucesso', async () => {
+      const mockPost = jest.fn().mockResolvedValue({});
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { post: mockPost } as unknown as unknown as AxiosInstance;
+
+      await repositorio.criarMedidaFeminina(medidaFeminina);
+
+      expect(mockPost).toHaveBeenCalledWith('/medidas/feminina', medidaFeminina);
+    });
+
+    it('deve lançar erro ao falhar na criação de medidas femininas', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        post: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.criarMedidaFeminina(medidaFeminina)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('criarMedidaMasculina', () => {
+    const medidaMasculina = {
+      clienteId: 1,
+      cintura: 80,
+      manga: 65,
+      colarinho: 40,
+      barra: 85,
+      torax: 95,
+    };
+
+    it('deve criar medida masculina com sucesso', async () => {
+      const mockPost = jest.fn().mockResolvedValue({});
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { post: mockPost } as unknown as unknown as AxiosInstance;
+
+      await repositorio.criarMedidaMasculina(medidaMasculina);
+
+      expect(mockPost).toHaveBeenCalledWith('/medidas/masculina', medidaMasculina);
+    });
+
+    it('deve lançar erro ao falhar na criação de medidas masculinas', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        post: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.criarMedidaMasculina(medidaMasculina)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('buscarMedidas', () => {
+    const mockMedidasFemininas = [
+      {
+        id: 1,
+        clienteId: 1,
+        cintura: 70,
+        manga: 60,
+        alturaBusto: 35,
+        raioBusto: 45,
+        corpo: 65,
+        ombro: 40,
+        decote: 35,
+        quadril: 80,
+        comprimentoVestido: 140,
+      },
+    ];
+
+    it('deve buscar medidas de um cliente quando existem', async () => {
+      const mockGet = jest.fn().mockResolvedValue({ data: mockMedidasFemininas });
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { get: mockGet } as unknown as unknown as AxiosInstance;
+
+      const resultado = await repositorio.buscarMedidas(1);
+
+      expect(resultado).toEqual(mockMedidasFemininas);
+      expect(mockGet).toHaveBeenCalledWith('/medidas', { params: { clienteId: 1 } });
+    });
+
+    it('deve retornar null quando cliente não tem medidas', async () => {
+      const mockGet = jest.fn().mockResolvedValue({ data: null });
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { get: mockGet } as unknown as unknown as AxiosInstance;
+
+      const resultado = await repositorio.buscarMedidas(1);
+
+      expect(resultado).toBeNull();
+    });
+
+    it('deve lançar erro ao falhar na busca de medidas', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        get: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.buscarMedidas(1)).rejects.toThrow(FalhaRequisicao);
+    });
+  });
+
+  describe('atualizarMedidasFeminina', () => {
+    const medidaAtualizada = {
+      clienteId: 1,
+      cintura: 72,
+      manga: 61,
+      alturaBusto: 36,
+      raioBusto: 46,
+      corpo: 66,
+      ombro: 41,
+      decote: 36,
+      quadril: 82,
+      comprimentoVestido: 142,
+    };
+
+    it('deve atualizar medida feminina com sucesso', async () => {
+      const mockPut = jest.fn().mockResolvedValue({});
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { put: mockPut } as unknown as unknown as AxiosInstance;
+
+      await repositorio.atualizarMedidasFeminina(medidaAtualizada, 1);
+
+      expect(mockPut).toHaveBeenCalledWith('/medidas/feminina/1', medidaAtualizada);
+    });
+
+    it('deve lançar erro ao falhar na atualização de medidas femininas', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        put: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.atualizarMedidasFeminina(medidaAtualizada, 1)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
+  describe('atualizarMedidasMasculina', () => {
+    const medidaAtualizada = {
+      clienteId: 1,
+      cintura: 82,
+      manga: 66,
+      colarinho: 41,
+      barra: 86,
+      torax: 96,
+    };
+
+    it('deve atualizar medida masculina com sucesso', async () => {
+      const mockPut = jest.fn().mockResolvedValue({});
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { put: mockPut } as unknown as unknown as AxiosInstance;
+
+      await repositorio.atualizarMedidasMasculina(medidaAtualizada, 1);
+
+      expect(mockPut).toHaveBeenCalledWith('/medidas/masculina/1', medidaAtualizada);
+    });
+
+    it('deve lançar erro ao falhar na atualização de medidas masculinas', async () => {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
+        put: jest.fn().mockRejectedValue(criarAxiosError500()),
+      } as unknown as unknown as AxiosInstance;
+
+      await expect(repositorio.atualizarMedidasMasculina(medidaAtualizada, 1)).rejects.toThrow(
+        FalhaRequisicao
+      );
+    });
+  });
+
   describe('deletar', () => {
     it('deve deletar cliente com sucesso', async () => {
       const mockDelete = jest.fn().mockResolvedValue({});
-      (repositorio as any).clienteApi = { delete: mockDelete };
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = { delete: mockDelete } as unknown as unknown as AxiosInstance;
 
       await repositorio.deletar(1);
 
@@ -198,9 +405,9 @@ describe('ClienteApiRepository', () => {
     });
 
     it('deve lançar RecursoNaoEncontrado quando cliente não existir (404)', async () => {
-      (repositorio as any).clienteApi = {
+      (repositorio as unknown as { clienteApi: AxiosInstance }).clienteApi = {
         delete: jest.fn().mockRejectedValue(criarAxiosError404()),
-      };
+      } as unknown as unknown as AxiosInstance;
 
       await expect(repositorio.deletar(999)).rejects.toThrow(RecursoNaoEncontrado);
     });

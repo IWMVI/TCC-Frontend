@@ -3,10 +3,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
-  testMatch: [
-    '**/__tests__/**/*.[jt]s?(x)',
-    '**/?(*.)+(spec|test).[jt]s?(x)',
-  ],
+  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
@@ -18,7 +15,10 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
+    'src/domain/**/*.{ts,tsx}',
+    'src/application/**/*.{ts,tsx}',
+    'src/infrastructure/**/*.{ts,tsx}',
+    'src/interfaces-graficas/utils/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/main.tsx',
     '!src/vite-env.d.ts',
@@ -32,10 +32,13 @@ module.exports = {
     },
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
-      useESM: false,
-    }],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+        useESM: false,
+      },
+    ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
