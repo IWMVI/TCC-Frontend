@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '../../../../componentes';
@@ -22,39 +22,69 @@ export function ListarClientes() {
   const [modalAberto, setModalAberto] = useState(false);
   const [clienteParaExcluir, setClienteParaExcluir] = useState<ClienteResponse | null>(null);
   const [estaExcluindo, setEstaExcluindo] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const jaCarregouRef = useRef(false);
 
   const carregarClientes = useCallback(
     async (busca?: string, pagina?: number) => {
+      // Cancelar requisição anterior
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+
       dispatch({ tipo: 'SET_CARREGANDO', payload: true });
       dispatch({ tipo: 'SET_ERRO', payload: null });
       try {
         const resultado = await listarClientesUseCase.executar(
           busca,
-          pagina ?? estado.paginaAtual,
+          pagina ?? 0,
           TAMANHO_PAGINA_PADRAO
         );
-        dispatch({ tipo: 'SET_CLIENTES', payload: resultado.content });
-        dispatch({
-          tipo: 'SET_PAGINACAO',
-          payload: {
-            totalPaginas: resultado.totalPages,
-            totalRegistros: resultado.totalElements,
-            tamanhoPagina: resultado.size,
-            paginaAtual: resultado.number,
-          },
-        });
-      } catch (_erro) {
-        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar clientes' });
+        
+        if (!signal.aborted) {
+          dispatch({ tipo: 'SET_CLIENTES', payload: resultado.content });
+          dispatch({
+            tipo: 'SET_PAGINACAO',
+            payload: {
+              totalPaginas: resultado.totalPages,
+              totalRegistros: resultado.totalElements,
+              tamanhoPagina: resultado.size,
+              paginaAtual: resultado.number,
+            },
+          });
+        }
+      } catch (erro) {
+        if (erro instanceof Error && erro.name !== 'AbortError') {
+          dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar clientes' });
+        }
       } finally {
-        dispatch({ tipo: 'SET_CARREGANDO', payload: false });
+        if (!signal.aborted) {
+          dispatch({ tipo: 'SET_CARREGANDO', payload: false });
+        }
       }
     },
-    [dispatch, estado.paginaAtual]
+    [dispatch]
   );
 
+  // Carregar dados iniciais
   useEffect(() => {
-    carregarClientes();
-  }, [carregarClientes]);
+    if (!jaCarregouRef.current) {
+      jaCarregouRef.current = true;
+      carregarClientes();
+    }
+  }, []);
+
+  // Limpar requisições ao desmontar
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
