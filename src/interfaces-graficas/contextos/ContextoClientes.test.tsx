@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ProvedorClientes, useClientes } from './ContextoClientes';
 import { ClienteResponse } from '../../domain/entidades';
 import { SiglaEstado } from '../../domain/entidades/Cliente';
@@ -31,20 +31,20 @@ describe('ContextoClientes', () => {
               },
               dataCadastro: '2024-01-01',
             };
-            dispatch({ type: 'ADICIONAR_CLIENTE', payload: novoCliente });
+            dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: novoCliente });
           }}
         >
           Adicionar
         </button>
         <button
           data-testid="btn-carregando"
-          onClick={() => dispatch({ type: 'SET_CARREGANDO', payload: true })}
+          onClick={() => dispatch({ tipo: 'SET_CARREGANDO', payload: true })}
         >
           Carregando
         </button>
         <button
           data-testid="btn-erro"
-          onClick={() => dispatch({ type: 'SET_ERRO', payload: 'Erro de teste' })}
+          onClick={() => dispatch({ tipo: 'SET_ERRO', payload: 'Erro de teste' })}
         >
           Erro
         </button>

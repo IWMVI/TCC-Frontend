@@ -32,17 +32,4 @@ describe('Layout', () => {
 
     expect(screen.getByText('© 2025 Sistema Interno')).toBeInTheDocument();
   });
-
-  it('deve renderizar Outlet para children', () => {
-    render(
-      <MemoryRouter>
-        <Layout>
-          <div data-testid="mock-child">Conteúdo</div>
-        </Layout>
-      </MemoryRouter>
-    );
-
-    // O Outlet não renderiza children diretamente, mas o componente deve existir
-    expect(document.body).toBeTruthy();
-  });
 });

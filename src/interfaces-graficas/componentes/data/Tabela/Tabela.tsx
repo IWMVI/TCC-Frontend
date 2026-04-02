@@ -1,6 +1,6 @@
 import styles from './Tabela.module.css';
 
-interface Coluna<T> {
+export interface Coluna<T> {
   chave: keyof T | 'acoes';
   titulo: string;
   render?: (item: T) => React.ReactNode;

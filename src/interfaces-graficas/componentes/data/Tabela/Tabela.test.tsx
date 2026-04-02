@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { Tabela } from './Tabela';
+import { Tabela, Coluna } from './Tabela';
 
 interface DadoTeste {
   id: number;
@@ -53,7 +53,7 @@ describe('Tabela', () => {
   it('deve renderizar dados com render function', () => {
     const colunasComRender: Coluna<DadoTeste>[] = [
       { chave: 'id', titulo: 'ID' },
-      { chave: 'nome', titulo: 'Nome', render: (item) => <strong>{item.nome}</strong> },
+      { chave: 'nome', titulo: 'Nome', render: (item: DadoTeste) => <strong>{item.nome}</strong> },
       { chave: 'email', titulo: 'Email' },
     ];
 
