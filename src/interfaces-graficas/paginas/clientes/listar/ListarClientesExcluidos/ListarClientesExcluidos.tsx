@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Paginacao } from '../../../../componentes';
+import { Card, Tabela, Modal, Paginacao } from '../../../../componentes';
 import { useClientes } from '../../../../contextos/ContextoClientes';
 import {
   ListarClientesExcluidosUseCase,
@@ -32,7 +32,7 @@ export function ListarClientesExcluidos() {
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [totalRegistros, setTotalRegistros] = useState(0);
-  const [tamanhoPagina, setTamanhoPagina] = useState(TAMANHO_PAGINA_PADRAO);
+  const tamanhoPagina = TAMANHO_PAGINA_PADRAO;
 
   const jaCarregouRef = useRef(false);
 
@@ -40,10 +40,7 @@ export function ListarClientesExcluidos() {
     setCarregando(true);
     setErro(null);
     try {
-      const resultado = await listarClientesExcluidosUseCase.executar(
-        pagina ?? 0,
-        TAMANHO_PAGINA_PADRAO
-      );
+      const resultado = await listarClientesExcluidosUseCase.executar(pagina ?? 0, tamanhoPagina);
 
       setClientes(resultado.content);
       setTotalPaginas(resultado.totalPages);
@@ -80,13 +77,13 @@ export function ListarClientesExcluidos() {
 
     setEstaRecuperando(true);
     try {
-      await recuperarClienteUseCase.executar(clienteParaRecuperar.id);
+      const clienteRecuperado = await recuperarClienteUseCase.executar(clienteParaRecuperar.id);
       // Remove da lista local
-      setClientes(clientes.filter((c) => c.id !== clienteParaRecuperar.id));
+      setClientes((prev) => prev.filter((c) => c.id !== clienteRecuperado.id));
       fecharModal();
 
       // Notifica via contexto
-      dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: clienteParaRecuperar });
+      dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: clienteRecuperado });
     } catch (_erro) {
       setErro('Erro ao recuperar cliente');
     } finally {
