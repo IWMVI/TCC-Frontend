@@ -8,8 +8,9 @@
 .listar-clientes__header {
   margin-bottom: 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .listar-clientes__navegacao {
@@ -51,6 +52,15 @@
   color: var(--cor-texto-secundario);
   font-size: 0.8125rem;
   margin: 0.25rem 0 0 0;
+}
+
+.listar-clientes__acoes-header {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.listar-clientes__acoes-header a {
+  text-decoration: none;
 }
 
 /* Busca */

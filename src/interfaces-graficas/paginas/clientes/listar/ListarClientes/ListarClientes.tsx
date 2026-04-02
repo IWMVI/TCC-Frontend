@@ -187,9 +187,14 @@ export function ListarClientes() {
             <p>Gerencie os clientes do sistema</p>
           </div>
         </div>
-        <Link to="/clientes/novo">
-          <Botao>Novo Cliente</Botao>
-        </Link>
+        <div className={styles['listar-clientes__acoes-header']}>
+          <Link to="/clientes/excluidos">
+            <Botao tipo="secundario">Ver Excluídos</Botao>
+          </Link>
+          <Link to="/clientes/novo">
+            <Botao>Novo Cliente</Botao>
+          </Link>
+        </div>
       </header>
 
       <Card titulo="Lista de Clientes">

@@ -20,6 +20,11 @@ export interface IClienteRepository {
   atualizar(id: number, dados: ClienteRequest): Promise<ClienteResponse>;
   deletar(id: number): Promise<void>;
 
+  // Clientes Excluídos
+  listarExcluidos(pagina?: number, tamanho?: number): Promise<PaginacaoResultado<ClienteResponse>>;
+  listarTodosExcluidos(): Promise<ClienteResponse[]>;
+  recuperarCliente(id: number): Promise<ClienteResponse>;
+
   buscarMedidas(
     clienteId: number
   ): Promise<MedidaFemininaResponse[] | MedidaMasculinaResponse[] | null>;
