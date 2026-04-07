@@ -1,0 +1,1 @@
+export { ListarTrajes } from './ListarTrajes';

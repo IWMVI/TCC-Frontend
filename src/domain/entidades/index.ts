@@ -9,3 +9,4 @@ export type {
   MedidaFemininaResponse,
   MedidaMasculinaResponse,
 } from './Cliente';
+export type { Traje, TrajeRequest, TrajeResponse } from './Traje';

@@ -1,0 +1,12 @@
+.formulario-traje {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 30vh;
+  padding: 1rem;
+}
+
+.formulario-traje__carregando {
+  font-size: 1rem;
+  color: var(--cor-texto);
+}

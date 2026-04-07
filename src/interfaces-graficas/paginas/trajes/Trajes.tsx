@@ -1,23 +1,38 @@
-import { Link } from 'react-router-dom';
-import { Card, Botao } from '../../componentes';
+import {useNavigate} from 'react-router-dom';
+import {UserPlus, Users} from 'lucide-react';
+import {CardNavegacao} from '../../componentes/base/CardNavegacao';
 import styles from './Trajes.module.css';
 
 export function Trajes() {
-  return (
-    <div className={styles['trajes-page']}>
-      <header className={styles['trajes-page__header']}>
-        <div>
-          <h1>Trajes</h1>
-          <p>Gerencie o catálogo de trajes do sistema.</p>
-        </div>
-        <Link to="/trajes/novo">
-          <Botao>Novo Traje</Botao>
-        </Link>
-      </header>
+    const navegar = useNavigate();
 
-      <Card titulo="Lista de Trajes">
-        <p>Ainda não existem trajes cadastrados. Clique em "Novo Traje" para começar.</p>
-      </Card>
-    </div>
-  );
+    return (
+        <div className={styles.trajes}>
+            <button className={styles.trajes__voltar} onClick={() => navegar('/dashboard')} type="button">
+                ← Voltar
+            </button>
+
+            <section className={styles.trajes__cabecalho}>
+                <h1 className={styles.trajes__titulo}>Controle de Trajes</h1>
+                <p className={styles.trajes__subtitulo}>Escolha uma opção abaixo</p>
+            </section>
+
+            <section className={styles.trajes__cards} aria-label="Opções de trajes">
+                <CardNavegacao
+                    rota="/trajes/novo"
+                    titulo="Adicionar Traje"
+                    descricao="Cadastre um novo traje no sistema"
+                    icone={<UserPlus size={36} strokeWidth={1.5} aria-hidden="true"/>}
+                    textoBotao="Cadastrar"
+                />
+                <CardNavegacao
+                    rota="/trajes/listar"
+                    titulo="Listar Trajes"
+                    descricao="Visualize e edite trajes cadastrados"
+                    icone={<Users size={36} strokeWidth={1.5} aria-hidden="true"/>}
+                    textoBotao="Visualizar"
+                />
+            </section>
+        </div>
+    );
 }

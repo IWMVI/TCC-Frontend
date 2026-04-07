@@ -7,25 +7,33 @@ import {ListarClientesExcluidos} from './interfaces-graficas/paginas/clientes/li
 import {CriarCliente} from './interfaces-graficas/paginas/clientes/criar/CriarCliente';
 import {EditarCliente} from './interfaces-graficas/paginas/clientes/editar/EditarCliente';
 import {Trajes} from './interfaces-graficas/paginas/trajes/Trajes';
+import {ListarTrajes} from './interfaces-graficas/paginas/trajes/listar/ListarTrajes';
+import {CriarTraje} from './interfaces-graficas/paginas/trajes/criar/CriarTraje';
+import {EditarTraje} from './interfaces-graficas/paginas/trajes/editar/EditarTraje';
 import {Alugueis} from './interfaces-graficas/paginas/alugueis/Alugueis';
-import {ProvedorClientes} from './interfaces-graficas/contextos';
+import {ProvedorClientes, ProvedorTrajes} from './interfaces-graficas/contextos';
 
 function App() {
   return (
     <ProvedorClientes>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="clientes" element={<Clientes/>}/>
-          <Route path="clientes/listar" element={<ListarClientes/>}/>
-          <Route path="clientes/excluidos" element={<ListarClientesExcluidos/>}/>
-          <Route path="clientes/novo" element={<CriarCliente />} />
-          <Route path="clientes/:id/editar" element={<EditarCliente />} />
-          <Route path="trajes" element={<Trajes />} />
-          <Route path="alugueis" element={<Alugueis />} />
-        </Route>
-      </Routes>
+      <ProvedorTrajes>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="clientes" element={<Clientes/>}/>
+            <Route path="clientes/listar" element={<ListarClientes/>}/>
+            <Route path="clientes/excluidos" element={<ListarClientesExcluidos/>}/>
+            <Route path="clientes/novo" element={<CriarCliente />} />
+            <Route path="clientes/:id/editar" element={<EditarCliente />} />
+            <Route path="trajes" element={<Trajes />} />
+            <Route path="trajes/listar" element={<ListarTrajes />} />
+            <Route path="trajes/novo" element={<CriarTraje />} />
+            <Route path="trajes/:id/editar" element={<EditarTraje />} />
+            <Route path="alugueis" element={<Alugueis />} />
+          </Route>
+        </Routes>
+      </ProvedorTrajes>
     </ProvedorClientes>
   );
 }

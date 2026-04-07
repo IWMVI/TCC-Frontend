@@ -1,0 +1,1 @@
+export { EditarTraje } from './EditarTraje';
