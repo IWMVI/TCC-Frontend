@@ -6,11 +6,11 @@ Guia de referência para criação e organização de testes no projeto TCC-Fron
 
 | Ferramenta | Versão | Propósito |
 |---|---|---|
-| **Jest** | 30.x | Framework de teste |
-| **ts-jest** | 29.x | Suporte a TypeScript no Jest |
-| **React Testing Library** | 16.x | Teste de componentes React |
-| **@testing-library/user-event** | 14.x | Simulação de interações do usuário |
-| **@testing-library/jest-dom** | 6.x | Matchers customizados para DOM |
+| **Jest** | 30.3.0 | Framework de teste |
+| **ts-jest** | 29.4.6 | Suporte a TypeScript no Jest |
+| **React Testing Library** | 16.3.2 | Teste de componentes React |
+| **@testing-library/user-event** | 14.6.1 | Simulação de interações do usuário |
+| **@testing-library/jest-dom** | 6.9.1 | Matchers customizados para DOM |
 | **jsdom** | (via jest-environment-jsdom) | Ambiente DOM simulado |
 
 ## Início Rápido
@@ -49,7 +49,12 @@ src/
 ├── infrastructure/
 │   └── __tests__/          ← Testes de repositórios e APIs
 └── interfaces-graficas/
-    └── __tests__/          ← Testes de componentes React
+    ├── componentes/
+    │   └── __tests__/      ← Testes de componentes React
+    ├── contextos/
+    │   └── __tests__/      ← Testes de contextos React
+    └── paginas/
+        └── __tests__/     ← Testes de páginas
 ```
 
 ## Convenção de Nomenclatura

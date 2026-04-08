@@ -115,7 +115,7 @@ describe('ClienteService', () => {
 ### Teste de Componente React
 
 ```tsx
-// src/interfaces-graficas/components/__tests__/ClienteForm.test.tsx
+// src/interfaces-graficas/componentes/ClienteForm/ClienteForm.test.tsx
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ClienteForm } from '../ClienteForm'
