@@ -48,6 +48,80 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.formularioTraje__conteudo {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.formularioTraje__principal {
+  display: grid;
+  gap: 1rem;
+}
+
+.formularioTraje__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formularioTraje__previewCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.formularioTraje__previewTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.formularioTraje__previewWrapper {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.formularioTraje__previewImage {
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.formularioTraje__previewEmpty {
+  color: #666;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.formularioTraje__linhaDois {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.formularioTraje__linhaTres {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.formularioTraje__campo--full {
+  grid-column: 1 / -1;
+}
+
 .formularioTraje__campo {
   display: flex;
   flex-direction: column;
@@ -60,7 +134,8 @@
 }
 
 .formularioTraje__input,
-.formularioTraje__textarea {
+.formularioTraje__textarea,
+.formularioTraje__select {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -69,7 +144,8 @@
 }
 
 .formularioTraje__input:focus,
-.formularioTraje__textarea:focus {
+.formularioTraje__textarea:focus,
+.formularioTraje__select:focus {
   outline: none;
   border-color: #007bff;
 }
