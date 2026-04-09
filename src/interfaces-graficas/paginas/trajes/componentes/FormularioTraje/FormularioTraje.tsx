@@ -128,9 +128,15 @@ export function FormularioTraje({
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!validar(formData)) return;
-      await onSubmit(formData);
+      
+      const dadosComImagem = {
+        ...formData,
+        imagemUrl: imagemPreview || formData.imagemUrl,
+      };
+      
+      await onSubmit(dadosComImagem);
     },
-    [formData, validar, onSubmit]
+    [formData, validar, onSubmit, imagemPreview]
   );
 
   const handleAtualizarImagem = useCallback(
@@ -278,7 +284,7 @@ export function FormularioTraje({
 
             <div className={styles['formulario-traje__linha-tres']}>
               {renderSelect('status', 'Status', opcoesEnum.status, true)}
-              {renderSelect('genero', 'Sexo', opcoesEnum.sexo, true)}
+              {renderSelect('genero', 'Sexo', opcoesEnum.genero, true)}
               {renderSelect('condicao', 'Condição', opcoesEnum.condicao, true)}
             </div>
           </div>

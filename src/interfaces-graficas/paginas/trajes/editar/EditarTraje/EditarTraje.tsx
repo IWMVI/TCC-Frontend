@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FormularioTraje } from '../../componentes';
 import { LoadingState } from '../../../../componentes/feedback/LoadingState';
-import { atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS } from '@application/trajes';
+import { atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
 import { TrajeRequest } from '@domain/entidades';
 
 export function EditarTraje() {
@@ -24,12 +24,12 @@ export function EditarTraje() {
           tecido: traje.tecido,
           cor: traje.cor,
           estampa: traje.estampa,
-          tipo: traje.tipoTraje,
+          tipo: traje.tipo,
           valorItem: traje.preco,
           tamanho: traje.tamanho,
           textura: traje.textura,
           status: traje.status,
-          genero: traje.sexo,
+          genero: traje.genero,
           condicao: traje.condicao,
           imagemUrl: traje.imagem,
         });
@@ -49,7 +49,28 @@ export function EditarTraje() {
     setErro(null);
     setEstaEnviando(true);
     try {
-      await atualizarTrajeUseCase.executar(Number.parseInt(id, 10), dados);
+      const temImagemNova = dados.imagemUrl && dados.imagemUrl.startsWith('data:');
+      const dadosSemImagem = {
+        ...dados,
+        imagemUrl: temImagemNova ? '' : (dados.imagemUrl || ''),
+      };
+      
+      await atualizarTrajeUseCase.executar(Number.parseInt(id, 10), dadosSemImagem);
+      
+      if (temImagemNova) {
+        const base64 = dados.imagemUrl.split(',')[1];
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([blob], 'imagem.jpg', { type: 'image/jpeg' });
+        
+        await trajeRepository.atualizarImagem(Number.parseInt(id, 10), file);
+      }
+      
       navigate(TRAJE_CONSTANTS.ROUTES.LISTAR);
       return Number.parseInt(id, 10);
     } catch (err) {

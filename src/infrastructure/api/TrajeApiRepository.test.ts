@@ -32,12 +32,12 @@ describe('TrajeApiRepository', () => {
     descricao: 'Traje elegante',
     tecido: 'Seda',
     cor: 'Preto',
-    tipoTraje: 'Formal',
+    tipo: 'Formal',
     preco: 150,
     tamanho: 'M',
     textura: 'Lisa',
     status: 'DISPONIVEL',
-    sexo: 'MASCULINO',
+    genero: 'MASCULINO',
     condicao: 'NOVO',
     dataCadastro: '2024-01-01',
   };
@@ -95,7 +95,7 @@ describe('TrajeApiRepository', () => {
 
       expect(resultado).toEqual(mockPaginacao);
       expect(mockGet).toHaveBeenCalledWith('/trajes', {
-        params: { pagina: 0, tamanho: 10 },
+        params: { pagina: 0, tamanhoPagina: 10 },
       });
     });
 
@@ -106,7 +106,7 @@ describe('TrajeApiRepository', () => {
       await repositorio.listar('Formal', 0, 10);
 
       expect(mockGet).toHaveBeenCalledWith('/trajes', {
-        params: { busca: 'Formal', pagina: 0, tamanho: 10 },
+        params: { busca: 'Formal', pagina: 0, tamanhoPagina: 10 },
       });
     });
 

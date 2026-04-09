@@ -22,13 +22,21 @@ export class TrajeApiRepository implements ITrajeRepository {
   async listar(
     busca?: string,
     pagina?: number,
-    tamanho?: number
+    tamanhoPagina?: number,
+    status?: string,
+    genero?: string,
+    tipo?: string,
+    tamanho?: string
   ): Promise<PaginacaoResultado<TrajeResponse>> {
     try {
       const params: Record<string, string | number> = {};
       if (busca) params.busca = busca;
       if (pagina !== undefined) params.pagina = pagina;
-      if (tamanho !== undefined) params.tamanho = tamanho;
+      if (tamanhoPagina !== undefined) params.tamanhoPagina = tamanhoPagina;
+      if (status) params.status = status;
+      if (genero) params.genero = genero;
+      if (tipo) params.tipo = tipo;
+      if (tamanho) params.tamanho = tamanho;
 
       const resposta = await this.trajeApi.get<PaginacaoResultado<TrajeResponse>>('/trajes', {
         params,
@@ -153,19 +161,8 @@ export class TrajeApiRepository implements ITrajeRepository {
       delete dadosAjustados.imagem;
     }
 
-    if (dadosAjustados.preco !== undefined) {
-      dadosAjustados.valorItem = dadosAjustados.preco;
-      delete dadosAjustados.preco;
-    }
-
-    if (dadosAjustados.sexo !== undefined) {
-      dadosAjustados.genero = dadosAjustados.sexo;
-      delete dadosAjustados.sexo;
-    }
-
-    if (dadosAjustados.tipoTraje !== undefined) {
-      dadosAjustados.tipo = dadosAjustados.tipoTraje;
-      delete dadosAjustados.tipoTraje;
+    if (dadosAjustados.valorItem !== undefined && dadosAjustados.valorItem !== null) {
+      dadosAjustados.valorItem = Number(dadosAjustados.valorItem);
     }
 
     return dadosAjustados;
@@ -178,16 +175,8 @@ export class TrajeApiRepository implements ITrajeRepository {
       trajeNormalizado.imagem = trajeNormalizado.imagemUrl;
     }
 
-    if (trajeNormalizado.valorItem !== undefined) {
+    if (trajeNormalizado.valorItem !== undefined && !trajeNormalizado.preco) {
       trajeNormalizado.preco = Number(trajeNormalizado.valorItem);
-    }
-
-    if (trajeNormalizado.genero !== undefined) {
-      trajeNormalizado.sexo = String(trajeNormalizado.genero);
-    }
-
-    if (trajeNormalizado.tipo !== undefined) {
-      trajeNormalizado.tipoTraje = String(trajeNormalizado.tipo);
     }
 
     return trajeNormalizado as unknown as TrajeResponse;

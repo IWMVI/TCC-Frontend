@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormularioTraje } from '../../componentes';
 import { Modal } from '../../../../componentes/feedback/Modal/Modal';
-import { criarTrajeUseCase, TRAJE_CONSTANTS } from '@application/trajes';
+import { criarTrajeUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
 import { TrajeRequest } from '@domain/entidades';
 
 export function CriarTraje() {
@@ -22,7 +22,28 @@ export function CriarTraje() {
     setErro(null);
     setEstaEnviando(true);
     try {
-      const criado = await criarTrajeUseCase.executar(dados);
+      const temImagemNova = dados.imagemUrl && dados.imagemUrl.startsWith('data:');
+      const dadosSemImagem = {
+        ...dados,
+        imagemUrl: temImagemNova ? '' : (dados.imagemUrl || ''),
+      };
+      
+      const criado = await criarTrajeUseCase.executar(dadosSemImagem);
+      
+      if (temImagemNova) {
+        const base64 = dados.imagemUrl.split(',')[1];
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([blob], 'imagem.jpg', { type: 'image/jpeg' });
+        
+        await trajeRepository.atualizarImagem(criado.id, file);
+      }
+      
       setModalTitulo('Sucesso');
       setModalMensagem('Traje criado com sucesso.');
       setModalAberto(true);
