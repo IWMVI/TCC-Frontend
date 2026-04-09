@@ -1,81 +1,50 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '../../../../componentes';
-import { useTrajes } from '../../../../contextos/ContextoTrajes';
-import { ListarTrajesUseCase, DeletarTrajeUseCase } from '../../../../../application/trajes';
-import { TrajeApiRepository } from '../../../../../infrastructure/api';
-import { TrajeResponse } from '../../../../../domain/entidades';
+import { ArrowLeft, ImageIcon } from 'lucide-react';
+import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '@interfaces-graficas/componentes';
+import type { Coluna } from '@interfaces-graficas/componentes/data/Tabela';
+import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
+import { ErrorMessage } from '@interfaces-graficas/componentes/feedback/ErrorMessage';
+import { useTrajes } from '@interfaces-graficas/contextos/ContextoTrajes';
+import { TrajeResponse } from '@domain/entidades';
+import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import styles from './ListarTrajes.module.css';
 
-// TODO: mudar as propriedades do traje depois para o que foi definido no prototipo HI-FI, e o formulário irá ser atualizado para refletir essas mudanças.
-
-const trajeRepositorio = new TrajeApiRepository();
-const listarTrajesUseCase = new ListarTrajesUseCase(trajeRepositorio);
-const deletarTrajeUseCase = new DeletarTrajeUseCase(trajeRepositorio);
-
-const TAMANHO_PAGINA_PADRAO = 10;
-
 export function ListarTrajes() {
-  const { estado, dispatch } = useTrajes();
   const navigate = useNavigate();
+  const { estado, carregarTrajes, removerTraje, atualizarImagem, removerImagem, dispatch } = useTrajes();
   const [termoBusca, setTermoBusca] = useState('');
-  const [modalAberto, setModalAberto] = useState(false);
+  const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [trajeParaExcluir, setTrajeParaExcluir] = useState<TrajeResponse | null>(null);
   const [estaExcluindo, setEstaExcluindo] = useState(false);
+  const [modalImagemAberto, setModalImagemAberto] = useState(false);
+  const [trajeSelecionado, setTrajeSelecionado] = useState<TrajeResponse | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const jaCarregouRef = useRef(false);
+  const jaCarregouInicial = useRef(false);
 
-  const carregarTrajes = useCallback(
-    async (busca?: string, pagina?: number) => {
+  const [inicializou, setInicializou] = useState(false);
+
+  const carregarDados = useCallback(
+    (busca?: string, pagina?: number) => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-
       abortControllerRef.current = new AbortController();
-      const signal = abortControllerRef.current.signal;
-
-      dispatch({ tipo: 'SET_CARREGANDO', payload: true });
-      dispatch({ tipo: 'SET_ERRO', payload: null });
-
-      try {
-        const resultado = await listarTrajesUseCase.executar(
-          busca,
-          pagina ?? 0,
-          TAMANHO_PAGINA_PADRAO
-        );
-
-        if (!signal.aborted) {
-          dispatch({ tipo: 'SET_TRAJES', payload: resultado.content });
-          dispatch({
-            tipo: 'SET_PAGINACAO',
-            payload: {
-              totalPaginas: resultado.totalPages,
-              totalRegistros: resultado.totalElements,
-              tamanhoPagina: resultado.size,
-              paginaAtual: resultado.number,
-            },
-          });
-        }
-      } catch (erro) {
-        if (erro instanceof Error && erro.name !== 'AbortError') {
-          dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar trajes' });
-        }
-      } finally {
-        if (!signal.aborted) {
-          dispatch({ tipo: 'SET_CARREGANDO', payload: false });
-        }
-      }
+      carregarTrajes(busca, pagina);
     },
-    [dispatch]
+    [carregarTrajes]
   );
 
-  useEffect(() => {
-    if (!jaCarregouRef.current) {
-      jaCarregouRef.current = true;
-      carregarTrajes();
-    }
-  }, [carregarTrajes]);
+  const carregarDadosComDebounce = useMemo(
+    () => {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      return (busca?: string, pagina?: number) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => carregarDados(busca, pagina), TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
+      };
+    },
+    [carregarDados]
+  );
 
   useEffect(() => {
     return () => {
@@ -86,83 +55,155 @@ export function ListarTrajes() {
   }, []);
 
   useEffect(() => {
+    if (!inicializou) {
+      setInicializou(true);
+      carregarTrajes();
+    }
+  }, [carregarTrajes, inicializou]);
+
+  useEffect(() => {
+    if (!termoBusca) return;
     const timeoutId = setTimeout(() => {
-      carregarTrajes(termoBusca || undefined, 0);
-    }, 300);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      carregarTrajes(termoBusca, 0);
+    }, TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [termoBusca, carregarTrajes]);
+  }, [termoBusca]);
 
-  function abrirModalExclusao(traje: TrajeResponse) {
+  const abrirModalExclusao = useCallback((traje: TrajeResponse) => {
     setTrajeParaExcluir(traje);
-    setModalAberto(true);
-  }
+    setModalExclusaoAberto(true);
+  }, []);
 
-  function fecharModal() {
-    setModalAberto(false);
+  const fecharModalExclusao = useCallback(() => {
+    setModalExclusaoAberto(false);
     setTrajeParaExcluir(null);
-  }
+  }, []);
 
-  async function confirmarExclusao() {
+  const confirmarExclusao = useCallback(async () => {
     if (!trajeParaExcluir) return;
 
     setEstaExcluindo(true);
     try {
-      await deletarTrajeUseCase.executar(trajeParaExcluir.id);
-      dispatch({ tipo: 'REMOVER_TRAJE', payload: trajeParaExcluir.id });
-      fecharModal();
-      carregarTrajes(termoBusca || undefined, estado.paginaAtual);
+      await removerTraje(trajeParaExcluir.id);
+      fecharModalExclusao();
+      carregarDados(termoBusca || undefined, estado.paginaAtual);
     } catch {
       dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir traje' });
     } finally {
       setEstaExcluindo(false);
     }
-  }
+  }, [trajeParaExcluir, removerTraje, fecharModalExclusao, carregarDados, termoBusca, estado.paginaAtual, dispatch]);
 
-  function handlePageChange(pagina: number) {
-    carregarTrajes(termoBusca || undefined, pagina);
-  }
-
-  function handleVoltar() {
-    navigate(-1);
-  }
-
-  const colunas = [
-    { chave: 'id' as keyof TrajeResponse, titulo: 'ID', width: '60px' },
-    { chave: 'nome' as keyof TrajeResponse, titulo: 'Nome' },
-    { chave: 'tamanho' as keyof TrajeResponse, titulo: 'Tamanho' },
-    { chave: 'cor' as keyof TrajeResponse, titulo: 'Cor' },
-    {
-      chave: 'preco' as keyof TrajeResponse,
-      titulo: 'Preço',
-      render: (traje: TrajeResponse) =>
-        traje.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+  const handlePageChange = useCallback(
+    (pagina: number) => {
+      carregarDados(termoBusca || undefined, pagina);
     },
-    {
-      chave: 'acoes' as keyof TrajeResponse,
-      titulo: 'Ações',
-      width: '180px',
-      render: (traje: TrajeResponse) => (
-        <div className={styles['listar-trajes__acoes']}>
-          <Link
-            to={`/trajes/${traje.id}/editar`}
-            className={styles['listar-trajes__botao-editar']}
-            title="Editar traje"
-          >
-            Editar
-          </Link>
+    [carregarDados, termoBusca]
+  );
+
+  const abrirModalImagem = useCallback((traje: TrajeResponse) => {
+    setTrajeSelecionado(traje);
+    setModalImagemAberto(true);
+  }, []);
+
+  const fecharModalImagem = useCallback(() => {
+    setModalImagemAberto(false);
+    setTrajeSelecionado(null);
+  }, []);
+
+  const handleAtualizarImagem = useCallback(
+    async (trajeId: number, file: File) => {
+      try {
+        const novaUrl = await atualizarImagem(trajeId, file);
+        setTrajeSelecionado((prev) => (prev ? { ...prev, imagem: novaUrl, imagemUrl: novaUrl } : null));
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao atualizar imagem' });
+      }
+    },
+    [atualizarImagem, dispatch]
+  );
+
+  const handleRemoverImagem = useCallback(
+    async (trajeId: number) => {
+      try {
+        await removerImagem(trajeId);
+        setTrajeSelecionado((prev) => (prev ? { ...prev, imagem: '', imagemUrl: '' } : null));
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao remover imagem' });
+      }
+    },
+    [removerImagem, dispatch]
+  );
+
+  const colunas = useMemo<Coluna<TrajeResponse>[]>(
+    () => [
+      {
+        chave: 'imagem' as const,
+        titulo: 'Img',
+        render: (traje) => (
           <button
             type="button"
-            className={styles['listar-trajes__botao-excluir']}
-            onClick={() => abrirModalExclusao(traje)}
-            title="Excluir traje"
+            className={styles['listar-trajes__botao-imagem']}
+            onClick={() => abrirModalImagem(traje)}
+            title="Ver imagem"
           >
-            Excluir
+            {traje.imagem ? (
+              <img src={traje.imagem} alt="" className={styles['listar-trajes__miniatura']} />
+            ) : (
+              <ImageIcon size={20} className={styles['listar-trajes__sem-imagem']} />
+            )}
           </button>
-        </div>
-      ),
-    },
-  ];
+        ),
+      },
+      { chave: 'id', titulo: 'ID' },
+      { chave: 'nome', titulo: 'Nome' },
+      { chave: 'tamanho', titulo: 'Tamanho' },
+      { chave: 'cor', titulo: 'Cor' },
+      {
+        chave: 'preco',
+        titulo: 'Preço',
+        render: (traje) =>
+          traje.preco?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '-',
+      },
+      {
+        chave: 'acoes',
+        titulo: 'Ações',
+        render: (traje) => (
+          <div className={styles['listar-trajes__acoes']}>
+            <Link
+              to={TRAJE_CONSTANTS.ROUTES.EDITAR(traje.id)}
+              className={styles['listar-trajes__botao-editar']}
+              title="Editar traje"
+            >
+              Editar
+            </Link>
+            <button
+              type="button"
+              className={styles['listar-trajes__botao-excluir']}
+              onClick={() => abrirModalExclusao(traje)}
+              title="Excluir traje"
+            >
+              Excluir
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [abrirModalImagem, abrirModalExclusao]
+  );
+
+  const handleVoltar = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const limparErro = useCallback(() => {
+    dispatch({ tipo: 'SET_ERRO', payload: null });
+  }, [dispatch]);
 
   return (
     <div className={styles['listar-trajes']}>
@@ -178,57 +219,65 @@ export function ListarTrajes() {
             <span>Voltar</span>
           </button>
           <div className={styles['listar-trajes__titulo']}>
-            <h1>Trajes</h1>
-            <p>Gerencie os trajes do sistema</p>
+            <h1 className={styles['listar-trajes__titulo-texto']}>Trajes</h1>
+            <p className={styles['listar-trajes__titulo-subtitulo']}>Gerencie os trajes do sistema</p>
           </div>
         </div>
         <div className={styles['listar-trajes__acoes-header']}>
-          <Link to="/trajes/novo">
+          <Link to={TRAJE_CONSTANTS.ROUTES.CRIAR}>
             <Botao>Novo Traje</Botao>
           </Link>
         </div>
       </header>
 
       <Card titulo="Lista de Trajes">
-        <div className={styles.card__conteudo}>
-          <div className={styles.card__corpo}>
-            <div className={styles['listar-trajes__busca']}>
-              <Busca
-                valor={termoBusca}
-                onChange={setTermoBusca}
-                placeholder="Buscar por nome, tamanho ou cor..."
-                onSearch={(valor) => carregarTrajes(valor || undefined, 0)}
-              />
-            </div>
+        <div className={styles['listar-trajes__busca']}>
+          <Busca
+            valor={termoBusca}
+            onChange={setTermoBusca}
+            placeholder="Buscar por nome, tamanho ou cor..."
+            onSearch={(valor) => carregarDadosComDebounce(valor || undefined, 0)}
+          />
+        </div>
 
-            {estado.erro && <div className={styles['listar-trajes__erro']}>{estado.erro}</div>}
+        {estado.erro && (
+          <ErrorMessage mensagem={estado.erro} onDismiss={limparErro} />
+        )}
 
-            <div className={styles['listar-trajes__tabela-wrapper']}>
-              <Tabela colunas={colunas} dados={estado.trajes} estaCarregando={estado.estaCarregando} />
-            </div>
-          </div>
+        <div className={styles['listar-trajes__tabela-wrapper']}>
+          <Tabela colunas={colunas} dados={estado.trajes} estaCarregando={estado.estaCarregando} />
+        </div>
 
-          <div className={styles['listar-trajes__paginacao-container']}>
-            <Paginacao
-              paginaAtual={estado.paginaAtual}
-              totalPaginas={estado.totalPaginas || 1}
-              totalRegistros={estado.totalRegistros}
-              tamanhoPagina={estado.tamanhoPagina}
-              onPageChange={handlePageChange}
-            />
-          </div>
+        <div className={styles['listar-trajes__paginacao']}>
+          <Paginacao
+            paginaAtual={estado.paginaAtual}
+            totalPaginas={estado.totalPaginas || 1}
+            totalRegistros={estado.totalRegistros}
+            tamanhoPagina={estado.tamanhoPagina}
+            onPageChange={handlePageChange}
+          />
         </div>
       </Card>
 
       <Modal
         titulo="Confirmar Exclusão"
         mensagem={`Tem certeza que deseja excluir o traje "${trajeParaExcluir?.nome}"? Esta ação não pode ser desfeita.`}
-        estaAberto={modalAberto}
+        estaAberto={modalExclusaoAberto}
         aoConfirmar={confirmarExclusao}
-        aoCancelar={fecharModal}
+        aoCancelar={fecharModalExclusao}
         textoBotaoConfirmar={estaExcluindo ? 'Excluindo...' : 'Excluir'}
         textoBotaoCancelar="Cancelar"
         tipoBotaoConfirmar="perigo"
+      />
+
+      <ModalVisualizacaoImagem
+        imagemUrl={trajeSelecionado?.imagem}
+        trajeId={trajeSelecionado?.id ?? 0}
+        trajeNome={trajeSelecionado?.nome ?? ''}
+        estaAberto={modalImagemAberto}
+        aoFechar={fecharModalImagem}
+        aoAtualizarImagem={handleAtualizarImagem}
+        aoRemoverImagem={handleRemoverImagem}
       />
     </div>
   );

@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FormularioTraje } from '../../componentes';
-import { AtualizarTrajeUseCase, BuscarTrajePorIdUseCase } from '@application/trajes';
-import { TrajeApiRepository } from '@infrastructure/api';
+import { LoadingState } from '../../../../componentes/feedback/LoadingState';
+import { atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS } from '@application/trajes';
 import { TrajeRequest } from '@domain/entidades';
-import styles from './EditarTraje.module.css';
-
-const trajeRepositorio = new TrajeApiRepository();
-const buscarTrajeUseCase = new BuscarTrajePorIdUseCase(trajeRepositorio);
-const atualizarTrajeUseCase = new AtualizarTrajeUseCase(trajeRepositorio);
-
-// TODO: mudar as propriedades do traje depois para o que foi definido no prototipo HI-FI, e o formulário irá ser atualizado para refletir essas mudanças.
 
 export function EditarTraje() {
   const { id } = useParams<{ id: string }>();
@@ -24,21 +17,21 @@ export function EditarTraje() {
     async function carregarTraje() {
       if (!id) return;
       try {
-        const traje = await buscarTrajeUseCase.executar(Number.parseInt(id, 10));
+        const traje = await buscarTrajePorIdUseCase.executar(Number.parseInt(id, 10));
         setInitialData({
           nome: traje.nome,
           descricao: traje.descricao,
           tecido: traje.tecido,
           cor: traje.cor,
           estampa: traje.estampa,
-          tipoTraje: traje.tipoTraje,
-          preco: traje.preco,
+          tipo: traje.tipoTraje,
+          valorItem: traje.preco,
           tamanho: traje.tamanho,
           textura: traje.textura,
           status: traje.status,
-          sexo: traje.sexo,
+          genero: traje.sexo,
           condicao: traje.condicao,
-          imagem: traje.imagem,
+          imagemUrl: traje.imagem,
         });
       } catch {
         setErro('Traje não encontrado');
@@ -57,7 +50,7 @@ export function EditarTraje() {
     setEstaEnviando(true);
     try {
       await atualizarTrajeUseCase.executar(Number.parseInt(id, 10), dados);
-      navigate('/trajes/listar');
+      navigate(TRAJE_CONSTANTS.ROUTES.LISTAR);
       return Number.parseInt(id, 10);
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao atualizar traje');
@@ -68,11 +61,7 @@ export function EditarTraje() {
   }
 
   if (estaCarregando) {
-    return (
-      <div className={styles['formulario-traje']}>
-        <p className={styles['formulario-traje__carregando']}>Carregando...</p>
-      </div>
-    );
+    return <LoadingState mensagem="Carregando traje..." />;
   }
 
   return (

@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Botao } from '../../../../componentes/base/Botao';
-import { TrajeRequest } from '../../../../../domain/entidades';
-import { enumApiRepository, EnumValues } from '../../../../../infrastructure/api';
+import { Eye, X } from 'lucide-react';
+import { Botao } from '@interfaces-graficas/componentes/base/Botao';
+import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
+import { LoadingState } from '@interfaces-graficas/componentes/feedback/LoadingState';
+import { TrajeRequest } from '@domain/entidades';
+import { enumApiRepository, EnumValues } from '@infrastructure/api';
+import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
+import { useFormTraje, formatarValorDigitado, useImageHandler } from '@application/trajes/hooks';
 import styles from './FormularioTraje.module.css';
 
 interface FormularioTrajeProps {
@@ -13,6 +18,20 @@ interface FormularioTrajeProps {
   onSubmit: (dados: TrajeRequest) => Promise<unknown>;
 }
 
+const MENSAGENS_VALIDACAO = {
+  nomeObrigatorio: 'Nome é obrigatório',
+  descricaoObrigatoria: 'Descrição é obrigatória',
+  tecidoObrigatorio: 'Tecido é obrigatório',
+  tipoObrigatorio: 'Tipo do traje é obrigatório',
+  tamanhoObrigatorio: 'Tamanho é obrigatório',
+  corObrigatoria: 'Cor é obrigatória',
+  texturaObrigatoria: 'Textura é obrigatória',
+  statusObrigatorio: 'Status é obrigatório',
+  sexoObrigatorio: 'Sexo é obrigatório',
+  condicaoObrigatoria: 'Condição é obrigatória',
+  precoInvalido: 'Preço deve ser maior que zero',
+} as const;
+
 export function FormularioTraje({
   titulo,
   trajeInicial = {},
@@ -21,216 +40,173 @@ export function FormularioTraje({
   onSubmit,
 }: Readonly<FormularioTrajeProps>) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<TrajeRequest>({
-    nome: '',
-    descricao: '',
-    tecido: '',
-    cor: '',
-    estampa: '',
-    tipoTraje: '',
-    preco: 0,
-    tamanho: '',
-    textura: '',
-    status: '',
-    sexo: '',
-    condicao: '',
-    imagem: '',
+  const [opcoesEnum, setOpcoesEnum] = useState<EnumValues | null>(null);
+  const [modalImagemAberto, setModalImagemAberto] = useState(false);
+  const [valorItemDisplay, setValorItemDisplay] = useState('');
+
+  const { formData, errosValidacao, setField, setErro, imagemPreview, setImagemPreview } = useFormTraje({
+    trajeInicial,
   });
 
-  useEffect(() => {
-    if (trajeInicial) {
-      setFormData((prev) => ({
-        ...prev,
-        nome: trajeInicial.nome || '',
-        descricao: trajeInicial.descricao || '',
-        tecido: trajeInicial.tecido || '',
-        cor: trajeInicial.cor || '',
-        estampa: trajeInicial.estampa || '',
-        tipoTraje: trajeInicial.tipoTraje || '',
-        preco: trajeInicial.preco || 0,
-        tamanho: trajeInicial.tamanho || '',
-        textura: trajeInicial.textura || '',
-        status: trajeInicial.status || '',
-        sexo: trajeInicial.sexo || '',
-        condicao: trajeInicial.condicao || '',
-        imagem: trajeInicial.imagem || '',
-      }));
-    }
-  }, [trajeInicial]);
-  const [imagemPreview, setImagemPreview] = useState<string>(trajeInicial.imagem || '');
-  const [opcoesEnum, setOpcoesEnum] = useState<EnumValues | null>(null);
+  const { handleFileChange, handleRemover } = useImageHandler();
 
   useEffect(() => {
     enumApiRepository.buscarValoresEnum().then(setOpcoesEnum).catch(console.error);
   }, []);
 
-  const [errosValidacao, setErrosValidacao] = useState<Partial<Record<keyof TrajeRequest, string>>>(
-    {}
-  );
+  useEffect(() => {
+    if (trajeInicial.valorItem) {
+      setValorItemDisplay(
+        trajeInicial.valorItem.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      );
+    }
+  }, [trajeInicial.valorItem]);
 
-  function handleInputChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) {
-    const { name, value } = e.target;
+  const validar = useCallback((dados: TrajeRequest): boolean => {
+    const erros: Partial<Record<keyof TrajeRequest, string>> = {};
 
-    setFormData((prev) => {
-      const novoValor = name === 'preco' ? Number.parseFloat(value) || 0 : value;
+    if (!dados.nome?.trim()) erros.nome = MENSAGENS_VALIDACAO.nomeObrigatorio;
+    if (!dados.descricao?.trim()) erros.descricao = MENSAGENS_VALIDACAO.descricaoObrigatoria;
+    if (!dados.tecido) erros.tecido = MENSAGENS_VALIDACAO.tecidoObrigatorio;
+    if (!dados.tipo) erros.tipo = MENSAGENS_VALIDACAO.tipoObrigatorio;
+    if (!dados.tamanho) erros.tamanho = MENSAGENS_VALIDACAO.tamanhoObrigatorio;
+    if (!dados.cor) erros.cor = MENSAGENS_VALIDACAO.corObrigatoria;
+    if (!dados.textura) erros.textura = MENSAGENS_VALIDACAO.texturaObrigatoria;
+    if (!dados.status) erros.status = MENSAGENS_VALIDACAO.statusObrigatorio;
+    if (!dados.genero) erros.genero = MENSAGENS_VALIDACAO.sexoObrigatorio;
+    if (!dados.condicao) erros.condicao = MENSAGENS_VALIDACAO.condicaoObrigatoria;
+    if (dados.valorItem <= 0) erros.valorItem = MENSAGENS_VALIDACAO.precoInvalido;
 
-      return {
-        ...prev,
-        [name]: novoValor,
-      } as TrajeRequest;
+    Object.entries(erros).forEach(([campo, mensagem]) => {
+      setErro(campo as keyof TrajeRequest, mensagem);
     });
 
-    if (errosValidacao[name as keyof TrajeRequest]) {
-      setErrosValidacao((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
-  }
+    return Object.keys(erros).length === 0;
+  }, [setErro]);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setField(name as keyof TrajeRequest, value);
+    },
+    [setField]
+  );
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setFormData((prev) => ({ ...prev, imagem: base64 }));
-      setImagemPreview(base64);
-    };
-    reader.readAsDataURL(file);
-  }
+  const handleValorItemChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { display, numeric } = formatarValorDigitado(e.target.value);
+      setValorItemDisplay(display);
+      setField('valorItem', numeric);
+    },
+    [setField]
+  );
 
-  function validarFormulario(): boolean {
-    const novosErros: Partial<Record<keyof TrajeRequest, string>> = {};
+  const handleImageChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      handleFileChange(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagemPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    },
+    [handleFileChange, setImagemPreview]
+  );
 
-    if (!formData.nome?.trim()) {
-      novosErros.nome = 'Nome é obrigatório';
-    }
+  const handleRemoverImagem = useCallback(() => {
+    handleRemover();
+    setImagemPreview('');
+    setModalImagemAberto(false);
+  }, [handleRemover, setImagemPreview]);
 
-    if (!formData.descricao?.trim()) {
-      novosErros.descricao = 'Descrição é obrigatória';
-    }
-
-    if (!formData.tecido) {
-      novosErros.tecido = 'Tecido é obrigatório';
-    }
-
-    if (!formData.tipoTraje) {
-      novosErros.tipoTraje = 'Tipo do traje é obrigatório';
-    }
-
-    if (!formData.tamanho) {
-      novosErros.tamanho = 'Tamanho é obrigatório';
-    }
-
-    if (!formData.cor) {
-      novosErros.cor = 'Cor é obrigatória';
-    }
-
-    if (!formData.textura) {
-      novosErros.textura = 'Textura é obrigatória';
-    }
-
-    if (!formData.status) {
-      novosErros.status = 'Status é obrigatório';
-    }
-
-    if (!formData.sexo) {
-      novosErros.sexo = 'Sexo é obrigatório';
-    }
-
-    if (!formData.condicao) {
-      novosErros.condicao = 'Condição é obrigatória';
-    }
-
-    if (formData.preco <= 0) {
-      novosErros.preco = 'Preço deve ser maior que zero';
-    }
-
-    setErrosValidacao(novosErros);
-    return Object.keys(novosErros).length === 0;
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!validarFormulario()) {
-      return;
-    }
-
-    try {
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validar(formData)) return;
       await onSubmit(formData);
-    } catch (error) {
-      // Erro já tratado no componente pai
-    }
-  }
+    },
+    [formData, validar, onSubmit]
+  );
 
-  function renderSelect(
-    name: keyof TrajeRequest,
-    label: string,
-    options: string[],
-    obrigatorio = false
-  ) {
-    const erro = errosValidacao[name];
-    const currentValue = formData[name] as string;
-    const hasSelected = currentValue !== '';
+  const handleAtualizarImagem = useCallback(
+    async (_trajeId: number, file: File): Promise<void> => {
+      return new Promise((resolve) => {
+        handleFileChange(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagemPreview(reader.result as string);
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    [handleFileChange, setImagemPreview]
+  );
 
-    return (
-      <div className={styles.formularioTraje__campo}>
-        <label htmlFor={name} className={styles.formularioTraje__label}>
-          {label} {obrigatorio && '*'}
-        </label>
-        <select
-          id={name}
-          name={name}
-          value={currentValue}
-          onChange={handleInputChange}
-          className={`${styles.formularioTraje__select} ${erro ? styles['formularioTraje__input--erro'] : ''}`}
-          disabled={estaEnviando}
-        >
-          <option value="" disabled={hasSelected}>
-            Selecione
-          </option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
+  const renderSelect = useCallback(
+    (name: keyof TrajeRequest, label: string, options: string[], obrigatorio = false) => {
+      const erro = errosValidacao[name];
+      const currentValue = formData[name] as string;
+      const hasSelected = currentValue !== '';
+
+      return (
+        <div className={styles['formulario-traje__campo']}>
+          <label htmlFor={name} className={styles['formulario-traje__label']}>
+            {label} {obrigatorio && '*'}
+          </label>
+          <select
+            id={name}
+            name={name}
+            value={currentValue}
+            onChange={handleInputChange}
+            className={`${styles['formulario-traje__select']} ${erro ? styles['formulario-traje__input--erro'] : ''}`}
+            disabled={estaEnviando}
+          >
+            <option value="" disabled={hasSelected}>
+              Selecione
             </option>
-          ))}
-        </select>
-        {erro && <span className={styles.formularioTraje__erro}>{erro}</span>}
-      </div>
-    );
-  }
+            {options.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          {erro && <span className={styles['formulario-traje__erro']}>{erro}</span>}
+        </div>
+      );
+    },
+    [errosValidacao, formData, handleInputChange, estaEnviando]
+  );
 
   if (!opcoesEnum) {
-    return <div>Carregando...</div>;
+    return <LoadingState mensagem="Carregando enums..." />;
   }
 
   return (
-    <div className={styles.formularioTraje}>
+    <div className={styles['formulario-traje']}>
       <button
-        className={styles.formularioTraje__voltar}
-        onClick={() => navigate('/trajes')}
+        className={styles['formulario-traje__voltar']}
+        onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)}
         type="button"
       >
         ← Voltar
       </button>
 
-      <section className={styles.formularioTraje__cabecalho}>
-        <h1 className={styles.formularioTraje__titulo}>{titulo}</h1>
+      <section className={styles['formulario-traje__cabecalho']}>
+        <h1 className={styles['formulario-traje__titulo']}>{titulo}</h1>
       </section>
 
-      <form className={styles.formularioTraje__form} onSubmit={handleSubmit}>
-        <div className={styles.formularioTraje__conteudo}>
-          <div className={styles.formularioTraje__principal}>
-            <div className={styles.formularioTraje__linhaDois}>
-              <div className={styles.formularioTraje__campo}>
-                <label htmlFor="nome" className={styles.formularioTraje__label}>
+      <form className={styles['formulario-traje__form']} onSubmit={handleSubmit}>
+        <div className={styles['formulario-traje__conteudo']}>
+          <div className={styles['formulario-traje__principal']}>
+            <div className={styles['formulario-traje__linha-dois']}>
+              <div className={styles['formulario-traje__campo']}>
+                <label htmlFor="nome" className={styles['formulario-traje__label']}>
                   Nome *
                 </label>
                 <input
@@ -239,19 +215,17 @@ export function FormularioTraje({
                   name="nome"
                   value={formData.nome}
                   onChange={handleInputChange}
-                  className={`${styles.formularioTraje__input} ${errosValidacao.nome ? styles['formularioTraje__input--erro'] : ''}`}
+                  className={`${styles['formulario-traje__input']} ${errosValidacao.nome ? styles['formulario-traje__input--erro'] : ''}`}
                   disabled={estaEnviando}
                 />
                 {errosValidacao.nome && (
-                  <span className={styles.formularioTraje__erro}>{errosValidacao.nome}</span>
+                  <span className={styles['formulario-traje__erro']}>{errosValidacao.nome}</span>
                 )}
               </div>
             </div>
 
-            <div
-              className={`${styles.formularioTraje__campo} ${styles['formularioTraje__campo--full']}`}
-            >
-              <label htmlFor="descricao" className={styles.formularioTraje__label}>
+            <div className={`${styles['formulario-traje__campo']} ${styles['formulario-traje__campo--full']}`}>
+              <label htmlFor="descricao" className={styles['formulario-traje__label']}>
                 Descrição *
               </label>
               <textarea
@@ -259,43 +233,42 @@ export function FormularioTraje({
                 name="descricao"
                 value={formData.descricao}
                 onChange={handleInputChange}
-                className={`${styles.formularioTraje__textarea} ${errosValidacao.descricao ? styles['formularioTraje__textarea--erro'] : ''}`}
+                className={`${styles['formulario-traje__textarea']} ${errosValidacao.descricao ? styles['formulario-traje__input--erro'] : ''}`}
                 disabled={estaEnviando}
                 rows={4}
               />
               {errosValidacao.descricao && (
-                <span className={styles.formularioTraje__erro}>{errosValidacao.descricao}</span>
+                <span className={styles['formulario-traje__erro']}>{errosValidacao.descricao}</span>
               )}
             </div>
 
-            <div className={styles.formularioTraje__linhaDois}>
+            <div className={styles['formulario-traje__linha-dois']}>
               {renderSelect('tecido', 'Tecido', opcoesEnum.tecido, true)}
               {renderSelect('cor', 'Cor', opcoesEnum.cor, true)}
             </div>
 
-            <div className={styles.formularioTraje__linhaDois}>
+            <div className={styles['formulario-traje__linha-dois']}>
               {renderSelect('estampa', 'Estampa', opcoesEnum.estampa)}
-              {renderSelect('tipoTraje', 'Tipo do traje', opcoesEnum.tipoTraje, true)}
+              {renderSelect('tipo', 'Tipo do traje', opcoesEnum.tipoTraje, true)}
             </div>
 
-            <div className={styles.formularioTraje__linhaTres}>
-              <div className={styles.formularioTraje__campo}>
-                <label htmlFor="preco" className={styles.formularioTraje__label}>
+            <div className={styles['formulario-traje__linha-tres']}>
+              <div className={styles['formulario-traje__campo']}>
+                <label htmlFor="valorItem" className={styles['formulario-traje__label']}>
                   Preço (R$) *
                 </label>
                 <input
-                  type="number"
-                  id="preco"
-                  name="preco"
-                  value={formData.preco}
-                  onChange={handleInputChange}
-                  className={`${styles.formularioTraje__input} ${errosValidacao.preco ? styles['formularioTraje__input--erro'] : ''}`}
+                  type="text"
+                  id="valorItem"
+                  name="valorItem"
+                  value={valorItemDisplay}
+                  onChange={handleValorItemChange}
+                  placeholder="0,00"
+                  className={`${styles['formulario-traje__input']} ${errosValidacao.valorItem ? styles['formulario-traje__input--erro'] : ''}`}
                   disabled={estaEnviando}
-                  step="0.01"
-                  min="0"
                 />
-                {errosValidacao.preco && (
-                  <span className={styles.formularioTraje__erro}>{errosValidacao.preco}</span>
+                {errosValidacao.valorItem && (
+                  <span className={styles['formulario-traje__erro']}>{errosValidacao.valorItem}</span>
                 )}
               </div>
 
@@ -303,25 +276,45 @@ export function FormularioTraje({
               {renderSelect('textura', 'Textura', opcoesEnum.textura, true)}
             </div>
 
-            <div className={styles.formularioTraje__linhaTres}>
+            <div className={styles['formulario-traje__linha-tres']}>
               {renderSelect('status', 'Status', opcoesEnum.status, true)}
-              {renderSelect('sexo', 'Sexo', opcoesEnum.sexo, true)}
+              {renderSelect('genero', 'Sexo', opcoesEnum.sexo, true)}
               {renderSelect('condicao', 'Condição', opcoesEnum.condicao, true)}
             </div>
           </div>
 
-          <aside className={styles.formularioTraje__preview}>
-            <div className={styles.formularioTraje__previewCard}>
-              <span className={styles.formularioTraje__previewTitle}>Imagem do traje</span>
-              <div className={styles.formularioTraje__previewWrapper}>
+          <aside className={styles['formulario-traje__preview']}>
+            <div className={styles['formulario-traje__preview-card']}>
+              <span className={styles['formulario-traje__preview-titulo']}>Imagem do traje</span>
+              <div className={styles['formulario-traje__preview-wrapper']}>
                 {imagemPreview ? (
-                  <img
-                    src={imagemPreview}
-                    alt="Pré-visualização do traje"
-                    className={styles.formularioTraje__previewImage}
-                  />
+                  <>
+                    <img
+                      src={imagemPreview}
+                      alt="Pré-visualização do traje"
+                      className={styles['formulario-traje__preview-imagem']}
+                    />
+                    <div className={styles['formulario-traje__preview-overlay']}>
+                      <button
+                        type="button"
+                        className={styles['formulario-traje__preview-botao']}
+                        onClick={() => setModalImagemAberto(true)}
+                        title="Visualizar imagem"
+                      >
+                        <Eye size={20} />
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles['formulario-traje__preview-botao']} ${styles['formulario-traje__preview-botao--remover']}`}
+                        onClick={handleRemoverImagem}
+                        title="Remover imagem"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  </>
                 ) : (
-                  <div className={styles.formularioTraje__previewEmpty}>
+                  <div className={styles['formulario-traje__preview-vazio']}>
                     Nenhuma imagem selecionada
                   </div>
                 )}
@@ -331,15 +324,20 @@ export function FormularioTraje({
                 accept="image/*"
                 onChange={handleImageChange}
                 disabled={estaEnviando}
+                id="input-imagem"
+                className={styles['formulario-traje__input-arquivo']}
               />
+              <label htmlFor="input-imagem" className={styles['formulario-traje__label-arquivo']}>
+                {imagemPreview ? 'Trocar Imagem' : 'Selecionar Imagem'}
+              </label>
             </div>
           </aside>
         </div>
 
-        {erro && <div className={styles.formularioTraje__erroGeral}>{erro}</div>}
+        {erro && <div className={styles['formulario-traje__erro-geral']}>{erro}</div>}
 
-        <div className={styles.formularioTraje__botoes}>
-          <Botao tipo="secundario" onClick={() => navigate('/trajes')} disabled={estaEnviando}>
+        <div className={styles['formulario-traje__botoes']}>
+          <Botao tipo="secundario" onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)} disabled={estaEnviando}>
             Cancelar
           </Botao>
           <Botao tipo="primario" tipoHtml="submit" disabled={estaEnviando}>
@@ -347,6 +345,18 @@ export function FormularioTraje({
           </Botao>
         </div>
       </form>
+
+      <ModalVisualizacaoImagem
+        imagemUrl={imagemPreview}
+        trajeId={0}
+        trajeNome={formData.nome || 'Traje'}
+        estaAberto={modalImagemAberto}
+        aoFechar={() => setModalImagemAberto(false)}
+        aoAtualizarImagem={handleAtualizarImagem}
+        aoRemoverImagem={async () => {
+          handleRemoverImagem();
+        }}
+      />
     </div>
   );
 }

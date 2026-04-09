@@ -2,14 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormularioTraje } from '../../componentes';
 import { Modal } from '../../../../componentes/feedback/Modal/Modal';
-import { CriarTrajeUseCase } from '../../../../../application/trajes';
-import { TrajeApiRepository } from '../../../../../infrastructure/api';
-import { TrajeRequest } from '../../../../../domain/entidades';
-
-// TODO: mudar as propriedades do traje depois para o que foi definido no prototipo HI-FI, e o formulário irá ser atualizado para refletir essas mudanças.
-
-const trajeRepositorio = new TrajeApiRepository();
-const criarTrajeUseCase = new CriarTrajeUseCase(trajeRepositorio);
+import { criarTrajeUseCase, TRAJE_CONSTANTS } from '@application/trajes';
+import { TrajeRequest } from '@domain/entidades';
 
 export function CriarTraje() {
   const navigate = useNavigate();
@@ -21,7 +15,7 @@ export function CriarTraje() {
 
   function voltarParaInicial() {
     setModalAberto(false);
-    navigate('/trajes');
+    navigate(TRAJE_CONSTANTS.ROUTES.LISTA);
   }
 
   async function handleSubmit(dados: TrajeRequest): Promise<number> {

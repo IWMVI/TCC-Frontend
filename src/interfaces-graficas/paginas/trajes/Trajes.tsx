@@ -1,6 +1,7 @@
-import {useNavigate} from 'react-router-dom';
-import {UserPlus, Users} from 'lucide-react';
-import {CardNavegacao} from '../../componentes/base/CardNavegacao';
+import { useNavigate } from 'react-router-dom';
+import { UserPlus, Users } from 'lucide-react';
+import { CardNavegacao } from '../../componentes/base/CardNavegacao';
+import { TRAJE_CONSTANTS } from '@application/trajes';
 import styles from './Trajes.module.css';
 
 export function Trajes() {
@@ -19,17 +20,17 @@ export function Trajes() {
 
             <section className={styles.trajes__cards} aria-label="Opções de trajes">
                 <CardNavegacao
-                    rota="/trajes/novo"
+                    rota={TRAJE_CONSTANTS.ROUTES.CRIAR}
                     titulo="Adicionar Traje"
                     descricao="Cadastre um novo traje no sistema"
-                    icone={<UserPlus size={36} strokeWidth={1.5} aria-hidden="true"/>}
+                    icone={<UserPlus size={36} strokeWidth={1.5} aria-hidden="true" />}
                     textoBotao="Cadastrar"
                 />
                 <CardNavegacao
-                    rota="/trajes/listar"
+                    rota={TRAJE_CONSTANTS.ROUTES.LISTAR}
                     titulo="Listar Trajes"
                     descricao="Visualize e edite trajes cadastrados"
-                    icone={<Users size={36} strokeWidth={1.5} aria-hidden="true"/>}
+                    icone={<Users size={36} strokeWidth={1.5} aria-hidden="true" />}
                     textoBotao="Visualizar"
                 />
             </section>
