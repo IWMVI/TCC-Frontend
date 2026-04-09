@@ -45,7 +45,7 @@ describe('useImageHandler', () => {
     jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(function(this: FileReader) {
       setTimeout(() => {
         if (this.onerror) {
-          this.onerror(new Event('error'));
+          this.onerror({} as ProgressEvent<FileReader>);
         }
       }, 0);
     });

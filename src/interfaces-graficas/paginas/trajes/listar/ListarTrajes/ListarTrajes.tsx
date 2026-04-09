@@ -20,8 +20,6 @@ export function ListarTrajes() {
   const [modalImagemAberto, setModalImagemAberto] = useState(false);
   const [trajeSelecionado, setTrajeSelecionado] = useState<TrajeResponse | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const jaCarregouInicial = useRef(false);
-
   const [inicializou, setInicializou] = useState(false);
 
   const carregarDados = useCallback(

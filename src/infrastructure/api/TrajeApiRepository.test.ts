@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { TrajeApiRepository, PaginacaoResultado } from './TrajeApiRepository';
+import { TrajeApiRepository } from './TrajeApiRepository';
+import { PaginacaoResultado } from './ClienteApiRepository';
 import { TrajeRequest, TrajeResponse } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 
