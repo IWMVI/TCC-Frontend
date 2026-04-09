@@ -25,14 +25,13 @@ export interface TrajeRequest {
   tecido: string;
   cor: string;
   estampa?: string;
-  tipoTraje: string;
-  preco: number;
+  tipo: string;
+  valorItem: number;
   tamanho: string;
   textura: string;
   status: string;
-  sexo: string;
+  genero: string;
   condicao: string;
-  imagem?: string;
   imagemUrl?: string;
 }
 

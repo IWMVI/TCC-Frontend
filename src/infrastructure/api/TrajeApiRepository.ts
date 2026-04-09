@@ -33,7 +33,10 @@ export class TrajeApiRepository implements ITrajeRepository {
       const resposta = await this.trajeApi.get<PaginacaoResultado<TrajeResponse>>('/trajes', {
         params,
       });
-      return resposta.data;
+      return {
+        ...resposta.data,
+        content: resposta.data.content.map((traje) => this.normalizarResposta(traje)),
+      };
     } catch (error_) {
       throw this.criarErro(error_, 'Erro ao listar trajes');
     }
@@ -93,6 +96,52 @@ export class TrajeApiRepository implements ITrajeRepository {
         throw new RecursoNaoEncontrado('Traje', id);
       }
       throw this.criarErro(error_, 'Erro ao deletar traje');
+    }
+  }
+
+  async buscarImagem(trajeId: number): Promise<string | null> {
+    try {
+      const resposta = await this.trajeApi.get<{ imagemUrl: string }>('/trajes/imagem', {
+        params: { trajeId },
+      });
+      return resposta.data.imagemUrl || null;
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        return null;
+      }
+      throw this.criarErro(error_, 'Erro ao buscar imagem');
+    }
+  }
+
+  async atualizarImagem(trajeId: number, file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append('imagem', file);
+      formData.append('trajeId', trajeId.toString());
+
+      const resposta = await this.trajeApi.post<{ imagemUrl: string }>(
+        '/trajes/imagem',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return resposta.data.imagemUrl;
+    } catch (error_) {
+      throw this.criarErro(error_, 'Erro ao atualizar imagem');
+    }
+  }
+
+  async removerImagem(trajeId: number): Promise<void> {
+    try {
+      await this.trajeApi.delete('/trajes/imagem', { params: { trajeId } });
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        throw new RecursoNaoEncontrado('Traje', trajeId);
+      }
+      throw this.criarErro(error_, 'Erro ao remover imagem');
     }
   }
 

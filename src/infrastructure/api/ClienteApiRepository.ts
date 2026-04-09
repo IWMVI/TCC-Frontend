@@ -12,16 +12,16 @@ import {FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado} from '@domain/erros
 
 const API_BASE_URL = 'http://localhost:8080';
 
-export interface PaginacaoResultado<T> {
-    content: T[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-    first: boolean;
-    last: boolean;
-    empty: boolean;
-}
+export type PaginacaoResultado<T> = {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first?: boolean;
+  last?: boolean;
+  empty?: boolean;
+};
 
 export class ClienteApiRepository implements IClienteRepository {
     private readonly clienteApi: AxiosInstance;

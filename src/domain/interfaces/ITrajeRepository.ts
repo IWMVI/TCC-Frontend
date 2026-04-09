@@ -12,4 +12,6 @@ export interface ITrajeRepository {
   criar(dados: TrajeRequest): Promise<TrajeResponse>;
   atualizar(id: number, dados: TrajeRequest): Promise<TrajeResponse>;
   deletar(id: number): Promise<void>;
+  atualizarImagem(trajeId: number, file: File): Promise<string>;
+  removerImagem(trajeId: number): Promise<void>;
 }
