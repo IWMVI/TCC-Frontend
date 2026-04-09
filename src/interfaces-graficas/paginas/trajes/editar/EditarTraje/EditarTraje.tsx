@@ -28,9 +28,17 @@ export function EditarTraje() {
         setInitialData({
           nome: traje.nome,
           descricao: traje.descricao,
-          tamanho: traje.tamanho,
+          tecido: traje.tecido,
           cor: traje.cor,
+          estampa: traje.estampa,
+          tipoTraje: traje.tipoTraje,
           preco: traje.preco,
+          tamanho: traje.tamanho,
+          textura: traje.textura,
+          status: traje.status,
+          sexo: traje.sexo,
+          condicao: traje.condicao,
+          imagem: traje.imagem,
         });
       } catch {
         setErro('Traje não encontrado');

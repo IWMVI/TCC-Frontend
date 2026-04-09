@@ -30,10 +30,9 @@ export class TrajeApiRepository implements ITrajeRepository {
       if (pagina !== undefined) params.pagina = pagina;
       if (tamanho !== undefined) params.tamanho = tamanho;
 
-      const resposta = await this.trajeApi.get<PaginacaoResultado<TrajeResponse>>(
-        '/trajes',
-        { params }
-      );
+      const resposta = await this.trajeApi.get<PaginacaoResultado<TrajeResponse>>('/trajes', {
+        params,
+      });
       return resposta.data;
     } catch (error_) {
       throw this.criarErro(error_, 'Erro ao listar trajes');
@@ -43,7 +42,7 @@ export class TrajeApiRepository implements ITrajeRepository {
   async listarTodos(): Promise<TrajeResponse[]> {
     try {
       const resposta = await this.trajeApi.get<TrajeResponse[]>('/trajes/todos');
-      return resposta.data;
+      return resposta.data.map((traje) => this.normalizarResposta(traje));
     } catch (error_) {
       throw this.criarErro(error_, 'Erro ao listar trajes');
     }
@@ -52,7 +51,7 @@ export class TrajeApiRepository implements ITrajeRepository {
   async buscarPorId(id: number): Promise<TrajeResponse> {
     try {
       const resposta = await this.trajeApi.get<TrajeResponse>(`/trajes/${id}`);
-      return resposta.data;
+      return this.normalizarResposta(resposta.data);
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
         throw new RecursoNaoEncontrado('Traje', id);
@@ -63,8 +62,10 @@ export class TrajeApiRepository implements ITrajeRepository {
 
   async criar(dados: TrajeRequest): Promise<TrajeResponse> {
     try {
-      const resposta = await this.trajeApi.post<TrajeResponse>('/trajes', dados);
-      return resposta.data;
+      // Transforma 'imagem' em 'imagemUrl' para compatibilidade com o backend
+      const dadosAjustados = this.normalizarDados(dados);
+      const resposta = await this.trajeApi.post<TrajeResponse>('/trajes', dadosAjustados);
+      return this.normalizarResposta(resposta.data);
     } catch (error_) {
       throw this.criarErro(error_, 'Erro ao criar traje');
     }
@@ -72,8 +73,10 @@ export class TrajeApiRepository implements ITrajeRepository {
 
   async atualizar(id: number, dados: TrajeRequest): Promise<TrajeResponse> {
     try {
-      const resposta = await this.trajeApi.put<TrajeResponse>(`/trajes/${id}`, dados);
-      return resposta.data;
+      // Transforma 'imagem' em 'imagemUrl' para compatibilidade com o backend
+      const dadosAjustados = this.normalizarDados(dados);
+      const resposta = await this.trajeApi.put<TrajeResponse>(`/trajes/${id}`, dadosAjustados);
+      return this.normalizarResposta(resposta.data);
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
         throw new RecursoNaoEncontrado('Traje', id);
@@ -91,6 +94,54 @@ export class TrajeApiRepository implements ITrajeRepository {
       }
       throw this.criarErro(error_, 'Erro ao deletar traje');
     }
+  }
+
+  private normalizarDados(dados: TrajeRequest): Record<string, unknown> {
+    const dadosAjustados = { ...dados } as Record<string, unknown>;
+
+    if (dadosAjustados.imagem && !dadosAjustados.imagemUrl) {
+      dadosAjustados.imagemUrl = dadosAjustados.imagem;
+      delete dadosAjustados.imagem;
+    }
+
+    if (dadosAjustados.preco !== undefined) {
+      dadosAjustados.valorItem = dadosAjustados.preco;
+      delete dadosAjustados.preco;
+    }
+
+    if (dadosAjustados.sexo !== undefined) {
+      dadosAjustados.genero = dadosAjustados.sexo;
+      delete dadosAjustados.sexo;
+    }
+
+    if (dadosAjustados.tipoTraje !== undefined) {
+      dadosAjustados.tipo = dadosAjustados.tipoTraje;
+      delete dadosAjustados.tipoTraje;
+    }
+
+    return dadosAjustados;
+  }
+
+  private normalizarResposta(traje: TrajeResponse): TrajeResponse {
+    const trajeNormalizado = { ...traje } as Record<string, unknown>;
+
+    if (trajeNormalizado.imagemUrl && !trajeNormalizado.imagem) {
+      trajeNormalizado.imagem = trajeNormalizado.imagemUrl;
+    }
+
+    if (trajeNormalizado.valorItem !== undefined) {
+      trajeNormalizado.preco = Number(trajeNormalizado.valorItem);
+    }
+
+    if (trajeNormalizado.genero !== undefined) {
+      trajeNormalizado.sexo = String(trajeNormalizado.genero);
+    }
+
+    if (trajeNormalizado.tipo !== undefined) {
+      trajeNormalizado.tipoTraje = String(trajeNormalizado.tipo);
+    }
+
+    return trajeNormalizado as unknown as TrajeResponse;
   }
 
   private criarErro(error_: unknown, mensagemPadrao: string) {

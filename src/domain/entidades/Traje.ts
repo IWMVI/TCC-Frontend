@@ -7,18 +7,19 @@ export interface Traje {
   cor: string;
   estampa?: string;
   tipoTraje: string;
-  preco: number;
+  preco?: number;
+  valorItem?: number;
   tamanho: string;
   textura: string;
   status: string;
   sexo: string;
   condicao: string;
   imagem?: string;
+  imagemUrl?: string;
   dataCadastro?: string;
 }
 
 export interface TrajeRequest {
-  codigo: string;
   nome: string;
   descricao: string;
   tecido: string;
@@ -32,6 +33,7 @@ export interface TrajeRequest {
   sexo: string;
   condicao: string;
   imagem?: string;
+  imagemUrl?: string;
 }
 
 export interface TrajeResponse {
@@ -44,12 +46,13 @@ export interface TrajeResponse {
   estampa?: string;
   tipoTraje: string;
   preco: number;
+  valorItem?: number;
   tamanho: string;
   textura: string;
   status: string;
   sexo: string;
   condicao: string;
   imagem?: string;
+  imagemUrl?: string;
   dataCadastro: string;
 }
-                                
