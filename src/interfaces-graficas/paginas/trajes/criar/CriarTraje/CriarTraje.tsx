@@ -30,7 +30,7 @@ export function CriarTraje() {
       
       const criado = await criarTrajeUseCase.executar(dadosSemImagem);
       
-      if (temImagemNova) {
+      if (temImagemNova && dados.imagemUrl) {
         const base64 = dados.imagemUrl.split(',')[1];
         const byteCharacters = atob(base64);
         const byteNumbers = new Array(byteCharacters.length);
