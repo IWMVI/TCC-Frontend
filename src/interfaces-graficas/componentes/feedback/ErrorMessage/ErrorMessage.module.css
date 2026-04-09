@@ -1,0 +1,50 @@
+.mensagem {
+  display: flex;
+  align-items: center;
+  gap: var(--espacamento-sm, 0.5rem);
+  padding: var(--espacamento-md, 1rem);
+  border-radius: var(--raio-borda, 4px);
+  font-size: var(--tamanho-fonte-sm, 0.875rem);
+}
+
+.mensagem--erro {
+  background-color: var(--cor-erro-bg, #f8d7da);
+  border: 1px solid var(--cor-erro-borda, #f5c6cb);
+  color: var(--cor-erro-texto, #721c24);
+}
+
+.mensagem--aviso {
+  background-color: var(--cor-aviso-bg, #fff3cd);
+  border: 1px solid var(--cor-aviso-borda, #ffeaa7);
+  color: var(--cor-aviso-texto, #856404);
+}
+
+.mensagem--sucesso {
+  background-color: var(--cor-sucesso-bg, #d4edda);
+  border: 1px solid var(--cor-sucesso-borda, #c3e6cb);
+  color: var(--cor-sucesso-texto, #155724);
+}
+
+.mensagem__icone {
+  flex-shrink: 0;
+}
+
+.mensagem__texto {
+  flex: 1;
+}
+
+.mensagem__botao-fechar {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--tamanho-fonte-lg, 1.25rem);
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.mensagem__botao-fechar:hover {
+  opacity: 1;
+}

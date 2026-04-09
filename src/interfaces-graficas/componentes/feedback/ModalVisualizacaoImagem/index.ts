@@ -1,0 +1,1 @@
+export { ModalVisualizacaoImagem } from './ModalVisualizacaoImagem';
