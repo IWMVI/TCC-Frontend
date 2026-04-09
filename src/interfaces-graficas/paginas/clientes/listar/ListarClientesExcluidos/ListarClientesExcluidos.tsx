@@ -84,7 +84,7 @@ export function ListarClientesExcluidos() {
 
       // Notifica via contexto
       dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: clienteRecuperado });
-    } catch (_erro) {
+    } catch {
       setErro('Erro ao recuperar cliente');
     } finally {
       setEstaRecuperando(false);

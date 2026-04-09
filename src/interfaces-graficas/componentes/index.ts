@@ -5,3 +5,4 @@ export { Busca } from './form/Busca';
 export { Layout, Card } from './layout';
 export { Modal } from './feedback/Modal';
 export { Tabela } from './data/Tabela';
+export type { Coluna } from './data/Tabela';

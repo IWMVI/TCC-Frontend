@@ -114,7 +114,7 @@ export function ListarClientes() {
       fecharModal();
       // Recarrega a lista após exclusão
       carregarClientes(termoBusca || undefined, estado.paginaAtual);
-    } catch (_erro) {
+    } catch {
       dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir cliente' });
     } finally {
       setEstaExcluindo(false);
