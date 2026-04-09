@@ -1,13 +1,20 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { TrajeResponse } from '../../domain/entidades';
+import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import { TrajeRequest, TrajeResponse } from '../../domain/entidades';
+import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
+import {
+  listarTrajesUseCase,
+  atualizarTrajeUseCase,
+  deletarTrajeUseCase,
+  trajeRepository,
+} from '@application/trajes/TrajeDependencies';
+import { PaginacaoResultado } from '@infrastructure/api';
 
 interface EstadoTrajes {
   trajes: TrajeResponse[];
   trajeSelecionado: TrajeResponse | null;
   estaCarregando: boolean;
   erro: string | null;
-  // Paginação
   paginaAtual: number;
   totalPaginas: number;
   totalRegistros: number;
@@ -32,7 +39,7 @@ const estadoInicial: EstadoTrajes = {
   paginaAtual: 0,
   totalPaginas: 0,
   totalRegistros: 0,
-  tamanhoPagina: 10,
+  tamanhoPagina: TRAJE_CONSTANTS.TAMANHO_PAGINA_PADRAO,
 };
 
 function trajesReducer(estado: EstadoTrajes, acao: AcaoTrajes): EstadoTrajes {
@@ -75,6 +82,11 @@ function trajesReducer(estado: EstadoTrajes, acao: AcaoTrajes): EstadoTrajes {
 interface ContextoTrajesType {
   estado: EstadoTrajes;
   dispatch: React.Dispatch<AcaoTrajes>;
+  carregarTrajes: (busca?: string, pagina?: number) => Promise<void>;
+  atualizarTraje: (traje: TrajeResponse) => Promise<void>;
+  removerTraje: (id: number) => Promise<void>;
+  atualizarImagem: (trajeId: number, file: File) => Promise<string>;
+  removerImagem: (trajeId: number) => Promise<void>;
 }
 
 const ContextoTrajes = createContext<ContextoTrajesType | undefined>(undefined);
@@ -82,8 +94,131 @@ const ContextoTrajes = createContext<ContextoTrajesType | undefined>(undefined);
 export function ProvedorTrajes({ children }: { children: ReactNode }) {
   const [estado, dispatch] = useReducer(trajesReducer, estadoInicial);
 
+  const carregarTrajes = useCallback(
+    async (busca?: string, pagina?: number): Promise<void> => {
+      dispatch({ tipo: 'SET_CARREGANDO', payload: true });
+      dispatch({ tipo: 'SET_ERRO', payload: null });
+
+      try {
+        const resultado: PaginacaoResultado<TrajeResponse> = await listarTrajesUseCase.executar(
+          busca,
+          pagina ?? 0,
+          TRAJE_CONSTANTS.TAMANHO_PAGINA_PADRAO
+        );
+
+        dispatch({ tipo: 'SET_TRAJES', payload: resultado.content });
+        dispatch({
+          tipo: 'SET_PAGINACAO',
+          payload: {
+            totalPaginas: resultado.totalPages,
+            totalRegistros: resultado.totalElements,
+            tamanhoPagina: resultado.size,
+            paginaAtual: resultado.number,
+          },
+        });
+      } catch (erro) {
+        if (erro instanceof Error && erro.name !== 'AbortError') {
+          dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar trajes' });
+        }
+      } finally {
+        dispatch({ tipo: 'SET_CARREGANDO', payload: false });
+      }
+    },
+    []
+  );
+
+  const atualizarTraje = useCallback(
+    async (traje: TrajeResponse): Promise<void> => {
+      try {
+        const request: TrajeRequest = {
+          nome: traje.nome,
+          descricao: traje.descricao,
+          tecido: traje.tecido,
+          cor: traje.cor,
+          estampa: traje.estampa,
+          tipo: traje.tipoTraje,
+          valorItem: traje.preco,
+          tamanho: traje.tamanho,
+          textura: traje.textura,
+          status: traje.status,
+          genero: traje.sexo,
+          condicao: traje.condicao,
+          imagemUrl: traje.imagemUrl,
+        };
+        const atualizado = await atualizarTrajeUseCase.executar(traje.id, request);
+        dispatch({ tipo: 'ATUALIZAR_TRAJE', payload: atualizado });
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao atualizar traje' });
+        throw new Error('Erro ao atualizar traje');
+      }
+    },
+    []
+  );
+
+  const removerTraje = useCallback(
+    async (id: number): Promise<void> => {
+      try {
+        await deletarTrajeUseCase.executar(id);
+        dispatch({ tipo: 'REMOVER_TRAJE', payload: id });
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao remover traje' });
+        throw new Error('Erro ao remover traje');
+      }
+    },
+    []
+  );
+
+  const atualizarImagem = useCallback(
+    async (trajeId: number, file: File): Promise<string> => {
+      try {
+        const novaUrl = await trajeRepository.atualizarImagem(trajeId, file);
+        const trajeAtualizado = estado.trajes.find((t) => t.id === trajeId);
+        if (trajeAtualizado) {
+          dispatch({
+            tipo: 'ATUALIZAR_TRAJE',
+            payload: { ...trajeAtualizado, imagem: novaUrl, imagemUrl: novaUrl },
+          });
+        }
+        return novaUrl;
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao atualizar imagem' });
+        throw new Error('Erro ao atualizar imagem');
+      }
+    },
+    [estado.trajes]
+  );
+
+  const removerImagem = useCallback(
+    async (trajeId: number): Promise<void> => {
+      try {
+        await trajeRepository.removerImagem(trajeId);
+        const trajeAtualizado = estado.trajes.find((t) => t.id === trajeId);
+        if (trajeAtualizado) {
+          dispatch({
+            tipo: 'ATUALIZAR_TRAJE',
+            payload: { ...trajeAtualizado, imagem: '', imagemUrl: '' },
+          });
+        }
+      } catch {
+        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao remover imagem' });
+        throw new Error('Erro ao remover imagem');
+      }
+    },
+    [estado.trajes]
+  );
+
+  const contextoValue = {
+    estado,
+    dispatch,
+    carregarTrajes,
+    atualizarTraje,
+    removerTraje,
+    atualizarImagem,
+    removerImagem,
+  };
+
   return (
-    <ContextoTrajes.Provider value={{ estado, dispatch }}>
+    <ContextoTrajes.Provider value={contextoValue}>
       {children}
     </ContextoTrajes.Provider>
   );
