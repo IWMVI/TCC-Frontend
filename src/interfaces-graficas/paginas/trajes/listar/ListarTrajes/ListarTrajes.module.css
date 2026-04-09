@@ -1,0 +1,224 @@
+.listar-trajes {
+  padding: 1rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.listar-trajes__header {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.listar-trajes__navegacao {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.listar-trajes__botao-voltar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--cor-texto);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.listar-trajes__botao-voltar:hover {
+  background: var(--cor-fundo);
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.listar-trajes__titulo h1 {
+  font-size: 1.25rem;
+  color: var(--cor-texto);
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.listar-trajes__titulo p {
+  color: var(--cor-texto-secundario);
+  font-size: 0.8125rem;
+  margin: 0.25rem 0 0 0;
+}
+
+.listar-trajes__acoes-header {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.listar-trajes__acoes-header a {
+  text-decoration: none;
+}
+
+.listar-trajes__busca {
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.listar-trajes__erro {
+  padding: 0.625rem;
+  margin-bottom: 0.75rem;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--raio-borda);
+  color: #721c24;
+  font-size: 0.8125rem;
+}
+
+.listar-trajes__tabela-wrapper {
+  overflow-x: auto;
+}
+
+.listar-trajes .tabela {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.listar-trajes .tabela th,
+.listar-trajes .tabela td {
+  padding: 0.625rem 0.75rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.listar-trajes .tabela th {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.listar-trajes .tabela td {
+  font-size: 0.8125rem;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listar-trajes__acoes {
+  display: flex;
+  gap: 0.375rem;
+  justify-content: flex-start;
+}
+
+.listar-trajes__botao-editar,
+.listar-trajes__botao-excluir {
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--raio-borda);
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.listar-trajes__botao-editar {
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+.listar-trajes__botao-editar:hover {
+  background-color: var(--cor-secundaria);
+}
+
+.listar-trajes__botao-excluir {
+  background-color: transparent;
+  color: var(--cor-erro);
+  border: 1px solid var(--cor-erro);
+}
+
+.listar-trajes__botao-excluir:hover {
+  background-color: var(--cor-erro);
+  color: white;
+}
+
+.listar-trajes .card__conteudo {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.listar-trajes .card__corpo {
+  padding: 1rem;
+  flex: 1;
+}
+
+.listar-trajes__paginacao-container {
+  margin-top: auto;
+  border-top: 1px solid var(--cor-borda);
+}
+
+@media (min-width: 640px) {
+  .listar-trajes {
+    padding: 1.25rem;
+  }
+
+  .listar-trajes__header {
+    margin-bottom: 1.25rem;
+  }
+
+  .listar-trajes__titulo h1 {
+    font-size: 1.5rem;
+  }
+
+  .listar-trajes__titulo p {
+    font-size: 0.875rem;
+  }
+
+  .listar-trajes__busca {
+    max-width: 400px;
+  }
+
+  .listar-trajes .tabela th,
+  .listar-trajes .tabela td {
+    padding: 0.75rem 1rem;
+  }
+
+  .listar-trajes__botao-editar,
+  .listar-trajes__botao-excluir {
+    padding: 0.4375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .listar-trajes {
+    padding: 1.5rem;
+  }
+
+  .listar-trajes__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .listar-trajes__navegacao {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .listar-trajes {
+    padding: 2rem;
+  }
+}
