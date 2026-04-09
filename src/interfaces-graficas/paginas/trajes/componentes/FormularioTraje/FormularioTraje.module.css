@@ -1,183 +1,255 @@
-.formularioTraje {
+.formulario-traje {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  padding: 1rem 1.5rem 0.75rem;
-  gap: 0.6rem;
-  background-color: #f0f0f0;
+  padding: var(--espacamento-md, 1rem) var(--espacamento-lg, 1.5rem) var(--espacamento-sm, 0.75rem);
+  gap: var(--espacamento-sm, 0.6rem);
+  background-color: var(--cor-fundo-pagina, #f0f0f0);
 }
 
-.formularioTraje__voltar {
+.formulario-traje__voltar {
   align-self: flex-start;
-  padding: 0.5rem 1rem;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  color: #333;
+  padding: var(--espacamento-xs, 0.5rem) var(--espacamento-md, 1rem);
+  background-color: var(--cor-fundo, #ffffff);
+  border: 1px solid var(--cor-borda, #ddd);
+  border-radius: var(--raio-borda, 6px);
+  color: var(--cor-texto, #333);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--tamanho-fonte-sm, 0.9rem);
   transition: background-color 0.2s;
 }
 
-.formularioTraje__voltar:hover {
-  background-color: #f5f5f5;
+.formulario-traje__voltar:hover {
+  background-color: var(--cor-fundo-secundario, #f5f5f5);
 }
 
-.formularioTraje__cabecalho {
+.formulario-traje__cabecalho {
   flex-shrink: 0;
 }
 
-.formularioTraje__titulo {
-  font-size: 1.5rem;
+.formulario-traje__titulo {
+  font-size: var(--tamanho-fonte-xl, 1.5rem);
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--cor-texto, #1a1a1a);
   margin: 0;
 }
 
-.formularioTraje__form {
+.formulario-traje__form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: var(--espacamento-md, 1rem);
+  background-color: var(--cor-fundo, #ffffff);
+  border-radius: var(--raio-borda-lg, 8px);
+  box-shadow: var(--sombra-card, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.formularioTraje__conteudo {
+.formulario-traje__conteudo {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 1.5rem;
+  gap: var(--espacamento-lg, 1.5rem);
   align-items: start;
 }
 
-.formularioTraje__principal {
+.formulario-traje__principal {
   display: grid;
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
 }
 
-.formularioTraje__preview {
+.formulario-traje__preview {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
 }
 
-.formularioTraje__previewCard {
+.formulario-traje__preview-card {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fafafa;
+  gap: var(--espacamento-md, 1rem);
+  padding: var(--espacamento-md, 1rem);
+  border: 1px solid var(--cor-borda, #ddd);
+  border-radius: var(--raio-borda-lg, 8px);
+  background-color: var(--cor-fundo-secundario, #fafafa);
 }
 
-.formularioTraje__previewTitle {
-  font-size: 1rem;
+.formulario-traje__preview-titulo {
+  font-size: var(--tamanho-fonte-md, 1rem);
   font-weight: 600;
-  color: #333;
+  color: var(--cor-texto, #333);
 }
 
-.formularioTraje__previewWrapper {
+.formulario-traje__preview-wrapper {
+  position: relative;
   min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 0.75rem;
+  background-color: var(--cor-fundo, #fff);
+  border: 1px solid var(--cor-borda, #ddd);
+  border-radius: var(--raio-borda-lg, 8px);
+  padding: var(--espacamento-sm, 0.75rem);
 }
 
-.formularioTraje__previewImage {
+.formulario-traje__preview-imagem {
   max-width: 100%;
   max-height: 220px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--raio-borda-lg, 8px);
 }
 
-.formularioTraje__previewEmpty {
-  color: #666;
-  font-size: 0.95rem;
+.formulario-traje__preview-vazio {
+  color: var(--cor-texto-secundario, #666);
+  font-size: var(--tamanho-fonte-sm, 0.95rem);
   text-align: center;
 }
 
-.formularioTraje__linhaDois {
+.formulario-traje__preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamento-xs, 0.5rem);
+  border-radius: var(--raio-borda-lg, 8px);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.formulario-traje__preview-wrapper:hover .formulario-traje__preview-overlay {
+  opacity: 1;
+}
+
+.formulario-traje__preview-botao {
+  padding: var(--espacamento-xs, 0.5rem);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: var(--cor-texto, #333);
+}
+
+.formulario-traje__preview-botao:hover {
+  background-color: var(--cor-fundo, #ffffff);
+  transform: scale(1.1);
+}
+
+.formulario-traje__preview-botao--remover:hover {
+  color: var(--cor-erro, #dc3545);
+  background-color: var(--cor-fundo, #ffffff);
+}
+
+.formulario-traje__input-arquivo {
+  display: none;
+}
+
+.formulario-traje__label-arquivo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espacamento-xs, 0.5rem) var(--espacamento-md, 1rem);
+  background-color: var(--cor-primaria, #007bff);
+  color: white;
+  border-radius: var(--raio-borda, 4px);
+  cursor: pointer;
+  font-size: var(--tamanho-fonte-sm, 0.9rem);
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.formulario-traje__label-arquivo:hover {
+  background-color: var(--cor-secundaria, #0056b3);
+}
+
+.formulario-traje__linha-dois {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
 }
 
-.formularioTraje__linhaTres {
+.formulario-traje__linha-tres {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
 }
 
-.formularioTraje__campo--full {
+.formulario-traje__campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacamento-xs, 0.5rem);
+}
+
+.formulario-traje__campo--full {
   grid-column: 1 / -1;
 }
 
-.formularioTraje__campo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.formularioTraje__label {
+.formulario-traje__label {
   font-weight: 500;
-  color: #333;
+  color: var(--cor-texto, #333);
 }
 
-.formularioTraje__input,
-.formularioTraje__textarea,
-.formularioTraje__select {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+.formulario-traje__input,
+.formulario-traje__textarea,
+.formulario-traje__select {
+  padding: var(--espacamento-sm, 0.75rem);
+  border: 1px solid var(--cor-borda, #ddd);
+  border-radius: var(--raio-borda, 4px);
+  font-size: var(--tamanho-fonte-base, 1rem);
   transition: border-color 0.2s;
 }
 
-.formularioTraje__input:focus,
-.formularioTraje__textarea:focus,
-.formularioTraje__select:focus {
+.formulario-traje__input:focus,
+.formulario-traje__textarea:focus,
+.formulario-traje__select:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--cor-primaria, #007bff);
 }
 
-.formularioTraje__input--erro,
-.formularioTraje__textarea--erro {
-  border-color: #dc3545;
+.formulario-traje__input--erro,
+.formulario-traje__textarea--erro {
+  border-color: var(--cor-erro, #dc3545);
 }
 
-.formularioTraje__textarea {
+.formulario-traje__textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-.formularioTraje__erro {
-  color: #dc3545;
-  font-size: 0.875rem;
+.formulario-traje__erro {
+  color: var(--cor-erro, #dc3545);
+  font-size: var(--tamanho-fonte-sm, 0.875rem);
 }
 
-.formularioTraje__erroGeral {
-  padding: 0.75rem;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  color: #721c24;
-  font-size: 0.9rem;
+.formulario-traje__erro-geral {
+  padding: var(--espacamento-sm, 0.75rem);
+  background-color: var(--cor-erro-bg, #f8d7da);
+  border: 1px solid var(--cor-erro-borda, #f5c6cb);
+  border-radius: var(--raio-borda, 4px);
+  color: var(--cor-erro-texto, #721c24);
+  font-size: var(--tamanho-fonte-sm, 0.9rem);
 }
 
-.formularioTraje__botoes {
+.formulario-traje__botoes {
   display: flex;
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
   justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
+  padding-top: var(--espacamento-md, 1rem);
+  border-top: 1px solid var(--cor-borda, #eee);
+}
+
+@media (max-width: 768px) {
+  .formulario-traje__conteudo {
+    grid-template-columns: 1fr;
+  }
 }

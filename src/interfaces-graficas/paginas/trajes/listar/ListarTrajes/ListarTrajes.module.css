@@ -1,61 +1,67 @@
 .listar-trajes {
-  padding: 1rem;
+  padding: var(--espacamento-md, 1rem);
   width: 100%;
   max-width: 100%;
 }
 
 .listar-trajes__header {
-  margin-bottom: 1rem;
+  margin-bottom: var(--espacamento-md, 1rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--espacamento-md, 1rem);
 }
 
 .listar-trajes__navegacao {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--espacamento-sm, 0.75rem);
 }
 
 .listar-trajes__botao-voltar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: var(--espacamento-xs, 0.5rem);
+  padding: var(--espacamento-xs, 0.5rem) var(--espacamento-sm, 0.75rem);
   background: transparent;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-borda);
+  border: 1px solid var(--cor-borda, #ddd);
+  border-radius: var(--raio-borda, 4px);
   cursor: pointer;
-  font-size: 0.875rem;
-  color: var(--cor-texto);
+  font-size: var(--tamanho-fonte-sm, 0.875rem);
+  color: var(--cor-texto, #333);
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .listar-trajes__botao-voltar:hover {
-  background: var(--cor-fundo);
-  border-color: var(--cor-primaria);
-  color: var(--cor-primaria);
+  background: var(--cor-fundo, #f5f5f5);
+  border-color: var(--cor-primaria, #007bff);
+  color: var(--cor-primaria, #007bff);
 }
 
-.listar-trajes__titulo h1 {
-  font-size: 1.25rem;
-  color: var(--cor-texto);
-  margin: 0;
+.listar-trajes__titulo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacamento-xs, 0.25rem);
+}
+
+.listar-trajes__titulo-texto {
+  font-size: var(--tamanho-fonte-lg, 1.25rem);
+  color: var(--cor-texto, #333);
   font-weight: 600;
+  margin: 0;
   line-height: 1.2;
 }
 
-.listar-trajes__titulo p {
-  color: var(--cor-texto-secundario);
-  font-size: 0.8125rem;
-  margin: 0.25rem 0 0 0;
+.listar-trajes__titulo-subtitulo {
+  color: var(--cor-texto-secundario, #666);
+  font-size: var(--tamanho-fonte-sm, 0.8125rem);
+  margin: 0;
 }
 
 .listar-trajes__acoes-header {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--espacamento-sm, 0.75rem);
 }
 
 .listar-trajes__acoes-header a {
@@ -63,152 +69,180 @@
 }
 
 .listar-trajes__busca {
-  margin-bottom: 0;
+  margin-bottom: var(--espacamento-sm, 0.75rem);
   width: 100%;
   max-width: 100%;
 }
 
 .listar-trajes__erro {
-  padding: 0.625rem;
-  margin-bottom: 0.75rem;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: var(--raio-borda);
-  color: #721c24;
-  font-size: 0.8125rem;
+  padding: var(--espacamento-sm, 0.625rem);
+  margin-bottom: var(--espacamento-sm, 0.75rem);
+  background-color: var(--cor-erro-bg, #f8d7da);
+  border: 1px solid var(--cor-erro-borda, #f5c6cb);
+  border-radius: var(--raio-borda, 4px);
+  color: var(--cor-erro-texto, #721c24);
+  font-size: var(--tamanho-fonte-sm, 0.8125rem);
 }
 
 .listar-trajes__tabela-wrapper {
   overflow-x: auto;
 }
 
-.listar-trajes .tabela {
+.listar-trajes__tabela {
   margin-bottom: 0;
   width: 100%;
+  border-collapse: collapse;
 }
 
-.listar-trajes .tabela th,
-.listar-trajes .tabela td {
-  padding: 0.625rem 0.75rem;
+.listar-trajes__tabela-cabecalho th,
+.listar-trajes__tabela-celula {
+  padding: var(--espacamento-sm, 0.625rem) var(--espacamento-sm, 0.75rem);
   vertical-align: middle;
   white-space: nowrap;
+  text-align: left;
 }
 
-.listar-trajes .tabela th {
-  font-size: 0.6875rem;
+.listar-trajes__tabela-cabecalho th {
+  font-size: var(--tamanho-fonte-xs, 0.6875rem);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
+  color: var(--cor-texto-secundario, #666);
+  border-bottom: 1px solid var(--cor-borda, #ddd);
 }
 
-.listar-trajes .tabela td {
-  font-size: 0.8125rem;
-  max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.listar-trajes__tabela-celula {
+  font-size: var(--tamanho-fonte-sm, 0.8125rem);
+  color: var(--cor-texto, #333);
+  border-bottom: 1px solid var(--cor-borda, #e0e0e0);
+}
+
+.listar-trajes__tabela-linha:hover .listar-trajes__tabela-celula {
+  background-color: var(--cor-fundo, #fafafa);
 }
 
 .listar-trajes__acoes {
   display: flex;
-  gap: 0.375rem;
+  gap: var(--espacamento-xs, 0.375rem);
   justify-content: flex-start;
 }
 
 .listar-trajes__botao-editar,
-.listar-trajes__botao-excluir {
-  padding: 0.375rem 0.625rem;
-  border-radius: var(--raio-borda);
-  font-size: 0.75rem;
+.listar-trajes__botao-excluir,
+.listar-trajes__botao-imagem {
+  padding: var(--espacamento-xs, 0.375rem) var(--espacamento-xs, 0.625rem);
+  border-radius: var(--raio-borda, 4px);
+  font-size: var(--tamanho-fonte-xs, 0.75rem);
   transition: all 0.2s;
-  border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   white-space: nowrap;
+  border: none;
 }
 
 .listar-trajes__botao-editar {
-  background-color: var(--cor-primaria);
+  background-color: var(--cor-primaria, #007bff);
   color: white;
 }
 
 .listar-trajes__botao-editar:hover {
-  background-color: var(--cor-secundaria);
+  background-color: var(--cor-secundaria, #0056b3);
 }
 
 .listar-trajes__botao-excluir {
   background-color: transparent;
-  color: var(--cor-erro);
-  border: 1px solid var(--cor-erro);
+  color: var(--cor-erro, #dc3545);
+  border: 1px solid var(--cor-erro, #dc3545);
 }
 
 .listar-trajes__botao-excluir:hover {
-  background-color: var(--cor-erro);
+  background-color: var(--cor-erro, #dc3545);
   color: white;
 }
 
-.listar-trajes .card__conteudo {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+.listar-trajes__botao-imagem {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--cor-borda, #ddd);
+  background-color: var(--cor-fundo, #f5f5f5);
 }
 
-.listar-trajes .card__corpo {
-  padding: 1rem;
-  flex: 1;
+.listar-trajes__botao-imagem:hover {
+  border-color: var(--cor-primaria, #007bff);
+  background-color: var(--cor-fundo-secundario, #fafafa);
 }
 
-.listar-trajes__paginacao-container {
+.listar-trajes__miniatura {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listar-trajes__sem-imagem {
+  color: var(--cor-texto-secundario, #666);
+}
+
+.listar-trajes__vazio {
+  padding: var(--espacamento-xl, 2rem);
+  text-align: center;
+  color: var(--cor-texto-secundario, #666);
+  font-size: var(--tamanho-fonte-sm, 0.875rem);
+}
+
+.listar-trajes__paginacao {
   margin-top: auto;
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-borda, #ddd);
+  padding: var(--espacamento-md, 1rem);
 }
 
 @media (min-width: 640px) {
   .listar-trajes {
-    padding: 1.25rem;
+    padding: var(--espacamento-lg, 1.25rem);
   }
 
   .listar-trajes__header {
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--espacamento-lg, 1.25rem);
   }
 
-  .listar-trajes__titulo h1 {
-    font-size: 1.5rem;
+  .listar-trajes__titulo-texto {
+    font-size: var(--tamanho-fonte-xl, 1.5rem);
   }
 
-  .listar-trajes__titulo p {
-    font-size: 0.875rem;
+  .listar-trajes__titulo-subtitulo {
+    font-size: var(--tamanho-fonte-base, 0.875rem);
   }
 
   .listar-trajes__busca {
     max-width: 400px;
   }
 
-  .listar-trajes .tabela th,
-  .listar-trajes .tabela td {
-    padding: 0.75rem 1rem;
+  .listar-trajes__tabela-cabecalho th,
+  .listar-trajes__tabela-celula {
+    padding: var(--espacamento-md, 0.75rem) var(--espacamento-md, 1rem);
   }
 
   .listar-trajes__botao-editar,
   .listar-trajes__botao-excluir {
-    padding: 0.4375rem 0.75rem;
-    font-size: 0.8125rem;
+    padding: var(--espacamento-xs, 0.4375rem) var(--espacamento-sm, 0.75rem);
+    font-size: var(--tamanho-fonte-sm, 0.8125rem);
   }
 }
 
 @media (min-width: 768px) {
   .listar-trajes {
-    padding: 1.5rem;
+    padding: var(--espacamento-xl, 1.5rem);
   }
 
   .listar-trajes__header {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
+    margin-bottom: var(--espacamento-xl, 1.5rem);
+    gap: var(--espacamento-md, 1rem);
   }
 
   .listar-trajes__navegacao {
@@ -219,6 +253,6 @@
 
 @media (min-width: 1024px) {
   .listar-trajes {
-    padding: 2rem;
+    padding: var(--espacamento-xxl, 2rem);
   }
 }
