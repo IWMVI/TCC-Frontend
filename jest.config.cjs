@@ -41,4 +41,14 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  globals: {
+    'import.meta': {
+      env: {
+        VITE_API_BASE_URL: 'http://localhost:8080',
+        MODE: 'test',
+        DEV: false,
+        PROD: false,
+      },
+    },
+  },
 };

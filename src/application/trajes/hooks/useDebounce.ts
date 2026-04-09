@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { TRAJE_CONSTANTS } from '../TrajeDependencies';
+
+const DEBOUNCE_DELAY_MS = 300;
 
 interface UseDebounceOptions {
   delay?: number;
@@ -12,7 +13,7 @@ interface UseDebounceReturn<T> {
 }
 
 export function useDebounce<T>(initialValue: T, options: UseDebounceOptions = {}): UseDebounceReturn<T> {
-  const { delay = TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS } = options;
+  const { delay = DEBOUNCE_DELAY_MS } = options;
   const [value, setValue] = useState<T>(initialValue);
   const [debouncedValue, setDebouncedValue] = useState<T>(initialValue);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,7 +43,7 @@ export function useDebounce<T>(initialValue: T, options: UseDebounceOptions = {}
 
 export function useDebouncedCallback<T extends (...args: Parameters<T>) => ReturnType<T>>(
   callback: T,
-  delay: number = TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS
+  delay: number = DEBOUNCE_DELAY_MS
 ): T {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
