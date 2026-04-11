@@ -1,0 +1,1 @@
+export { RealizarAluguel } from './RealizarAluguel';
