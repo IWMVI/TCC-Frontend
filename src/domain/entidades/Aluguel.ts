@@ -1,4 +1,4 @@
-import { Cliente, ClienteResponse } from './Cliente';
+import { ClienteResponse } from './Cliente';
 import { Traje } from './Traje';
 
 export enum StatusAluguel {

@@ -1,4 +1,4 @@
-import { AluguemResponse, AluguemRequest } from '../../../domain/entidades';
+import { AluguemResponse, AluguemRequest } from '../../domain/entidades';
 
 export interface AluguemRepository {
   criar(dados: AluguemRequest): Promise<AluguemResponse>;

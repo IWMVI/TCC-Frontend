@@ -1,4 +1,4 @@
-import { AluguemResponse, AluguemRequest } from '../../../domain/entidades';
+import { AluguemResponse, AluguemRequest } from '../../domain/entidades';
 import { AluguemRepository } from './CriarAluguemUseCase';
 
 export class AtualizarAluguemUseCase {

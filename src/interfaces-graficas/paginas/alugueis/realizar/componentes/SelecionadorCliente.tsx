@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { ClienteResponse } from '../../../../../domain/entidades';
 import { ListarClientesUseCase } from '../../../../../application/clientes';
 import { ClienteApiRepository } from '../../../../../infrastructure/api';
-import { Tabela, Busca } from '../../../../componentes';
+import { Tabela } from '../../../../componentes';
 import { mascararCpfCnpj, mascararCelular } from '../../../../utils/formatacoes';
 import styles from './SelecionadorCliente.module.css';
 
