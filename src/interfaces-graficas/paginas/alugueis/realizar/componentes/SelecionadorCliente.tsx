@@ -21,27 +21,24 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  const carregarClientes = useCallback(
-    async (busca?: string) => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-      setEstaCarregando(true);
-
-      try {
-        const resultado = await listarClientesUseCase.executar(busca, 0, 50);
-        setClientes(resultado.content || []);
-      } catch {
-        setClientes([]);
-      } finally {
-        setEstaCarregando(false);
-      }
-    },
-    []
-  );
+	
+	const carregarClientes = useCallback(async (busca?: string) => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		
+		abortControllerRef.current = new AbortController();
+		setEstaCarregando(true);
+		
+		try {
+			const resultado = await listarClientesUseCase.executar(busca, 0, 50);
+			setClientes(resultado.content || []);
+		} catch {
+			setClientes([]);
+		} finally {
+			setEstaCarregando(false);
+		}
+	}, []);
 
   useEffect(() => {
     return () => {
@@ -53,6 +50,10 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+		if (clienteSelecionado) {
+			return;
+		}
+
       if (termoBuscaCPF || termoBuscaNome) {
         carregarClientes(termoBuscaCPF || termoBuscaNome);
       } else {
@@ -61,7 +62,21 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [termoBuscaCPF, termoBuscaNome, carregarClientes]);
+  }, [termoBuscaCPF, termoBuscaNome, clienteSelecionado, carregarClientes]);
+	
+	function selecionarCliente(cliente: ClienteResponse) {
+		onClienteChange(cliente);
+		setTermoBuscaCPF('');
+		setTermoBuscaNome('');
+		setClientes([]);
+	}
+	
+	function limparClienteSelecionado() {
+		onClienteChange(null);
+		setTermoBuscaCPF('');
+		setTermoBuscaNome('');
+		setClientes([]);
+	}
 
   const colunas = [
     { chave: 'id' as keyof ClienteResponse, titulo: 'ID', width: '60px' },
@@ -85,7 +100,7 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
         <button
           type="button"
           className={styles.botaoSelecionar}
-          onClick={() => onClienteChange(cliente)}
+          onClick={() => selecionarCliente(cliente)}
         >
           Selecionar
         </button>
@@ -95,37 +110,39 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
 
   return (
     <div className={styles.selecionadorCliente}>
-      <div className={styles.buscas}>
-        <div className={styles.campoBusca}>
-          <label htmlFor="cpf-busca">CPF</label>
-          <div className={styles.inputComícone}>
-            <input
-              id="cpf-busca"
-              type="text"
-              placeholder="Pesquisar por CPF..."
-              value={termoBuscaCPF}
-              onChange={(e) => setTermoBuscaCPF(e.target.value)}
-              className={styles.input}
-            />
-            <Search size={18} className={styles.icone} />
-          </div>
-        </div>
-
-        <div className={styles.campoBusca}>
-          <label htmlFor="nome-busca">Nome</label>
-          <div className={styles.inputComícone}>
-            <input
-              id="nome-busca"
-              type="text"
-              placeholder="Pesquisar por nome..."
-              value={termoBuscaNome}
-              onChange={(e) => setTermoBuscaNome(e.target.value)}
-              className={styles.input}
-            />
-            <Search size={18} className={styles.icone} />
-          </div>
-        </div>
-      </div>
+		{!clienteSelecionado && (
+			<div className={styles.buscas}>
+				<div className={styles.campoBusca}>
+					<label htmlFor="cpf-busca">CPF</label>
+					<div className={styles.inputComIcone}>
+						<input
+							id="cpf-busca"
+						    type="text"
+						    placeholder="Pesquisar por CPF..."
+						    value={termoBuscaCPF}
+						    onChange={(e) => setTermoBuscaCPF(e.target.value)}
+						    className={styles.input}
+						/>
+						<Search size={18} className={styles.icone}/>
+					</div>
+				</div>
+				
+				<div className={styles.campoBusca}>
+					<label htmlFor="nome-busca">Nome</label>
+					<div className={styles.inputComIcone}>
+						<input
+							id="nome-busca"
+						    type="text"
+						    placeholder="Pesquisar por nome..."
+						    value={termoBuscaNome}
+						    onChange={(e) => setTermoBuscaNome(e.target.value)}
+						    className={styles.input}
+						/>
+						<Search size={18} className={styles.icone}/>
+					</div>
+				</div>
+			</div>
+		)}
 
       {clienteSelecionado && (
         <div className={styles.clienteSelecionado}>
@@ -143,15 +160,15 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
             <button
               type="button"
               className={styles.botaoRemover}
-              onClick={() => onClienteChange(null)}
+              onClick={limparClienteSelecionado}
             >
               Remover Seleção
             </button>
           </div>
         </div>
       )}
-
-      {(termoBuscaCPF || termoBuscaNome) && (
+		
+		{!clienteSelecionado && (termoBuscaCPF || termoBuscaNome) && (
         <div className={styles.resultados}>
           <h3>Resultados da Busca</h3>
           {estaCarregando ? (

@@ -1,4 +1,4 @@
-import { AluguemRequest, AluguemResponse } from '../entidades';
+import {AluguemRequest, AluguemResponse, AluguemUpdateRequest} from '../entidades';
 import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
 
 export interface IAluguemRepository {
@@ -9,7 +9,8 @@ export interface IAluguemRepository {
   ): Promise<PaginacaoResultado<AluguemResponse>>;
   buscarPorId(id: number): Promise<AluguemResponse>;
   criar(dados: AluguemRequest): Promise<AluguemResponse>;
-  atualizar(id: number, dados: AluguemRequest): Promise<AluguemResponse>;
+	
+	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;
   deletar(id: number): Promise<void>;
   marcarComoConcluido(id: number): Promise<AluguemResponse>;
 }

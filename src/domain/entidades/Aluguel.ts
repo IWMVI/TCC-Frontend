@@ -1,5 +1,4 @@
 import { ClienteResponse } from './Cliente';
-import { Traje } from './Traje';
 
 export enum StatusAluguel {
   ATIVO = 'ATIVO',
@@ -7,26 +6,33 @@ export enum StatusAluguel {
   CANCELADO = 'CANCELADO',
 }
 
+export enum TipoOcasiao {
+	CASAMENTO = 'CASAMENTO',
+	FORMATURA = 'FORMATURA',
+	BAILE_DE_GALA = 'BAILE_DE_GALA',
+	FESTA_FORMAL = 'FESTA_FORMAL',
+	EVENTO_CORPORATIVO = 'EVENTO_CORPORATIVO',
+	JANTAR_FORMAL = 'JANTAR_FORMAL',
+	CERIMONIA = 'CERIMONIA',
+}
+
 export interface AluguemItem {
-  id?: number;
   trajeId: number;
-  traje?: Traje;
-  tamanho: string;
-  dataRetirada?: string;
-  dataDevolucao?: string;
+	nomeTraje: string;
 }
 
 export interface Aluguel {
   id?: number;
   clienteId: number;
-  cliente?: ClienteResponse;
+	nomeCliente: string;
+	dataAluguel: string;
   dataRetirada: string;
   dataDevolucao: string;
   status: StatusAluguel;
-  desconto: number;
-  subtotal: number;
-  total: number;
-  dataCadastro?: string;
+	valorDesconto: number;
+	valorTotal: number;
+	observacoes?: string;
+	ocasiao: TipoOcasiao;
   itens?: AluguemItem[];
 }
 
@@ -34,25 +40,36 @@ export interface AluguemRequest {
   clienteId: number;
   dataRetirada: string;
   dataDevolucao: string;
-  desconto: number;
+	observacoes?: string;
+	ocasiao: TipoOcasiao;
+	valorDesconto?: number;
   itens: AluguemItemRequest[];
+}
+
+export interface AluguemUpdateRequest {
+	dataRetirada: string;
+	dataDevolucao: string;
+	observacoes?: string;
+	ocasiao: TipoOcasiao;
+	valorDesconto?: number;
 }
 
 export interface AluguemItemRequest {
   trajeId: number;
-  tamanho: string;
 }
 
 export interface AluguemResponse {
   id: number;
   clienteId: number;
-  cliente: ClienteResponse;
+	nomeCliente: string;
+	dataAluguel: string;
   dataRetirada: string;
   dataDevolucao: string;
   status: StatusAluguel;
-  desconto: number;
-  subtotal: number;
-  total: number;
-  dataCadastro: string;
+	valorDesconto: number;
+	valorTotal: number;
+	observacoes?: string;
+	ocasiao: TipoOcasiao;
   itens: AluguemItem[];
+	cliente?: ClienteResponse;
 }

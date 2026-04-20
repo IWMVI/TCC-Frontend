@@ -77,6 +77,11 @@
   flex-direction: column;
 }
 
+.cardTrajes {
+    max-height: 760px;
+    overflow-y: auto;
+}
+
 .detalhes {
   width: 100%;
 }

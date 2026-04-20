@@ -1,22 +1,20 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import {ArrowLeft, Edit2, Trash2} from 'lucide-react';
 import { Botao, Card, Tabela, Modal, Paginacao } from '../../../componentes';
 import {
-  ListarAlugueisUseCase,
-  DeletarAluguemUseCase,
-  MarcarAluguelComoConcluídoUseCase,
-  BuscarAluguelPorIdUseCase,
+	ListarAlugueisUseCase,
+	DeletarAluguemUseCase,
+	BuscarAluguelPorIdUseCase,
 } from '../../../../application/alugueis';
 import { AluguemApiRepository } from '../../../../infrastructure/api';
-import { AluguemResponse, StatusAluguel } from '../../../../domain/entidades';
-import { mascararCpfCnpj } from '../../../utils/formatacoes';
+import {AluguemResponse} from '../../../../domain/entidades';
+import {obterAliasTipoOcasiao} from '../utils/ocasiao';
 import styles from './ListarAluguel.module.css';
 
 const aluguelRepositorio = new AluguemApiRepository();
 const listarAlugueisUseCase = new ListarAlugueisUseCase(aluguelRepositorio);
 const deletarAluguemUseCase = new DeletarAluguemUseCase(aluguelRepositorio);
-const marcarComoConcluídoUseCase = new MarcarAluguelComoConcluídoUseCase(aluguelRepositorio);
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
 
 const TAMANHO_PAGINA_PADRAO = 10;
@@ -34,62 +32,55 @@ export function ListarAluguel() {
   const [modalAberto, setModalAberto] = useState(false);
   const [modalTitulo, setModalTitulo] = useState('');
   const [modalMensagem, setModalMensagem] = useState('');
-
   const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
   const [aluguelDetalhes, setAluguelDetalhes] = useState<AluguemResponse | null>(null);
-
   const [aluguelParaExcluir, setAluguelParaExcluir] = useState<AluguemResponse | null>(null);
-
-  const [estaMarcandoConcluido, setEstaMarcandoConcluido] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const jaCarregouRef = useRef(false);
-
-  const carregarAluguel = useCallback(
-    async (busca?: string, pagina?: number) => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-      const signal = abortControllerRef.current.signal;
-
-      setEstaCarregando(true);
-      try {
-        const resultado = await listarAlugueisUseCase.executar(
-          busca,
-          pagina ?? 0,
-          TAMANHO_PAGINA_PADRAO
-        );
-
-        if (!signal.aborted) {
-          setAluguel(resultado.content);
-          setTotalPaginas(resultado.totalPages);
-          setTotalRegistros(resultado.totalElements);
-          setTamanhoPagina(resultado.size);
-          setPaginaAtual(resultado.number);
-        }
-      } catch (erro) {
-        if (erro instanceof Error && erro.name !== 'AbortError') {
-          setModalTitulo('Erro');
-          setModalMensagem('Erro ao carregar aluguéis');
-          setModalAberto(true);
-        }
-      } finally {
-        if (!signal.aborted) {
-          setEstaCarregando(false);
-        }
-      }
-    },
-    []
-  );
+	
+	const carregarAluguel = useCallback(async (busca?: string, pagina?: number) => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		
+		abortControllerRef.current = new AbortController();
+		const signal = abortControllerRef.current.signal;
+		
+		setEstaCarregando(true);
+		try {
+			const resultado = await listarAlugueisUseCase.executar(
+				busca,
+				pagina ?? 0,
+				TAMANHO_PAGINA_PADRAO,
+			);
+			
+			if (!signal.aborted) {
+				setAluguel(resultado.content);
+				setTotalPaginas(resultado.totalPages);
+				setTotalRegistros(resultado.totalElements);
+				setTamanhoPagina(resultado.size);
+				setPaginaAtual(resultado.number);
+			}
+		} catch (erro) {
+			if (erro instanceof Error && erro.name !== 'AbortError') {
+				setModalTitulo('Erro');
+				setModalMensagem('Erro ao carregar aluguéis');
+				setModalAberto(true);
+			}
+		} finally {
+			if (!signal.aborted) {
+				setEstaCarregando(false);
+			}
+		}
+	}, []);
 
   useEffect(() => {
     if (!jaCarregouRef.current) {
       jaCarregouRef.current = true;
       carregarAluguel();
     }
-  }, []);
+  }, [carregarAluguel]);
 
   useEffect(() => {
     return () => {
@@ -145,70 +136,32 @@ export function ListarAluguel() {
     }
   }
 
-  async function marcarComoConcluido(aluguel: AluguemResponse) {
-    setEstaMarcandoConcluido(true);
-    try {
-      await marcarComoConcluídoUseCase.executar(aluguel.id);
-      carregarAluguel(termoBusca || undefined, paginaAtual);
-      setModalTitulo('Sucesso');
-      setModalMensagem('Aluguel marcado como concluído');
-      setModalAberto(true);
-    } catch {
-      setModalTitulo('Erro');
-      setModalMensagem('Erro ao marcar aluguel como concluído');
-      setModalAberto(true);
-    } finally {
-      setEstaMarcandoConcluido(false);
-    }
-  }
-
-  function handlePageChange(pagina: number) {
-    carregarAluguel(termoBusca || undefined, pagina);
-  }
-
-  function handleVoltar() {
-    navigate(-1);
-  }
-
   const colunas = [
     { chave: 'id' as keyof AluguemResponse, titulo: 'ID', width: '60px' },
     {
-      chave: 'cliente' as keyof AluguemResponse,
-      titulo: 'Cliente',
-      render: (aluguel: AluguemResponse) =>
-        aluguel.cliente?.nome || 'N/A',
+		chave: 'nomeCliente' as keyof AluguemResponse,
+		titulo: 'Nome do Cliente',
+		render: (aluguel: AluguemResponse) => aluguel.nomeCliente,
     },
     {
       chave: 'dataRetirada' as keyof AluguemResponse,
       titulo: 'Data Retirada',
-      render: (aluguel: AluguemResponse) =>
-        new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
+		render: (aluguel: AluguemResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
     },
     {
       chave: 'dataDevolucao' as keyof AluguemResponse,
-      titulo: 'Data Devolução',
-      render: (aluguel: AluguemResponse) =>
-        new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
+		titulo: 'Data de Devolução',
+		render: (aluguel: AluguemResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
     },
     {
-      chave: 'status' as keyof AluguemResponse,
-      titulo: 'Status',
-      render: (aluguel: AluguemResponse) => (
-        <span className={styles[`status-${aluguel.status.toLowerCase()}`]}>
-          {aluguel.status}
-        </span>
-      ),
-    },
-    {
-      chave: 'total' as keyof AluguemResponse,
-      titulo: 'Total',
-      render: (aluguel: AluguemResponse) =>
-        `R$ ${aluguel.total.toFixed(2)}`,
+		chave: 'valorTotal' as keyof AluguemResponse,
+		titulo: 'Valor Total',
+		render: (aluguel: AluguemResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
     },
     {
       chave: 'acoes' as keyof AluguemResponse,
       titulo: 'Ações',
-      width: '250px',
+		width: '220px',
       render: (aluguel: AluguemResponse) => (
         <div className={styles['aluguel-acoes']}>
           <button
@@ -227,17 +180,6 @@ export function ListarAluguel() {
           >
             <Edit2 size={16} />
           </button>
-          {aluguel.status !== StatusAluguel.CONCLUIDO && (
-            <button
-              type="button"
-              className={styles['botao-concluir']}
-              onClick={() => marcarComoConcluido(aluguel)}
-              disabled={estaMarcandoConcluido}
-              title="Marcar como concluído"
-            >
-              <CheckCircle2 size={16} />
-            </button>
-          )}
           <button
             type="button"
             className={styles['botao-excluir']}
@@ -258,7 +200,7 @@ export function ListarAluguel() {
           <button
             type="button"
             className={styles['listar-aluguel__botao-voltar']}
-            onClick={handleVoltar}
+            onClick={() => navigate(-1)}
             title="Voltar para página anterior"
           >
             <ArrowLeft size={20} />
@@ -281,7 +223,7 @@ export function ListarAluguel() {
           <div className={styles['listar-aluguel__busca']}>
             <input
               type="text"
-              placeholder="Buscar por cliente ou ID..."
+              placeholder="Buscar por nome do cliente ou ID..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
               className={styles['listar-aluguel__input-busca']}
@@ -300,7 +242,7 @@ export function ListarAluguel() {
                 totalPaginas={totalPaginas}
                 totalRegistros={totalRegistros}
                 tamanhoPagina={tamanhoPagina}
-                onPageChange={handlePageChange}
+                onPageChange={(pagina) => carregarAluguel(termoBusca || undefined, pagina)}
               />
             </>
           )}
@@ -311,18 +253,14 @@ export function ListarAluguel() {
         titulo={modalTitulo}
         mensagem={modalMensagem}
         estaAberto={modalAberto}
-        aoConfirmar={
-          modalTitulo === 'Confirmar Exclusão'
-            ? confirmarExclusao
-            : () => setModalAberto(false)
-        }
+        aoConfirmar={modalTitulo === 'Confirmar Exclusão' ? confirmarExclusao : () => setModalAberto(false)}
         aoCancelar={() => {
           setModalAberto(false);
           setAluguelParaExcluir(null);
         }}
         textoBotaoConfirmar={modalTitulo === 'Confirmar Exclusão' ? 'Excluir' : 'Ok'}
         textoBotaoCancelar="Fechar"
-        tipoBotaoConfirmar={modalTitulo === 'Confirmar Exclusão' ? 'perigo' : 'primario'}
+        tipoBotaoConfirmar={modalTitulo === 'Confirmar Exclusao' ? 'perigo' : 'primario'}
       />
 
       {modalDetalhesAberto && aluguelDetalhes && (
@@ -335,34 +273,34 @@ export function ListarAluguel() {
                   <strong>ID:</strong> {aluguelDetalhes.id}
                 </p>
                 <p>
-                  <strong>Cliente:</strong> {aluguelDetalhes.cliente?.nome}
+					<strong>Cliente ID:</strong> {aluguelDetalhes.clienteId}
+				</p>
+				  <p>
+					  <strong>Nome do Cliente:</strong> {aluguelDetalhes.nomeCliente}
                 </p>
                 <p>
-                  <strong>CPF:</strong> {mascararCpfCnpj(aluguelDetalhes.cliente?.cpfCnpj || '')}
+					<strong>Data Retirada:</strong> {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
                 </p>
                 <p>
-                  <strong>Data Retirada:</strong>{' '}
-                  {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
+					<strong>Data de
+		                Devolução:</strong> {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
                 </p>
                 <p>
-                  <strong>Data Devolução:</strong>{' '}
-                  {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
+					<strong>Ocasião:</strong> {obterAliasTipoOcasiao(aluguelDetalhes.ocasiao)}
                 </p>
                 <p>
                   <strong>Status:</strong> {aluguelDetalhes.status}
                 </p>
               </div>
-
-              {aluguelDetalhes.itens && aluguelDetalhes.itens.length > 0 && (
+				
+				{aluguelDetalhes.itens?.length > 0 && (
                 <div className={styles['detalhes-secao']}>
-                  <h3>Trajes Alugados</h3>
-                  {aluguelDetalhes.itens.map((item: any, index: number) => (
-                    <div key={index} className={styles['item-aluguel']}>
+					<h3>Itens do Aluguel</h3>
+					{aluguelDetalhes.itens.map((item, index) => (
+						<div key={`${item.trajeId}-${index}`} className={styles['item-aluguel']}>
                       <p>
-                        <strong>{item.traje?.nome}</strong>
+						  <strong>{item.nomeTraje}</strong>
                       </p>
-                      <p>Tamanho: {item.tamanho}</p>
-                      <p>Preço: R$ {item.traje?.preco?.toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -371,13 +309,10 @@ export function ListarAluguel() {
               <div className={styles['detalhes-secao']}>
                 <h3>Resumo Financeiro</h3>
                 <p>
-                  <strong>Subtotal:</strong> R$ {aluguelDetalhes.subtotal.toFixed(2)}
+					<strong>Valor Desconto:</strong> R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}
                 </p>
-                <p>
-                  <strong>Desconto:</strong> R$ {aluguelDetalhes.desconto.toFixed(2)}
-                </p>
-                <p className={styles['total']}>
-                  <strong>Total:</strong> R$ {aluguelDetalhes.total.toFixed(2)}
+				  <p className={styles.total}>
+					  <strong>Valor Total:</strong> R$ {aluguelDetalhes.valorTotal.toFixed(2)}
                 </p>
               </div>
 

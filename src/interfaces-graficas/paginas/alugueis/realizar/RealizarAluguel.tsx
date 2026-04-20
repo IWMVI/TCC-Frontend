@@ -4,7 +4,13 @@ import { ArrowLeft } from 'lucide-react';
 import { Modal, Botao, Card } from '../../../componentes';
 import { CriarAluguemUseCase } from '../../../../application/alugueis';
 import { AluguemApiRepository } from '../../../../infrastructure/api';
-import { AluguemRequest, AluguemItemRequest, ClienteResponse, Traje } from '../../../../domain/entidades';
+import {
+	AluguemRequest,
+	AluguemItemRequest,
+	ClienteResponse,
+	TipoOcasiao,
+	Traje,
+} from '../../../../domain/entidades';
 import { SelecionadorCliente } from './componentes/SelecionadorCliente';
 import { SelecionadorTraje } from './componentes/SelecionadorTraje';
 import { DetalhesAluguel } from './componentes/DetalhesAluguel';
@@ -16,7 +22,29 @@ const criarAluguemUseCase = new CriarAluguemUseCase(aluguelRepositorio);
 interface ItemSelecionado {
   trajeId: number;
   traje: Traje;
-  tamanho: string;
+}
+
+const MAX_DESCONTO_DIGITOS = 8;
+
+function formatarDescontoMoeda(valorDigitado: string): string {
+	const apenasDigitos = valorDigitado.replace(/\D/g, '').slice(0, MAX_DESCONTO_DIGITOS);
+	const centavos = Number.parseInt(apenasDigitos || '0', 10);
+	
+	return (centavos / 100).toLocaleString('pt-BR', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+}
+
+function converterMoedaBrParaNumero(valor: string): number {
+	return Number.parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+function formatarNumeroParaMoedaBr(valor: number): string {
+	return valor.toLocaleString('pt-BR', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
 }
 
 export function RealizarAluguel() {
@@ -25,7 +53,9 @@ export function RealizarAluguel() {
   const [itensSelecionados, setItensSelecionados] = useState<ItemSelecionado[]>([]);
   const [dataRetirada, setDataRetirada] = useState('');
   const [dataDevolucao, setDataDevolucao] = useState('');
-  const [desconto, setDesconto] = useState(0);
+	const [observacoes, setObservacoes] = useState('');
+	const [ocasiao, setOcasiao] = useState<TipoOcasiao | ''>('');
+	const [valorDesconto, setValorDesconto] = useState('0,00');
 
   const [estaEnviando, setEstaEnviando] = useState(false);
   const [modalAberto, setModalAberto] = useState(false);
@@ -33,36 +63,56 @@ export function RealizarAluguel() {
   const [modalMensagem, setModalMensagem] = useState('');
 
   const calcularSubtotal = useCallback(() => {
-    return itensSelecionados.reduce((total, item) => {
-      return total + (item.traje.preco || 0);
-    }, 0);
+	  return itensSelecionados.reduce((total, item) => total + (item.traje.preco || 0), 0);
   }, [itensSelecionados]);
+	
+	const descontoNumerico = converterMoedaBrParaNumero(valorDesconto);
 
   const calcularTotal = useCallback(() => {
     const subtotal = calcularSubtotal();
-    return Math.max(0, subtotal - desconto);
-  }, [calcularSubtotal, desconto]);
+	  return Math.max(0, subtotal - descontoNumerico);
+  }, [calcularSubtotal, descontoNumerico]);
 
   function voltarParaInicial() {
     setModalAberto(false);
     navigate('/alugueis');
   }
-
-  function adicionarTraje(traje: Traje, tamanho: string) {
-    const novoItem: ItemSelecionado = {
-      trajeId: traje.id!,
-      traje,
-      tamanho,
-    };
-    setItensSelecionados([...itensSelecionados, novoItem]);
+	
+	function adicionarTraje(traje: Traje) {
+		if (!traje.id) {
+			return;
+		}
+		
+		const trajeId = traje.id;
+		
+		setItensSelecionados((estadoAtual) => {
+			if (estadoAtual.some((item) => item.trajeId === trajeId)) {
+				return estadoAtual;
+			}
+			
+			return [
+				...estadoAtual,
+				{
+					trajeId,
+					traje,
+				},
+			];
+		});
   }
 
   function removerTraje(index: number) {
-    setItensSelecionados(itensSelecionados.filter((_, i) => i !== index));
+	  setItensSelecionados((estadoAtual) => estadoAtual.filter((_, i) => i !== index));
+  }
+	
+	function handleValorDescontoChange(valor: string) {
+		const descontoFormatado = formatarDescontoMoeda(valor);
+		const descontoDigitado = converterMoedaBrParaNumero(descontoFormatado);
+		const subtotalAtual = calcularSubtotal();
+		const descontoFinal = Math.min(descontoDigitado, subtotalAtual);
+		setValorDesconto(formatarNumeroParaMoedaBr(descontoFinal));
   }
 
   async function handleRealizarAluguel() {
-    // Validações
     if (!clienteSelecionado) {
       setModalTitulo('Erro');
       setModalMensagem('Selecione um cliente');
@@ -76,41 +126,49 @@ export function RealizarAluguel() {
       setModalAberto(true);
       return;
     }
-
-    if (!dataRetirada) {
+	  
+	  if (!dataRetirada || !dataDevolucao) {
       setModalTitulo('Erro');
-      setModalMensagem('Defina a data de retirada');
+		  setModalMensagem('Preencha data de retirada e devolucao');
       setModalAberto(true);
       return;
     }
-
-    if (!dataDevolucao) {
+	  
+	  if (!ocasiao) {
       setModalTitulo('Erro');
-      setModalMensagem('Defina a data de devolução');
+		  setModalMensagem('Selecione a ocasiao');
       setModalAberto(true);
       return;
     }
 
     if (dataDevolucao <= dataRetirada) {
       setModalTitulo('Erro');
-      setModalMensagem('Data de devolução deve ser após a data de retirada');
+		setModalMensagem('Data de devolucao deve ser apos a data de retirada');
+		setModalAberto(true);
+		return;
+	}
+	  
+	  if (descontoNumerico > calcularSubtotal()) {
+		  setModalTitulo('Erro');
+		  setModalMensagem('O desconto nao pode ser maior que o valor total dos itens');
       setModalAberto(true);
       return;
     }
 
     try {
       setEstaEnviando(true);
-
-      const itens: AluguemItemRequest[] = itensSelecionados.map(item => ({
+		
+		const itens: AluguemItemRequest[] = itensSelecionados.map((item) => ({
         trajeId: item.trajeId,
-        tamanho: item.tamanho,
       }));
 
       const dados: AluguemRequest = {
         clienteId: clienteSelecionado.id,
         dataRetirada,
         dataDevolucao,
-        desconto,
+		  observacoes: observacoes.trim() || undefined,
+		  ocasiao,
+		  valorDesconto: descontoNumerico,
         itens,
       };
 
@@ -121,7 +179,7 @@ export function RealizarAluguel() {
     } catch (err) {
       const mensagem = err instanceof Error ? err.message : 'Erro ao realizar aluguel';
       setModalTitulo('Falha');
-      setModalMensagem(`Não foi possível realizar aluguel: ${mensagem}`);
+		setModalMensagem(`Nao foi possivel realizar aluguel: ${mensagem}`);
       setModalAberto(true);
     } finally {
       setEstaEnviando(false);
@@ -149,7 +207,7 @@ export function RealizarAluguel() {
       <main className={styles.container}>
         <div className={styles.selecoes}>
           <div className={styles.secaoCliente}>
-            <Card titulo="Seleção de Cliente">
+			  <Card titulo="Selecao de Cliente">
               <SelecionadorCliente
                 clienteSelecionado={clienteSelecionado}
                 onClienteChange={setClienteSelecionado}
@@ -158,7 +216,7 @@ export function RealizarAluguel() {
           </div>
 
           <div className={styles.secaoTraje}>
-            <Card titulo="Seleção de Trajes">
+			  <Card titulo="Selecao de Trajes" className={styles.cardTrajes}>
               <SelecionadorTraje
                 itensSelecionados={itensSelecionados}
                 onAdicionarTraje={adicionarTraje}
@@ -172,28 +230,24 @@ export function RealizarAluguel() {
           <DetalhesAluguel
             dataRetirada={dataRetirada}
             dataDevolucao={dataDevolucao}
-            desconto={desconto}
+            observacoes={observacoes}
+            ocasiao={ocasiao}
+            valorDesconto={valorDesconto}
             subtotal={calcularSubtotal()}
             total={calcularTotal()}
             onDataRetiradaChange={setDataRetirada}
             onDataDevolucaoChange={setDataDevolucao}
-            onDescontoChange={setDesconto}
+            onObservacoesChange={setObservacoes}
+            onOcasiaoChange={setOcasiao}
+            onValorDescontoChange={handleValorDescontoChange}
           />
         </Card>
 
         <div className={styles.acoes}>
-          <Botao
-            tipo="primario"
-            onClick={handleRealizarAluguel}
-            disabled={estaEnviando}
-          >
+			<Botao tipo="primario" onClick={handleRealizarAluguel} disabled={estaEnviando}>
             {estaEnviando ? 'Processando...' : 'Realizar Aluguel'}
           </Botao>
-          <Botao
-            tipo="perigo"
-            onClick={() => navigate('/alugueis')}
-            disabled={estaEnviando}
-          >
+			<Botao tipo="perigo" onClick={() => navigate('/alugueis')} disabled={estaEnviando}>
             Cancelar
           </Botao>
         </div>
@@ -205,7 +259,7 @@ export function RealizarAluguel() {
         estaAberto={modalAberto}
         aoConfirmar={modalTitulo === 'Sucesso' ? voltarParaInicial : () => setModalAberto(false)}
         aoCancelar={() => setModalAberto(false)}
-        textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para aluguéis' : 'Ok'}
+        textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para alugueis' : 'Ok'}
         textoBotaoCancelar="Fechar"
         tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
       />

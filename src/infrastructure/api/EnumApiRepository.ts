@@ -12,6 +12,8 @@ export interface EnumValues {
   status: string[];
   genero: string[];
   condicao: string[];
+  statusAluguel: string[];
+  ocasiao: string[];
 }
 
 class EnumApiRepository {
@@ -38,6 +40,8 @@ class EnumApiRepository {
         status: [],
         genero: [],
         condicao: [],
+        statusAluguel: [],
+        ocasiao: [],
       };
     }
   }

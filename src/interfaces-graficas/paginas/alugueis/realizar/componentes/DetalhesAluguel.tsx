@@ -1,73 +1,105 @@
+import {TipoOcasiao} from '../../../../../domain/entidades';
+import {Calendario} from '../../../../componentes';
+import {obterAliasTipoOcasiao} from '../../utils/ocasiao';
 import styles from './DetalhesAluguel.module.css';
 
 interface Props {
   dataRetirada: string;
   dataDevolucao: string;
-  desconto: number;
+  observacoes: string;
+  ocasiao: TipoOcasiao | '';
+  valorDesconto: string;
   subtotal: number;
   total: number;
   onDataRetiradaChange: (data: string) => void;
   onDataDevolucaoChange: (data: string) => void;
-  onDescontoChange: (desconto: number) => void;
+  onObservacoesChange: (valor: string) => void;
+  onOcasiaoChange: (ocasiao: TipoOcasiao) => void;
+  onValorDescontoChange: (valor: string) => void;
 }
 
 export function DetalhesAluguel({
   dataRetirada,
   dataDevolucao,
-  desconto,
+                                  observacoes,
+                                  ocasiao,
+                                  valorDesconto,
   subtotal,
   total,
   onDataRetiradaChange,
   onDataDevolucaoChange,
-  onDescontoChange,
+                                  onObservacoesChange,
+                                  onOcasiaoChange,
+                                  onValorDescontoChange,
 }: Props) {
+  const descontoNumerico =
+      Number.parseFloat(valorDesconto.replace(/\./g, '').replace(',', '.')) || 0;
+
   return (
     <div className={styles.detalhesAluguel}>
       <div className={styles.linha1}>
-        <div className={styles.campo}>
-          <label htmlFor="data-retirada">Data de Retirada</label>
-          <input
+        <Calendario
             id="data-retirada"
-            type="date"
+            label="Data de Retirada"
             value={dataRetirada}
-            onChange={(e) => onDataRetiradaChange(e.target.value)}
-            className={styles.input}
-          />
-        </div>
-
-        <div className={styles.campo}>
-          <label htmlFor="data-devolucao">Data de Devolução</label>
-          <input
+            onChange={onDataRetiradaChange}
+            required
+        />
+        
+        <Calendario
             id="data-devolucao"
-            type="date"
+            label="Data de Devolução"
             value={dataDevolucao}
-            onChange={(e) => onDataDevolucaoChange(e.target.value)}
-            className={styles.input}
-          />
-        </div>
+            onChange={onDataDevolucaoChange}
+            required
+        />
 
         <div className={styles.campo}>
-          <label htmlFor="status">Status</label>
-          <select id="status" className={styles.input} disabled>
-            <option>ATIVO</option>
+          <label htmlFor="ocasiao">Ocasião</label>
+          <select
+              id="ocasiao"
+              value={ocasiao}
+              onChange={(e) => onOcasiaoChange(e.target.value as TipoOcasiao)}
+              className={styles.input}
+          >
+            <option value="">Selecione</option>
+            {Object.values(TipoOcasiao).map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {obterAliasTipoOcasiao(tipo)}
+                </option>
+            ))}
           </select>
         </div>
-
+      </div>
+      
+      <div className={styles.linha2}>
         <div className={styles.campo}>
-          <label htmlFor="desconto">Desconto (R$)</label>
+          <label htmlFor="valor-desconto">Valor Desconto (R$)</label>
           <input
-            id="desconto"
-            type="number"
-            min="0"
-            step="0.01"
-            value={desconto}
-            onChange={(e) => onDescontoChange(parseFloat(e.target.value) || 0)}
+              id="valor-desconto"
+              type="text"
+              inputMode="numeric"
+              placeholder="0,00"
+              value={valorDesconto}
+              onChange={(e) => onValorDescontoChange(e.target.value)}
             className={styles.input}
+          />
+        </div>
+        
+        <div className={styles.campo}>
+          <label htmlFor="observacoes">Observações</label>
+          <textarea
+              id="observacoes"
+              value={observacoes}
+              onChange={(e) => onObservacoesChange(e.target.value)}
+              maxLength={200}
+              className={styles.textarea}
+              placeholder="Observações do aluguel"
           />
         </div>
       </div>
-
-      <div className={styles.linha2}>
+      
+      <div className={styles.linha3}>
         <div className={styles.resumo}>
           <div className={styles.linha}>
             <span className={styles.rotulo}>Subtotal:</span>
@@ -75,12 +107,12 @@ export function DetalhesAluguel({
           </div>
 
           <div className={styles.linha}>
-            <span className={styles.rotulo}>Desconto:</span>
-            <span className={styles.valor}>- R$ {desconto.toFixed(2)}</span>
+            <span className={styles.rotulo}>Valor Desconto:</span>
+            <span className={styles.valor}>- R$ {descontoNumerico.toFixed(2)}</span>
           </div>
 
           <div className={styles.linhaNegrito}>
-            <span className={styles.rotulo}>Total:</span>
+            <span className={styles.rotulo}>Valor Total:</span>
             <span className={styles.valorTotal}>R$ {total.toFixed(2)}</span>
           </div>
         </div>

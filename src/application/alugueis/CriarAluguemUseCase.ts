@@ -1,10 +1,11 @@
-import { AluguemResponse, AluguemRequest } from '../../domain/entidades';
+import {AluguemRequest, AluguemResponse, AluguemUpdateRequest} from '../../domain/entidades';
 
 export interface AluguemRepository {
   criar(dados: AluguemRequest): Promise<AluguemResponse>;
   listar(busca?: string, pagina?: number, tamanho?: number): Promise<any>;
   buscarPorId(id: number): Promise<AluguemResponse>;
-  atualizar(id: number, dados: AluguemRequest): Promise<AluguemResponse>;
+	
+	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;
   deletar(id: number): Promise<void>;
   marcarComoConcluido(id: number): Promise<AluguemResponse>;
 }
@@ -24,6 +25,10 @@ export class CriarAluguemUseCase {
     if (dados.dataDevolucao <= dados.dataRetirada) {
       throw new Error('Data de devolução deve ser após a data de retirada');
     }
+	  
+	  if (!dados.ocasiao) {
+		  throw new Error('Ocasião é obrigatória');
+	  }
 
     if (!dados.itens || dados.itens.length === 0) {
       throw new Error('Pelo menos um item deve ser adicionado ao aluguel');

@@ -11,7 +11,6 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  margin-bottom: 1rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -28,14 +27,6 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
-  color: #666;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #f0f0f0;
-    border-color: #999;
-  }
 }
 
 .titulo {
@@ -57,7 +48,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+    gap: 1.5rem;
 }
 
 .secaoInfo,
@@ -76,7 +67,6 @@
     margin: 0;
     font-size: 0.95rem;
     color: #333;
-    font-weight: 600;
   }
 }
 
@@ -89,76 +79,21 @@
     margin: 0;
     font-size: 0.875rem;
     color: #333;
-
-    strong {
-      color: #007bff;
-    }
   }
-}
-
-.listaTrajes {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.item {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.75rem;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-
-  @media (max-width: 768px) {
-    flex-wrap: wrap;
-  }
-}
-
-.nome {
-  flex: 1;
-  font-weight: 600;
-  color: #333;
-}
-
-.tamanho {
-  font-size: 0.875rem;
-  color: #666;
-}
-
-.preco {
-  font-weight: 600;
-  color: #28a745;
-  min-width: 100px;
-  text-align: right;
-}
-
-.vazio {
-  margin: 0;
-  padding: 1rem;
-  text-align: center;
-  color: #999;
-  font-size: 0.875rem;
-  background-color: #f0f0f0;
-  border-radius: 4px;
 }
 
 .formulario {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
 }
 
-.campo {
+.campo,
+.campoCompleto {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -170,19 +105,28 @@
   }
 }
 
-.input {
+.campoCompleto {
+    grid-column: 1 / -1;
+}
+
+.input,
+.textarea {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.875rem;
   background-color: white;
-  transition: border-color 0.2s ease;
 
   &:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
   }
+}
+
+.textarea {
+    min-height: 90px;
+    resize: vertical;
 }
 
 .resumo {
@@ -192,47 +136,74 @@
   padding: 1rem;
   background-color: white;
   border-radius: 4px;
-
-  p {
-    margin: 0;
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    strong {
-      color: #333;
-    }
-  }
-}
-
-.total {
-  padding: 0.75rem;
-  background-color: #e7f3ff;
-  border-radius: 4px;
-  font-size: 1rem !important;
-  color: #0066cc !important;
-  font-weight: 600;
-
-  strong {
-    color: #0066cc !important;
-  }
 }
 
 .acoes {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
 
-  @media (max-width: 768px) {
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 2000;
+}
+
+.modalConteudo {
+    display: flex;
     flex-direction: column;
+    gap: 0.75rem;
+    min-width: 520px;
 
-    button {
-      width: 100%;
+    @media (max-width: 768px) {
+        min-width: auto;
+        width: 100%;
     }
-  }
+}
+
+.item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  padding: 0.75rem;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.nome {
+    flex: 1;
+  font-weight: 600;
+}
+
+.quantidade {
+    color: #666;
+}
+
+.preco {
+    min-width: 100px;
+    text-align: right;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.vazio {
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+    color: #999;
+}
+
+.modalAcoes {
+  display: flex;
+  justify-content: flex-end;
+    padding-top: 0.5rem;
 }
 
 .carregando,

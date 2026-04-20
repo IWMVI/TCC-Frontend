@@ -12,43 +12,38 @@ const listarTrajesUseCase = new ListarTrajesUseCase(trajeRepositorio);
 interface ItemSelecionado {
   trajeId: number;
   traje: Traje;
-  tamanho: string;
 }
 
 interface Props {
   itensSelecionados: ItemSelecionado[];
-  onAdicionarTraje: (traje: Traje, tamanho: string) => void;
+	onAdicionarTraje: (traje: Traje) => void;
   onRemoverTraje: (index: number) => void;
 }
 
 export function SelecionadorTraje({ itensSelecionados, onAdicionarTraje, onRemoverTraje }: Props) {
   const [termoBusca, setTermoBusca] = useState('');
-  const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
   const [trajes, setTrajes] = useState<Traje[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [trajeSelecionado, setTrajeSelecionado] = useState<Traje | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  const carregarTrajes = useCallback(
-    async (busca?: string) => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-      setEstaCarregando(true);
-
-      try {
-        const resultado = await listarTrajesUseCase.executar(busca, 0, 50);
-        setTrajes(resultado.content || []);
-      } catch {
-        setTrajes([]);
-      } finally {
-        setEstaCarregando(false);
-      }
-    },
-    []
-  );
+	
+	const carregarTrajes = useCallback(async (busca?: string) => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		
+		abortControllerRef.current = new AbortController();
+		setEstaCarregando(true);
+		
+		try {
+			const resultado = await listarTrajesUseCase.executar(busca, 0, 50);
+			setTrajes(resultado.content || []);
+		} catch {
+			setTrajes([]);
+		} finally {
+			setEstaCarregando(false);
+		}
+	}, []);
 
   useEffect(() => {
     return () => {
@@ -71,27 +66,24 @@ export function SelecionadorTraje({ itensSelecionados, onAdicionarTraje, onRemov
   }, [termoBusca, carregarTrajes]);
 
   function handleAdicionarTraje() {
-    if (!trajeSelecionado || !tamanhoSelecionado) {
+	  if (!trajeSelecionado) {
       return;
     }
-
-    onAdicionarTraje(trajeSelecionado, tamanhoSelecionado);
+	  
+	  onAdicionarTraje(trajeSelecionado);
     setTrajeSelecionado(null);
-    setTamanhoSelecionado('');
-    setTermoBusca('');
-    setTrajes([]);
   }
 
   const colunas = [
     { chave: 'id' as keyof Traje, titulo: 'ID', width: '60px' },
-    { chave: 'codigo' as keyof Traje, titulo: 'Código' },
+	  {chave: 'codigo' as keyof Traje, titulo: 'Codigo'},
     { chave: 'nome' as keyof Traje, titulo: 'Nome' },
     { chave: 'tipo' as keyof Traje, titulo: 'Tipo' },
     { chave: 'cor' as keyof Traje, titulo: 'Cor' },
     { chave: 'tamanho' as keyof Traje, titulo: 'Tamanho' },
     {
       chave: 'acoes' as keyof Traje,
-      titulo: 'Ações',
+		titulo: 'Acoes',
       width: '100px',
       render: (traje: Traje) => (
         <button
@@ -109,11 +101,11 @@ export function SelecionadorTraje({ itensSelecionados, onAdicionarTraje, onRemov
     <div className={styles.selecionadorTraje}>
       <div className={styles.busca}>
         <label htmlFor="busca-traje">Pesquisar Traje</label>
-        <div className={styles.inputComícone}>
+		  <div className={styles.inputComIcone}>
           <input
             id="busca-traje"
             type="text"
-            placeholder="Digite o nome ou código do traje..."
+            placeholder="Digite o nome ou codigo do traje..."
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
             className={styles.input}
@@ -126,51 +118,23 @@ export function SelecionadorTraje({ itensSelecionados, onAdicionarTraje, onRemov
         <div className={styles.trajeTemporario}>
           <div className={styles.infoTraje}>
             <h4>{trajeSelecionado.nome}</h4>
-            <p>Código: {trajeSelecionado.codigo}</p>
+			  <p>Codigo: {trajeSelecionado.codigo}</p>
             <p>Tipo: {trajeSelecionado.tipo}</p>
-            <p>Tamanho padrão: {trajeSelecionado.tamanho}</p>
-          </div>
-
-          <div className={styles.tamanhoInput}>
-            <label htmlFor="tamanho-select">Tamanho do Cliente</label>
-            <select
-              id="tamanho-select"
-              value={tamanhoSelecionado}
-              onChange={(e) => setTamanhoSelecionado(e.target.value)}
-              className={styles.select}
-            >
-              <option value="">Selecione um tamanho</option>
-              <option value="PP">PP</option>
-              <option value="P">P</option>
-              <option value="M">M</option>
-              <option value="G">G</option>
-              <option value="GG">GG</option>
-              <option value="XG">XG</option>
-            </select>
+			  <p>Tamanho: {trajeSelecionado.tamanho}</p>
           </div>
 
           <div className={styles.acoes}>
-            <Botao
-              tipo="primario"
-              onClick={handleAdicionarTraje}
-              disabled={!tamanhoSelecionado}
-            >
+			  <Botao tipo="primario" onClick={handleAdicionarTraje}>
               Adicionar
             </Botao>
-            <Botao
-              tipo="secundario"
-              onClick={() => {
-                setTrajeSelecionado(null);
-                setTamanhoSelecionado('');
-              }}
-            >
+			  <Botao tipo="secundario" onClick={() => setTrajeSelecionado(null)}>
               Cancelar
             </Botao>
           </div>
         </div>
       )}
-
-      {(termoBusca && !trajeSelecionado) && (
+		
+		{termoBusca && !trajeSelecionado && (
         <div className={styles.resultados}>
           <h3>Resultados da Busca</h3>
           {estaCarregando ? (
@@ -195,7 +159,6 @@ export function SelecionadorTraje({ itensSelecionados, onAdicionarTraje, onRemov
                   <p className={styles.nomeTraje}>{item.traje.nome}</p>
                   <p className={styles.detalhes}>
                     <span>{item.traje.codigo}</span>
-                    <span>Tamanho: {item.tamanho}</span>
                     <span>R$ {item.traje.preco?.toFixed(2)}</span>
                   </p>
                 </div>
