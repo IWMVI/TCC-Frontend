@@ -32,3 +32,26 @@ export function mascararTelefone(valor: string): string {
     }
     return mascararCelular(valor);
 }
+
+const MAX_DIGITOS_MOEDA_BR = 8;
+
+export function formatarMoedaBrPartindoDeDigitos(valorDigitado: string): string {
+    const apenasDigitos = valorDigitado.replace(/\D/g, '').slice(0, MAX_DIGITOS_MOEDA_BR);
+    const centavos = Number.parseInt(apenasDigitos || '0', 10);
+
+    return (centavos / 100).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
+export function converterMoedaBrParaNumero(valor: string): number {
+    return Number.parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+export function formatarNumeroParaMoedaBr(valor: number): string {
+    return valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}

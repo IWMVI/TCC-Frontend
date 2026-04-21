@@ -13,3 +13,20 @@ const TIPO_OCASIAO_ALIAS: Record<TipoOcasiao, string> = {
 export function obterAliasTipoOcasiao(ocasiao: TipoOcasiao): string {
 	return TIPO_OCASIAO_ALIAS[ocasiao] ?? ocasiao;
 }
+
+export function obterTipoOcasiaoPorValor(valor: string | undefined): TipoOcasiao | '' {
+	if (!valor) {
+		return '';
+	}
+
+	const normalizado = valor.trim().toLowerCase();
+
+	const correspondente = Object.values(TipoOcasiao).find((tipo) => {
+		if (tipo.toLowerCase() === normalizado) {
+			return true;
+		}
+		return TIPO_OCASIAO_ALIAS[tipo].toLowerCase() === normalizado;
+	});
+
+	return correspondente ?? '';
+}

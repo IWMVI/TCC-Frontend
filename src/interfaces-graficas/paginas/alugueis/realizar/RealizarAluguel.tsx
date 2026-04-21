@@ -14,6 +14,11 @@ import {
 import { SelecionadorCliente } from './componentes/SelecionadorCliente';
 import { SelecionadorTraje } from './componentes/SelecionadorTraje';
 import { DetalhesAluguel } from './componentes/DetalhesAluguel';
+import {
+	converterMoedaBrParaNumero,
+	formatarMoedaBrPartindoDeDigitos,
+	formatarNumeroParaMoedaBr,
+} from '../../../utils/formatacoes';
 import styles from './RealizarAluguel.module.css';
 
 const aluguelRepositorio = new AluguemApiRepository();
@@ -22,29 +27,6 @@ const criarAluguemUseCase = new CriarAluguemUseCase(aluguelRepositorio);
 interface ItemSelecionado {
   trajeId: number;
   traje: Traje;
-}
-
-const MAX_DESCONTO_DIGITOS = 8;
-
-function formatarDescontoMoeda(valorDigitado: string): string {
-	const apenasDigitos = valorDigitado.replace(/\D/g, '').slice(0, MAX_DESCONTO_DIGITOS);
-	const centavos = Number.parseInt(apenasDigitos || '0', 10);
-	
-	return (centavos / 100).toLocaleString('pt-BR', {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-}
-
-function converterMoedaBrParaNumero(valor: string): number {
-	return Number.parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
-}
-
-function formatarNumeroParaMoedaBr(valor: number): string {
-	return valor.toLocaleString('pt-BR', {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
 }
 
 export function RealizarAluguel() {
@@ -105,7 +87,7 @@ export function RealizarAluguel() {
   }
 	
 	function handleValorDescontoChange(valor: string) {
-		const descontoFormatado = formatarDescontoMoeda(valor);
+		const descontoFormatado = formatarMoedaBrPartindoDeDigitos(valor);
 		const descontoDigitado = converterMoedaBrParaNumero(descontoFormatado);
 		const subtotalAtual = calcularSubtotal();
 		const descontoFinal = Math.min(descontoDigitado, subtotalAtual);

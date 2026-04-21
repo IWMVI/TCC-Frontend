@@ -74,6 +74,7 @@ export class AluguemApiRepository implements IAluguemRepository {
 			clienteId: dados.clienteId,
 			dataRetirada: dados.dataRetirada,
 			dataDevolucao: dados.dataDevolucao,
+			valorDesconto: dados.valorDesconto,
 			observacoes: dados.observacoes || null,
 			ocasiao: dados.ocasiao,
 			itens: dados.itens,
@@ -91,8 +92,11 @@ export class AluguemApiRepository implements IAluguemRepository {
 		const payload = {
 			dataRetirada: dados.dataRetirada,
 			dataDevolucao: dados.dataDevolucao,
+			valorDesconto: dados.valorDesconto,
 			observacoes: dados.observacoes || null,
+			status: dados.status,
 			ocasiao: dados.ocasiao,
+			itens: dados.itens,
 		};
 		
 		const resposta = await this.aluguelApi.put<AluguemResponse>(`/alugueis/${id}`, payload);

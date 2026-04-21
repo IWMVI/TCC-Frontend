@@ -21,6 +21,14 @@ export class AtualizarAluguemUseCase {
 			throw new Error('Ocasião é obrigatória');
     }
 
+		if (!dados.status) {
+			throw new Error('Status é obrigatório');
+		}
+
+		if (!dados.itens || dados.itens.length === 0) {
+			throw new Error('Pelo menos um item deve estar associado ao aluguel');
+		}
+
     return this.aluguelRepository.atualizar(id, dados);
   }
 }

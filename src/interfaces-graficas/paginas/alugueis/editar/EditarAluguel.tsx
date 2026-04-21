@@ -1,301 +1,346 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import {Modal, Botao, Card, Calendario} from '../../../componentes';
-import {BuscarAluguelPorIdUseCase, AtualizarAluguemUseCase} from '../../../../application/alugueis';
-import { AluguemApiRepository } from '../../../../infrastructure/api';
-import {AluguemResponse, AluguemUpdateRequest, TipoOcasiao} from '../../../../domain/entidades';
-import {obterAliasTipoOcasiao} from '../utils/ocasiao';
+import {useState, useEffect, useCallback} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {ArrowLeft} from 'lucide-react';
+import {Modal, Botao, Card} from '../../../componentes';
+import {
+	BuscarAluguelPorIdUseCase,
+	AtualizarAluguemUseCase,
+} from '../../../../application/alugueis';
+import {BuscarTrajePorIdUseCase} from '../../../../application/trajes';
+import {AluguemApiRepository, TrajeApiRepository} from '../../../../infrastructure/api';
+import {
+	AluguemItemRequest,
+	AluguemResponse,
+	AluguemUpdateRequest,
+	StatusAluguel,
+	TipoOcasiao,
+	Traje,
+} from '../../../../domain/entidades';
+import {
+	converterMoedaBrParaNumero,
+	formatarMoedaBrPartindoDeDigitos,
+	formatarNumeroParaMoedaBr,
+	mascararCpfCnpj,
+} from '../../../utils/formatacoes';
+import {SelecionadorTraje} from '../realizar/componentes/SelecionadorTraje';
+import {DetalhesAluguel} from '../realizar/componentes/DetalhesAluguel';
+import {obterTipoOcasiaoPorValor} from '../utils/ocasiao';
+import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '../utils/status';
 import styles from './EditarAluguel.module.css';
 
 const aluguelRepositorio = new AluguemApiRepository();
+const trajeRepositorio = new TrajeApiRepository();
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
 const atualizarAluguemUseCase = new AtualizarAluguemUseCase(aluguelRepositorio);
+const buscarTrajePorIdUseCase = new BuscarTrajePorIdUseCase(trajeRepositorio);
 
-const MAX_DESCONTO_DIGITOS = 8;
-
-function formatarDescontoMoeda(valorDigitado: string): string {
-	const apenasDigitos = valorDigitado.replace(/\D/g, '').slice(0, MAX_DESCONTO_DIGITOS);
-	const centavos = Number.parseInt(apenasDigitos || '0', 10);
-	
-	return (centavos / 100).toLocaleString('pt-BR', {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
+interface ItemSelecionado {
+	trajeId: number;
+	traje: Traje;
 }
 
 export function EditarAluguel() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const aluguelId = parseInt(id || '0', 10);
+	const navigate = useNavigate();
+	const {id} = useParams<{id: string}>();
+	const aluguelId = parseInt(id || '0', 10);
 
-  const [aluguel, setAluguel] = useState<AluguemResponse | null>(null);
-  const [estaCarregando, setEstaCarregando] = useState(true);
-  const [estaEnviando, setEstaEnviando] = useState(false);
-	const [itensModalAberto, setItensModalAberto] = useState(false);
+	const [aluguel, setAluguel] = useState<AluguemResponse | null>(null);
+	const [estaCarregando, setEstaCarregando] = useState(true);
+	const [estaEnviando, setEstaEnviando] = useState(false);
 
-  const [dataRetirada, setDataRetirada] = useState('');
-  const [dataDevolucao, setDataDevolucao] = useState('');
+	const [itensSelecionados, setItensSelecionados] = useState<ItemSelecionado[]>([]);
+	const [dataRetirada, setDataRetirada] = useState('');
+	const [dataDevolucao, setDataDevolucao] = useState('');
 	const [observacoes, setObservacoes] = useState('');
 	const [ocasiao, setOcasiao] = useState<TipoOcasiao | ''>('');
+	const [status, setStatus] = useState<StatusAluguel | ''>('');
 	const [valorDesconto, setValorDesconto] = useState('0,00');
 
-  const [modalAberto, setModalAberto] = useState(false);
-  const [modalTitulo, setModalTitulo] = useState('');
-  const [modalMensagem, setModalMensagem] = useState('');
+	const [modalAberto, setModalAberto] = useState(false);
+	const [modalTitulo, setModalTitulo] = useState('');
+	const [modalMensagem, setModalMensagem] = useState('');
 
-  useEffect(() => {
-    async function carregarAluguel() {
-      try {
-        const dados = await buscarAluguelPorIdUseCase.executar(aluguelId);
-        setAluguel(dados);
-		  setDataRetirada(dados.dataRetirada?.split('T')[0] || '');
-		  setDataDevolucao(dados.dataDevolucao?.split('T')[0] || '');
-		  setObservacoes(dados.observacoes || '');
-		  setOcasiao(dados.ocasiao || '');
-		  setValorDesconto(formatarDescontoMoeda(String((dados.valorDesconto ?? 0) * 100)));
-	  } catch {
-        setModalTitulo('Erro');
-        setModalMensagem('Erro ao carregar aluguel');
-        setModalAberto(true);
-      } finally {
-        setEstaCarregando(false);
-      }
-    }
+	const calcularSubtotal = useCallback(() => {
+		return itensSelecionados.reduce((total, item) => total + (item.traje.preco || 0), 0);
+	}, [itensSelecionados]);
 
-    if (aluguelId > 0) {
-      carregarAluguel();
-    }
-  }, [aluguelId]);
+	const descontoNumerico = converterMoedaBrParaNumero(valorDesconto);
 
-  function voltarParaLista() {
-    setModalAberto(false);
-    navigate('/alugueis/listar');
-  }
-	
-	function handleValorDescontoChange(valor: string) {
-		setValorDesconto(formatarDescontoMoeda(valor));
+	const calcularTotal = useCallback(() => {
+		const subtotal = calcularSubtotal();
+		return Math.max(0, subtotal - descontoNumerico);
+	}, [calcularSubtotal, descontoNumerico]);
+
+	useEffect(() => {
+		async function carregarAluguel() {
+			try {
+				const dados = await buscarAluguelPorIdUseCase.executar(aluguelId);
+				setAluguel(dados);
+				setDataRetirada(dados.dataRetirada?.split('T')[0] || '');
+				setDataDevolucao(dados.dataDevolucao?.split('T')[0] || '');
+				setObservacoes(dados.observacoes || '');
+				setOcasiao(obterTipoOcasiaoPorValor(dados.ocasiao));
+				setStatus(obterStatusAluguelPorValor(dados.status) || StatusAluguel.ATIVO);
+				setValorDesconto(formatarNumeroParaMoedaBr(dados.valorDesconto ?? 0));
+
+				const itens = dados.itens ?? [];
+				const trajesDetalhados = await Promise.all(
+					itens.map(async (item) => {
+						const traje = await buscarTrajePorIdUseCase.executar(item.trajeId);
+						return {trajeId: item.trajeId, traje: traje as unknown as Traje};
+					}),
+				);
+				setItensSelecionados(trajesDetalhados);
+			} catch {
+				setModalTitulo('Erro');
+				setModalMensagem('Erro ao carregar aluguel');
+				setModalAberto(true);
+			} finally {
+				setEstaCarregando(false);
+			}
+		}
+
+		if (aluguelId > 0) {
+			carregarAluguel();
+		}
+	}, [aluguelId]);
+
+	function irParaLista() {
+		navigate('/alugueis/listar', {replace: true});
 	}
 
-  async function handleAtualizar() {
-	  if (!aluguel || !dataRetirada || !dataDevolucao || !ocasiao) {
-      setModalTitulo('Erro');
-		  setModalMensagem('Preencha todos os campos obrigatórios');
-      setModalAberto(true);
-      return;
-    }
+	function voltarParaLista() {
+		setModalAberto(false);
+		irParaLista();
+	}
 
-    if (dataDevolucao <= dataRetirada) {
-      setModalTitulo('Erro');
-      setModalMensagem('Data de devolução deve ser após a data de retirada');
-      setModalAberto(true);
-      return;
-    }
+	function adicionarTraje(traje: Traje) {
+		if (!traje.id) {
+			return;
+		}
 
-    try {
-      setEstaEnviando(true);
-		
-		const dadosAtualizacao: AluguemUpdateRequest = {
-        dataRetirada,
-        dataDevolucao,
-			observacoes: observacoes.trim() || undefined,
-			ocasiao,
-			valorDesconto:
-				Number.parseFloat(valorDesconto.replace(/\./g, '').replace(',', '.')) || 0,
-      };
+		const trajeId = traje.id;
 
-      await atualizarAluguemUseCase.executar(aluguelId, dadosAtualizacao);
-      setModalTitulo('Sucesso');
-      setModalMensagem('Aluguel atualizado com sucesso');
-      setModalAberto(true);
-    } catch (erro) {
-      const mensagem = erro instanceof Error ? erro.message : 'Erro ao atualizar aluguel';
-      setModalTitulo('Erro');
-      setModalMensagem(`Não foi possível atualizar aluguel: ${mensagem}`);
-      setModalAberto(true);
-    } finally {
-      setEstaEnviando(false);
-    }
-  }
+		setItensSelecionados((estadoAtual) => {
+			if (estadoAtual.some((item) => item.trajeId === trajeId)) {
+				return estadoAtual;
+			}
 
-  if (estaCarregando) {
-    return (
-      <div className={styles.editarAluguel}>
-        <p className={styles.carregando}>Carregando...</p>
-      </div>
-    );
-  }
+			return [...estadoAtual, {trajeId, traje}];
+		});
+	}
 
-  if (!aluguel) {
-    return (
-      <div className={styles.editarAluguel}>
-        <p className={styles.erro}>Aluguel não encontrado</p>
-      </div>
-    );
-  }
-	
-	const descontoNumerico =
-		Number.parseFloat(valorDesconto.replace(/\./g, '').replace(',', '.')) || 0;
+	function removerTraje(index: number) {
+		setItensSelecionados((estadoAtual) => estadoAtual.filter((_, i) => i !== index));
+	}
 
-  return (
-    <div className={styles.editarAluguel}>
-      <header className={styles.header}>
-        <button
-          type="button"
-          className={styles.botaoVoltar}
-          onClick={() => navigate('/alugueis/listar')}
-          title="Voltar"
-        >
-          <ArrowLeft size={20} />
-          <span>Voltar</span>
-        </button>
-        <div className={styles.titulo}>
-          <h1>Editar Aluguel</h1>
-          <p>Atualize os detalhes do aluguel ID {aluguel.id}</p>
-        </div>
-      </header>
+	function handleValorDescontoChange(valor: string) {
+		const descontoFormatado = formatarMoedaBrPartindoDeDigitos(valor);
+		const descontoDigitado = converterMoedaBrParaNumero(descontoFormatado);
+		const subtotalAtual = calcularSubtotal();
+		const descontoFinal = Math.min(descontoDigitado, subtotalAtual);
+		setValorDesconto(formatarNumeroParaMoedaBr(descontoFinal));
+	}
 
-      <Card titulo="Editar Aluguel">
-        <div className={styles.container}>
-          <div className={styles.secaoInfo}>
-            <h3>Informações do Cliente</h3>
-            <div className={styles.infoCliente}>
-              <p>
-				  <strong>Cliente:</strong> {aluguel.nomeCliente}
-              </p>
-              <p>
-				  <strong>Cliente ID:</strong> {aluguel.clienteId}
-              </p>
-            </div>
-          </div>
+	async function handleAtualizar() {
+		if (!aluguel) {
+			return;
+		}
 
-          <div className={styles.secaoTrajes}>
-			  <h3>Itens do Aluguel</h3>
-			  <Botao tipo="secundario" onClick={() => setItensModalAberto(true)}>
-				  Ver Itens do Aluguel
-			  </Botao>
-          </div>
+		if (itensSelecionados.length === 0) {
+			setModalTitulo('Erro');
+			setModalMensagem('Adicione pelo menos um traje');
+			setModalAberto(true);
+			return;
+		}
 
-          <div className={styles.secaoDatas}>
-			  <h3>Dados do Aluguel</h3>
-            <div className={styles.formulario}>
-				<Calendario
-					id="data-retirada"
-		            label="Data de Retirada"
-		            value={dataRetirada}
-		            onChange={setDataRetirada}
-		            required
-				/>
-				
-				<Calendario
-					id="data-devolucao"
-		            label="Data de Devolução"
-		            value={dataDevolucao}
-		            onChange={setDataDevolucao}
-		            required
-				/>
-				
-				<div className={styles.campo}>
-					<label htmlFor="ocasiao">Ocasião</label>
-					<select
-						id="ocasiao"
-			            value={ocasiao}
-			            onChange={(e) => setOcasiao(e.target.value as TipoOcasiao)}
-                  className={styles.input}
-					>
-						<option value="">Selecione</option>
-						{Object.values(TipoOcasiao).map((tipo) => (
-							<option key={tipo} value={tipo}>
-								{obterAliasTipoOcasiao(tipo)}
-							</option>
-						))}
-					</select>
-              </div>
+		if (!dataRetirada || !dataDevolucao) {
+			setModalTitulo('Erro');
+			setModalMensagem('Preencha data de retirada e devolução');
+			setModalAberto(true);
+			return;
+		}
 
-              <div className={styles.campo}>
-				  <label htmlFor="valor-desconto">Valor Desconto (R$)</label>
-                <input
-					id="valor-desconto"
-	                type="text"
-	                inputMode="numeric"
-	                value={valorDesconto}
-	                onChange={(e) => handleValorDescontoChange(e.target.value)}
-                  className={styles.input}
-	                placeholder="0,00"
-				/>
-			  </div>
-				
-				<div className={styles.campoCompleto}>
-					<label htmlFor="observacoes">Observações</label>
-					<textarea
-						id="observacoes"
-			            value={observacoes}
-			            onChange={(e) => setObservacoes(e.target.value)}
-			            maxLength={200}
-			            className={styles.textarea}
-                />
-              </div>
-            </div>
-          </div>
+		if (!ocasiao) {
+			setModalTitulo('Erro');
+			setModalMensagem('Selecione a ocasião');
+			setModalAberto(true);
+			return;
+		}
 
-          <div className={styles.secaoResumo}>
-            <h3>Resumo Financeiro</h3>
-            <div className={styles.resumo}>
-              <p>
-				  <strong>Valor Total:</strong> R$ {aluguel.valorTotal.toFixed(2)}
-              </p>
-              <p>
-				  <strong>Valor Desconto:</strong> R$ {descontoNumerico.toFixed(2)}
-              </p>
-            </div>
-          </div>
+		if (!status) {
+			setModalTitulo('Erro');
+			setModalMensagem('Selecione o status');
+			setModalAberto(true);
+			return;
+		}
 
-          <div className={styles.acoes}>
-			  <Botao tipo="primario" onClick={handleAtualizar} disabled={estaEnviando}>
-              {estaEnviando ? 'Salvando...' : 'Salvar Alterações'}
-            </Botao>
-            <Botao
-              tipo="secundario"
-              onClick={() => navigate('/alugueis/listar')}
-              disabled={estaEnviando}
-            >
-              Cancelar
-            </Botao>
-          </div>
-        </div>
-      </Card>
-		
-		{itensModalAberto && (
-			<div className={styles.modalOverlay}>
-				<Card titulo="Itens do Aluguel">
-					<div className={styles.modalConteudo}>
-						{aluguel.itens?.length ? (
-							aluguel.itens.map((item, index) => (
-								<div key={`${item.trajeId}-${index}`} className={styles.item}>
-									<span className={styles.nome}>{item.nomeTraje}</span>
-								</div>
-							))
-						) : (
-							<p className={styles.vazio}>Nenhum item associado</p>
-						)}
-						<div className={styles.modalAcoes}>
-							<Botao onClick={() => setItensModalAberto(false)}>Fechar</Botao>
-						</div>
+		if (dataDevolucao <= dataRetirada) {
+			setModalTitulo('Erro');
+			setModalMensagem('Data de devolução deve ser após a data de retirada');
+			setModalAberto(true);
+			return;
+		}
+
+		if (descontoNumerico > calcularSubtotal()) {
+			setModalTitulo('Erro');
+			setModalMensagem('O desconto não pode ser maior que o valor total dos itens');
+			setModalAberto(true);
+			return;
+		}
+
+		try {
+			setEstaEnviando(true);
+
+			const itens: AluguemItemRequest[] = itensSelecionados.map((item) => ({
+				trajeId: item.trajeId,
+			}));
+
+			const dados: AluguemUpdateRequest = {
+				dataRetirada,
+				dataDevolucao,
+				observacoes: observacoes.trim() || undefined,
+				ocasiao,
+				status,
+				valorDesconto: descontoNumerico,
+				itens,
+			};
+
+			await atualizarAluguemUseCase.executar(aluguelId, dados);
+			setModalTitulo('Sucesso');
+			setModalMensagem('Aluguel atualizado com sucesso.');
+			setModalAberto(true);
+		} catch (erro) {
+			const mensagem = erro instanceof Error ? erro.message : 'Erro ao atualizar aluguel';
+			setModalTitulo('Falha');
+			setModalMensagem(`Não foi possível atualizar aluguel: ${mensagem}`);
+			setModalAberto(true);
+		} finally {
+			setEstaEnviando(false);
+		}
+	}
+
+	if (estaCarregando) {
+		return (
+			<div className={styles.editarAluguel}>
+				<p className={styles.carregando}>Carregando...</p>
+			</div>
+		);
+	}
+
+	if (!aluguel) {
+		return (
+			<div className={styles.editarAluguel}>
+				<p className={styles.erro}>Aluguel não encontrado</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className={styles.editarAluguel}>
+			<header className={styles.header}>
+				<button
+					type="button"
+					className={styles.botaoVoltar}
+					onClick={irParaLista}
+					title="Voltar"
+				>
+					<ArrowLeft size={20} />
+					<span>Voltar</span>
+				</button>
+				<div className={styles.titulo}>
+					<h1>Editar Aluguel</h1>
+					<p>Atualize os detalhes do aluguel ID {aluguel.id}</p>
+				</div>
+			</header>
+
+			<main className={styles.container}>
+				<div className={styles.selecoes}>
+					<div className={styles.secaoCliente}>
+						<Card titulo="Cliente">
+							<div className={styles.infoCliente}>
+								<p>
+									<strong>Nome:</strong> {aluguel.nomeCliente}
+								</p>
+								<p>
+									<strong>ID:</strong> {aluguel.clienteId}
+								</p>
+								{aluguel.cliente?.cpfCnpj && (
+									<p>
+										<strong>CPF/CNPJ:</strong> {mascararCpfCnpj(aluguel.cliente.cpfCnpj)}
+									</p>
+								)}
+							</div>
+						</Card>
+					</div>
+
+					<div className={styles.secaoTraje}>
+						<Card titulo="Seleção de Trajes" className={styles.cardTrajes}>
+							<SelecionadorTraje
+								itensSelecionados={itensSelecionados}
+								onAdicionarTraje={adicionarTraje}
+								onRemoverTraje={removerTraje}
+							/>
+						</Card>
+					</div>
+				</div>
+
+				<Card titulo="Detalhes do Aluguel" className={styles.detalhes}>
+					<DetalhesAluguel
+						dataRetirada={dataRetirada}
+						dataDevolucao={dataDevolucao}
+						observacoes={observacoes}
+						ocasiao={ocasiao}
+						valorDesconto={valorDesconto}
+						subtotal={calcularSubtotal()}
+						total={calcularTotal()}
+						onDataRetiradaChange={setDataRetirada}
+						onDataDevolucaoChange={setDataDevolucao}
+						onObservacoesChange={setObservacoes}
+						onOcasiaoChange={setOcasiao}
+						onValorDescontoChange={handleValorDescontoChange}
+					/>
+				</Card>
+
+				<Card titulo="Status do Aluguel" className={styles.detalhes}>
+					<div className={styles.campo}>
+						<label htmlFor="status">Status</label>
+						<select
+							id="status"
+							value={status}
+							onChange={(e) => setStatus(e.target.value as StatusAluguel)}
+							className={styles.input}
+						>
+							<option value="">Selecione</option>
+							{Object.values(StatusAluguel).map((valor) => (
+								<option key={valor} value={valor}>
+									{obterAliasStatusAluguel(valor)}
+								</option>
+							))}
+						</select>
 					</div>
 				</Card>
-			</div>
-		)}
 
-      <Modal
-        titulo={modalTitulo}
-        mensagem={modalMensagem}
-        estaAberto={modalAberto}
-        aoConfirmar={modalTitulo === 'Sucesso' ? voltarParaLista : () => setModalAberto(false)}
-        aoCancelar={() => setModalAberto(false)}
-        textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para lista' : 'Ok'}
-        textoBotaoCancelar="Fechar"
-        tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
-      />
-    </div>
-  );
+				<div className={styles.acoes}>
+					<Botao tipo="primario" onClick={handleAtualizar} disabled={estaEnviando}>
+						{estaEnviando ? 'Salvando...' : 'Salvar Alterações'}
+					</Botao>
+					<Botao tipo="perigo" onClick={irParaLista} disabled={estaEnviando}>
+						Cancelar
+					</Botao>
+				</div>
+			</main>
+
+			<Modal
+				titulo={modalTitulo}
+				mensagem={modalMensagem}
+				estaAberto={modalAberto}
+				aoConfirmar={modalTitulo === 'Sucesso' ? voltarParaLista : () => setModalAberto(false)}
+				aoCancelar={() => setModalAberto(false)}
+				textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para lista' : 'Ok'}
+				textoBotaoCancelar="Fechar"
+				tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
+			/>
+		</div>
+	);
 }

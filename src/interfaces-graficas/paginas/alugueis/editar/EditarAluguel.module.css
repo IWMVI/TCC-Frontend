@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   gap: 2rem;
+  margin-bottom: 1rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -27,6 +28,14 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.875rem;
+  color: #666;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+  }
 }
 
 .titulo {
@@ -48,26 +57,33 @@
 .container {
   display: flex;
   flex-direction: column;
-    gap: 1.5rem;
+  gap: 2rem;
 }
 
-.secaoInfo,
-.secaoTrajes,
-.secaoDatas,
-.secaoResumo {
+.selecoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 100%;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.secaoCliente,
+.secaoTraje {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  border-left: 4px solid #007bff;
+}
 
-  h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #333;
-  }
+.cardTrajes {
+  max-height: 760px;
+  overflow-y: auto;
+}
+
+.detalhes {
+  width: 100%;
 }
 
 .infoCliente {
@@ -77,23 +93,12 @@
 
   p {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: #333;
   }
 }
 
-.formulario {
-  display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.campo,
-.campoCompleto {
+.campo {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -105,12 +110,7 @@
   }
 }
 
-.campoCompleto {
-    grid-column: 1 / -1;
-}
-
-.input,
-.textarea {
+.input {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -124,86 +124,20 @@
   }
 }
 
-.textarea {
-    min-height: 90px;
-    resize: vertical;
-}
-
-.resumo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: white;
-  border-radius: 4px;
-}
-
 .acoes {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-}
-
-.modalOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    z-index: 2000;
-}
-
-.modalConteudo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    min-width: 520px;
-
-    @media (max-width: 768px) {
-        min-width: auto;
-        width: 100%;
-    }
-}
-
-.item {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  padding: 0.75rem;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-  border-radius: 4px;
-}
-
-.nome {
-    flex: 1;
-  font-weight: 600;
-}
-
-.quantidade {
-    color: #666;
-}
-
-.preco {
-    min-width: 100px;
-    text-align: right;
-    color: #28a745;
-    font-weight: 600;
-}
-
-.vazio {
-    margin: 0;
-    padding: 1rem;
-    text-align: center;
-    color: #999;
-}
-
-.modalAcoes {
   display: flex;
+  gap: 1rem;
   justify-content: flex-end;
-    padding-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
 }
 
 .carregando,

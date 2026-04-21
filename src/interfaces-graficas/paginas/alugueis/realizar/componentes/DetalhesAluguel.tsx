@@ -1,5 +1,6 @@
 import {TipoOcasiao} from '../../../../../domain/entidades';
 import {Calendario} from '../../../../componentes';
+import {converterMoedaBrParaNumero} from '../../../../utils/formatacoes';
 import {obterAliasTipoOcasiao} from '../../utils/ocasiao';
 import styles from './DetalhesAluguel.module.css';
 
@@ -32,8 +33,7 @@ export function DetalhesAluguel({
                                   onOcasiaoChange,
                                   onValorDescontoChange,
 }: Props) {
-  const descontoNumerico =
-      Number.parseFloat(valorDesconto.replace(/\./g, '').replace(',', '.')) || 0;
+  const descontoNumerico = converterMoedaBrParaNumero(valorDesconto);
 
   return (
     <div className={styles.detalhesAluguel}>

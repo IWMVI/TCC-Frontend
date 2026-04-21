@@ -52,6 +52,8 @@ export interface AluguemUpdateRequest {
 	observacoes?: string;
 	ocasiao: TipoOcasiao;
 	valorDesconto?: number;
+	status: StatusAluguel;
+	itens: AluguemItemRequest[];
 }
 
 export interface AluguemItemRequest {
