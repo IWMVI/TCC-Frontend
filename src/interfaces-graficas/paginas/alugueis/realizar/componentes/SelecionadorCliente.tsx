@@ -3,7 +3,9 @@ import { Search } from 'lucide-react';
 import { ClienteResponse } from '../../../../../domain/entidades';
 import { ListarClientesUseCase } from '../../../../../application/clientes';
 import { ClienteApiRepository } from '../../../../../infrastructure/api';
+import { CriarCliente } from '../../../clientes/criar/CriarCliente/CriarCliente';
 import { Tabela } from '../../../../componentes';
+import { ModalFormulario } from '../../../../componentes/feedback/ModalFormulario/ModalFormulario';
 import { mascararCpfCnpj, mascararCelular } from '../../../../utils/formatacoes';
 import styles from './SelecionadorCliente.module.css';
 
@@ -15,30 +17,40 @@ interface Props {
   onClienteChange: (cliente: ClienteResponse | null) => void;
 }
 
-export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Props) {
+export function SelecionadorCliente({
+  clienteSelecionado,
+  onClienteChange,
+}: Readonly<Props>) {
   const [termoBuscaCPF, setTermoBuscaCPF] = useState('');
   const [termoBuscaNome, setTermoBuscaNome] = useState('');
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
+  const [buscaSemResultados, setBuscaSemResultados] = useState(false);
+  const [modalCadastroAberto, setModalCadastroAberto] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-	
-	const carregarClientes = useCallback(async (busca?: string) => {
-		if (abortControllerRef.current) {
-			abortControllerRef.current.abort();
-		}
-		
-		abortControllerRef.current = new AbortController();
-		setEstaCarregando(true);
-		
-		try {
-			const resultado = await listarClientesUseCase.executar(busca, 0, 50);
-			setClientes(resultado.content || []);
-		} catch {
-			setClientes([]);
-		} finally {
-			setEstaCarregando(false);
-		}
-	}, []);
+
+  const carregarClientes = useCallback(async (busca?: string) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+    setEstaCarregando(true);
+    setBuscaSemResultados(false);
+    const termoAtual = busca?.trim() ?? '';
+
+    try {
+      const resultado = await listarClientesUseCase.executar(busca, 0, 50);
+      const lista = resultado.content || [];
+      setClientes(lista);
+      setBuscaSemResultados(termoAtual.length > 0 && lista.length === 0);
+    } catch {
+      setClientes([]);
+      setBuscaSemResultados(false);
+    } finally {
+      setEstaCarregando(false);
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -50,33 +62,41 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-		if (clienteSelecionado) {
-			return;
-		}
+      if (clienteSelecionado) {
+        return;
+      }
 
       if (termoBuscaCPF || termoBuscaNome) {
         carregarClientes(termoBuscaCPF || termoBuscaNome);
       } else {
         setClientes([]);
+        setBuscaSemResultados(false);
       }
     }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [termoBuscaCPF, termoBuscaNome, clienteSelecionado, carregarClientes]);
-	
-	function selecionarCliente(cliente: ClienteResponse) {
-		onClienteChange(cliente);
-		setTermoBuscaCPF('');
-		setTermoBuscaNome('');
-		setClientes([]);
-	}
-	
-	function limparClienteSelecionado() {
-		onClienteChange(null);
-		setTermoBuscaCPF('');
-		setTermoBuscaNome('');
-		setClientes([]);
-	}
+
+  function selecionarCliente(cliente: ClienteResponse) {
+    onClienteChange(cliente);
+    setTermoBuscaCPF('');
+    setTermoBuscaNome('');
+    setClientes([]);
+    setBuscaSemResultados(false);
+  }
+
+  function limparClienteSelecionado() {
+    onClienteChange(null);
+    setTermoBuscaCPF('');
+    setTermoBuscaNome('');
+    setClientes([]);
+    setBuscaSemResultados(false);
+  }
+
+  function handleCadastroSucesso(cliente: ClienteResponse) {
+    setModalCadastroAberto(false);
+    selecionarCliente(cliente);
+  }
 
   const colunas = [
     { chave: 'id' as keyof ClienteResponse, titulo: 'ID', width: '60px' },
@@ -108,41 +128,65 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
     },
   ];
 
+  const exibeResultados = !clienteSelecionado && (termoBuscaCPF || termoBuscaNome);
+  let conteudoResultados: JSX.Element | null = null;
+
+  if (estaCarregando) {
+    conteudoResultados = <p className={styles.mensagem}>Carregando...</p>;
+  } else if (clientes.length === 0) {
+    conteudoResultados = (
+      <div className={styles.semResultados}>
+        <p className={styles.mensagem}>Nenhum cliente encontrado</p>
+        {buscaSemResultados && (
+          <button
+            type="button"
+            className={styles.botaoCadastrar}
+            onClick={() => setModalCadastroAberto(true)}
+          >
+            Cadastrar cliente
+          </button>
+        )}
+      </div>
+    );
+  } else {
+    conteudoResultados = <Tabela colunas={colunas} dados={clientes} />;
+  }
+
   return (
     <div className={styles.selecionadorCliente}>
-		{!clienteSelecionado && (
-			<div className={styles.buscas}>
-				<div className={styles.campoBusca}>
-					<label htmlFor="cpf-busca">CPF</label>
-					<div className={styles.inputComIcone}>
-						<input
-							id="cpf-busca"
-						    type="text"
-						    placeholder="Pesquisar por CPF..."
-						    value={termoBuscaCPF}
-						    onChange={(e) => setTermoBuscaCPF(e.target.value)}
-						    className={styles.input}
-						/>
-						<Search size={18} className={styles.icone}/>
-					</div>
-				</div>
-				
-				<div className={styles.campoBusca}>
-					<label htmlFor="nome-busca">Nome</label>
-					<div className={styles.inputComIcone}>
-						<input
-							id="nome-busca"
-						    type="text"
-						    placeholder="Pesquisar por nome..."
-						    value={termoBuscaNome}
-						    onChange={(e) => setTermoBuscaNome(e.target.value)}
-						    className={styles.input}
-						/>
-						<Search size={18} className={styles.icone}/>
-					</div>
-				</div>
-			</div>
-		)}
+      {!clienteSelecionado && (
+        <div className={styles.buscas}>
+          <div className={styles.campoBusca}>
+            <label htmlFor="cpf-busca">CPF</label>
+            <div className={styles.inputComIcone}>
+              <input
+                id="cpf-busca"
+                type="text"
+                placeholder="Pesquisar por CPF..."
+                value={termoBuscaCPF}
+                onChange={(e) => setTermoBuscaCPF(e.target.value)}
+                className={styles.input}
+              />
+              <Search size={18} className={styles.icone} />
+            </div>
+          </div>
+
+          <div className={styles.campoBusca}>
+            <label htmlFor="nome-busca">Nome</label>
+            <div className={styles.inputComIcone}>
+              <input
+                id="nome-busca"
+                type="text"
+                placeholder="Pesquisar por nome..."
+                value={termoBuscaNome}
+                onChange={(e) => setTermoBuscaNome(e.target.value)}
+                className={styles.input}
+              />
+              <Search size={18} className={styles.icone} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {clienteSelecionado && (
         <div className={styles.clienteSelecionado}>
@@ -167,19 +211,25 @@ export function SelecionadorCliente({ clienteSelecionado, onClienteChange }: Pro
           </div>
         </div>
       )}
-		
-		{!clienteSelecionado && (termoBuscaCPF || termoBuscaNome) && (
+
+      {exibeResultados && (
         <div className={styles.resultados}>
           <h3>Resultados da Busca</h3>
-          {estaCarregando ? (
-            <p className={styles.mensagem}>Carregando...</p>
-          ) : clientes.length === 0 ? (
-            <p className={styles.mensagem}>Nenhum cliente encontrado</p>
-          ) : (
-            <Tabela colunas={colunas} dados={clientes} />
-          )}
+          {conteudoResultados}
         </div>
       )}
+
+      <ModalFormulario
+        titulo="Cadastrar Cliente"
+        estaAberto={modalCadastroAberto}
+        aoFechar={() => setModalCadastroAberto(false)}
+      >
+        <CriarCliente
+          modoModal
+          onCadastroSucesso={handleCadastroSucesso}
+          onCancelar={() => setModalCadastroAberto(false)}
+        />
+      </ModalFormulario>
     </div>
   );
 }

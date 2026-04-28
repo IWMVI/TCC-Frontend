@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Botao } from '../../../../componentes/base/Botao';
-import { ClienteRequest, SiglaEstado } from '../../../../../domain/entidades';
+import { ClienteRequest, ClienteResponse, SiglaEstado } from '../../../../../domain/entidades';
 import { ClienteApiRepository } from '../../../../../infrastructure/api';
 import {
   mascararCelular,
@@ -80,8 +80,10 @@ interface FormularioClienteProps {
   };
   estaEnviando: boolean;
   erro: string | null;
-  onSubmit: (dados: ClienteRequest) => Promise<number | void>;
+  onSubmit: (dados: ClienteRequest) => Promise<number | ClienteResponse | void>;
   clienteId?: number;
+  modoModal?: boolean;
+  onCancel?: () => void;
 }
 
 export function FormularioCliente({
@@ -91,6 +93,8 @@ export function FormularioCliente({
   erro,
   onSubmit,
   clienteId,
+  modoModal = false,
+  onCancel,
 }: Readonly<FormularioClienteProps>) {
   const navigate = useNavigate();
 
@@ -233,11 +237,13 @@ export function FormularioCliente({
     };
 
     const clienteIdSalvo = await onSubmit(dadosCliente);
+    const idSalvo =
+      typeof clienteIdSalvo === 'number' ? clienteIdSalvo : clienteIdSalvo?.id;
 
     // Salva medidas se clienteId disponível e alguma medida foi preenchida
     const temMedidas = Object.values(medidas).some((v) => v > 0);
     const medidaId = initialData?.medidaId;
-    const idParaMedidas = clienteIdSalvo ?? clienteId;
+    const idParaMedidas = idSalvo ?? clienteId;
 
     if (idParaMedidas && temMedidas) {
       const centToDecimal = (c: number) => parseFloat((c / 100).toFixed(2));
@@ -390,6 +396,17 @@ export function FormularioCliente({
       }
     }
   }
+
+  function handleCancelar() {
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+
+    navigate('/clientes');
+  }
+
+  const mostrarCancelar = !modoModal || Boolean(onCancel);
 
   const listaMedidas =
     tipoPessoa === 'juridica'
@@ -616,9 +633,11 @@ export function FormularioCliente({
 
         {/* ── Rodapé ── */}
         <div className={styles.fc__acoes}>
-          <Botao tipo="secundario" onClick={() => navigate('/clientes')} disabled={estaEnviando}>
-            Cancelar
-          </Botao>
+          {mostrarCancelar && (
+            <Botao tipo="secundario" onClick={handleCancelar} disabled={estaEnviando}>
+              Cancelar
+            </Botao>
+          )}
           <Botao tipo="primario" tipoHtml="submit" disabled={estaEnviando}>
             {estaEnviando ? 'Salvando...' : 'Salvar'}
           </Botao>
