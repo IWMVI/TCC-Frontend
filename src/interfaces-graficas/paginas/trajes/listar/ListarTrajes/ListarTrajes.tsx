@@ -68,17 +68,17 @@ export function ListarTrajes() {
   }, [carregarTrajes, inicializou]);
 
   useEffect(() => {
-    if (!termoBusca) return;
+    if (!inicializou) return;
     const timeoutId = setTimeout(() => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
       abortControllerRef.current = new AbortController();
-      carregarTrajes(termoBusca, 0);
+      carregarTrajes(termoBusca || undefined, 0);
     }, TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [termoBusca, carregarTrajes]);
+  }, [termoBusca, carregarTrajes, inicializou]);
 
   const abrirModalExclusao = useCallback((traje: TrajeResponse) => {
     setTrajeParaExcluir(traje);
