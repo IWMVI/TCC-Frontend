@@ -17,6 +17,7 @@ describe('RegistrarDevolucaoUseCase', () => {
       deletar: jest.fn(),
       marcarComoConcluido: jest.fn(),
       buscarAtivoByTrajeId: jest.fn(),
+      gerarContratoPdf: jest.fn(),
     };
     useCase = new RegistrarDevolucaoUseCase(mockRepositorio);
   });

@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw, MoreVertical } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw, MoreVertical, FileText } from 'lucide-react';
 import { Dropdown } from 'react-bootstrap';
 import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '../../../componentes';
 import {
 	ListarAlugueisUseCase,
 	DeletarAluguemUseCase,
 	BuscarAluguelPorIdUseCase,
+	GerarContratoAluguelUseCase,
 } from '../../../../application/alugueis';
 import { AluguemApiRepository } from '../../../../infrastructure/api';
 import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../../../domain/entidades';
@@ -19,6 +20,7 @@ const aluguelRepositorio = new AluguemApiRepository();
 const listarAlugueisUseCase = new ListarAlugueisUseCase(aluguelRepositorio);
 const deletarAluguemUseCase = new DeletarAluguemUseCase(aluguelRepositorio);
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
+const gerarContratoUseCase = new GerarContratoAluguelUseCase(aluguelRepositorio);
 
 const TAMANHO_PAGINA_PADRAO = 10;
 
@@ -108,6 +110,19 @@ export function ListarAluguel() {
     } catch {
       setModalTitulo('Erro');
       setModalMensagem('Erro ao carregar detalhes do aluguel');
+      setModalAberto(true);
+    }
+  }
+
+  async function gerarContrato(aluguel: AluguemResponse) {
+    try {
+      const blob = await gerarContratoUseCase.executar(aluguel.id);
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch {
+      setModalTitulo('Erro');
+      setModalMensagem('Erro ao gerar contrato');
       setModalAberto(true);
     }
   }
@@ -230,6 +245,10 @@ export function ListarAluguel() {
               <Dropdown.Item onClick={() => navigate(`/alugueis/${aluguel.id}/editar`)}>
                 <Edit2 size={14} className={styles['icone-editar']} />
                 <span className={styles['acao-texto']}>Editar aluguel</span>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => gerarContrato(aluguel)}>
+                <FileText size={14} className={styles['icone-detalhes']} />
+                <span className={styles['acao-texto']}>Gerar contrato</span>
               </Dropdown.Item>
               {aluguel.status === StatusAluguel.ATIVO && (
                 <Dropdown.Item onClick={() => abrirModalDevolucao(aluguel)}>

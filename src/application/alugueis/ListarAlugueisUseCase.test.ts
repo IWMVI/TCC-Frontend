@@ -17,6 +17,7 @@ describe('ListarAlugueisUseCase', () => {
       marcarComoConcluido: jest.fn(),
       registrarDevolucao: jest.fn(),
       buscarAtivoByTrajeId: jest.fn(),
+      gerarContratoPdf: jest.fn(),
     };
     useCase = new ListarAlugueisUseCase(mockRepositorio);
   });

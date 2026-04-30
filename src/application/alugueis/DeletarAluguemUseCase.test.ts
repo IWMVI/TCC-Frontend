@@ -13,6 +13,7 @@ describe('DeletarAluguemUseCase', () => {
       buscarPorId: jest.fn(),
       atualizar: jest.fn(),
       marcarComoConcluido: jest.fn(),
+      gerarContratoPdf: jest.fn(),
     };
     useCase = new DeletarAluguemUseCase(mockRepositorio);
   });

@@ -9,6 +9,7 @@ export interface AluguemRepository {
 	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;
   deletar(id: number): Promise<void>;
   marcarComoConcluido(id: number): Promise<AluguemResponse>;
+  gerarContratoPdf(id: number): Promise<Blob>;
 }
 
 export class CriarAluguemUseCase {

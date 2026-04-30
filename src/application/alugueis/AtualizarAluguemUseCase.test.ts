@@ -14,6 +14,7 @@ describe('AtualizarAluguemUseCase', () => {
       buscarPorId: jest.fn(),
       deletar: jest.fn(),
       marcarComoConcluido: jest.fn(),
+      gerarContratoPdf: jest.fn(),
     };
     useCase = new AtualizarAluguemUseCase(mockRepositorio);
   });
