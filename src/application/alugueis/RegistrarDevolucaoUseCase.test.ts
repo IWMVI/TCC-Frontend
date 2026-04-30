@@ -1,6 +1,6 @@
 import { RegistrarDevolucaoUseCase } from './RegistrarDevolucaoUseCase';
 import { IAluguemRepository } from '../../domain/interfaces';
-import { DevolucaoRequest, DevolucaoResponse } from '../../domain/entidades';
+import { CondicaoTraje, DevolucaoRequest, DevolucaoResponse } from '../../domain/entidades';
 
 describe('RegistrarDevolucaoUseCase', () => {
   let mockRepositorio: jest.Mocked<IAluguemRepository>;
@@ -25,6 +25,7 @@ describe('RegistrarDevolucaoUseCase', () => {
     dataDevolucao: '2026-05-15',
     valorMulta: 25,
     observacoes: 'Traje com pequeno rasgo na manga',
+    itens: [{ trajeId: 10, condicao: CondicaoTraje.USADO }],
   };
 
   const devolucaoResponse: DevolucaoResponse = {
@@ -46,7 +47,10 @@ describe('RegistrarDevolucaoUseCase', () => {
     });
 
     it('deve registrar devolucao sem multa e observacoes opcionais', async () => {
-      const devolucaoSimples: DevolucaoRequest = { dataDevolucao: '2026-05-15' };
+      const devolucaoSimples: DevolucaoRequest = {
+        dataDevolucao: '2026-05-15',
+        itens: [{ trajeId: 10, condicao: CondicaoTraje.BOM }],
+      };
       const responseSimples: DevolucaoResponse = {
         idDevolucao: 2,
         dataDevolucao: '2026-05-15',

@@ -6,7 +6,7 @@ import type { Coluna } from '@interfaces-graficas/componentes/data/Tabela';
 import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
 import { ErrorMessage } from '@interfaces-graficas/componentes/feedback/ErrorMessage';
 import { useTrajes } from '@interfaces-graficas/contextos/ContextoTrajes';
-import { TrajeResponse } from '@domain/entidades';
+import { AluguemResponse, TrajeResponse } from '@domain/entidades';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import { AluguemApiRepository } from '@infrastructure/api';
 import { FormularioDevolucao } from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
@@ -27,7 +27,7 @@ export function ListarTrajes() {
   // Devolução
   const aluguelRepositorio = useMemo(() => new AluguemApiRepository(), []);
   const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
-  const [aluguelIdParaDevolver, setAluguelIdParaDevolver] = useState<number | null>(null);
+  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguemResponse | null>(null);
   const [estaBuscandoAluguel, setEstaBuscandoAluguel] = useState(false);
 
   const carregarDados = useCallback(
@@ -126,7 +126,7 @@ export function ListarTrajes() {
     setEstaBuscandoAluguel(true);
     try {
       const aluguel = await aluguelRepositorio.buscarAtivoByTrajeId(traje.id);
-      setAluguelIdParaDevolver(aluguel.id);
+      setAluguelParaDevolver(aluguel);
       setModalDevolucaoAberto(true);
     } catch {
       dispatch({ tipo: 'SET_ERRO', payload: `Nenhum aluguel ativo encontrado para o traje "${traje.nome}"` });
@@ -310,17 +310,18 @@ export function ListarTrajes() {
         aoRemoverImagem={handleRemoverImagem}
       />
 
-      {modalDevolucaoAberto && aluguelIdParaDevolver !== null && (
+      {modalDevolucaoAberto && aluguelParaDevolver !== null && (
         <FormularioDevolucao
-          aluguelId={aluguelIdParaDevolver}
+          aluguelId={aluguelParaDevolver.id}
+          itens={aluguelParaDevolver.itens ?? []}
           onSucesso={() => {
             setModalDevolucaoAberto(false);
-            setAluguelIdParaDevolver(null);
+            setAluguelParaDevolver(null);
             carregarDados(termoBusca || undefined, estado.paginaAtual);
           }}
           onCancelar={() => {
             setModalDevolucaoAberto(false);
-            setAluguelIdParaDevolver(null);
+            setAluguelParaDevolver(null);
           }}
         />
       )}

@@ -19,4 +19,5 @@ export type {
   AluguemItemRequest,
   AluguemResponse,
 } from './Aluguel';
-export type { DevolucaoRequest, DevolucaoResponse } from './Devolucao';
+export type { DevolucaoRequest, DevolucaoResponse, ItemDevolucaoRequest } from './Devolucao';
+export { CondicaoTraje } from './Devolucao';

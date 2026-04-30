@@ -556,6 +556,7 @@ export function ListarAluguel() {
       {modalDevolucaoAberto && aluguelParaDevolver && (
         <FormularioDevolucao
           aluguelId={aluguelParaDevolver.id}
+          itens={aluguelParaDevolver.itens ?? []}
           onSucesso={handleDevolucaoSucesso}
           onCancelar={handleDevolucaoCancelar}
         />

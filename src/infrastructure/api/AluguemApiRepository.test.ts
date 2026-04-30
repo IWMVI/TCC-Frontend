@@ -2,6 +2,7 @@ import {
   AluguemRequest,
   AluguemResponse,
   AluguemUpdateRequest,
+  CondicaoTraje,
   DevolucaoRequest,
   DevolucaoResponse,
   StatusAluguel,
@@ -408,6 +409,7 @@ describe('AluguemApiRepository', () => {
       dataDevolucao: '2026-05-15',
       valorMulta: 30,
       observacoes: 'Rasgo na manga',
+      itens: [{ trajeId: 10, condicao: CondicaoTraje.AVARIADO }],
     };
 
     const devolucaoResponse: DevolucaoResponse = {
