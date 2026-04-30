@@ -12,6 +12,7 @@ interface CalendarioProps {
 	max?: string;
 	disabled?: boolean;
 	required?: boolean;
+	permitirPassado?: boolean;
 }
 
 type DiaCalendario = {
@@ -150,24 +151,27 @@ export function Calendario({
 							   max,
 							   disabled = false,
 							   required = false,
+							   permitirPassado = false,
 						   }: Readonly<CalendarioProps>) {
-	const selecionada = parseIsoDate(value);
-	const hoje = normalizeDate(new Date());
+	const hoje = useMemo(() => normalizeDate(new Date()), []);
+	const selecionada = useMemo(() => parseIsoDate(value), [value]);
 	const minDateProp = min ? parseIsoDate(min) : null;
 	const maxDate = max ? parseIsoDate(max) : null;
-	const minDate = minDateProp && minDateProp > hoje ? normalizeDate(minDateProp) : hoje;
+	const minDate = permitirPassado
+		? (minDateProp ? normalizeDate(minDateProp) : new Date(0))
+		: (minDateProp && minDateProp > hoje ? normalizeDate(minDateProp) : hoje);
 	
 	const [aberto, setAberto] = useState(false);
 	const [painel, setPainel] = useState<PainelCalendario>('dia');
-	const [mesAtual, setMesAtual] = useState<Date>(selecionada ?? hoje);
-	const [inicioPaginaAnos, setInicioPaginaAnos] = useState(hoje.getFullYear() - 5);
+	const [mesAtual, setMesAtual] = useState<Date>(() => selecionada ?? hoje);
+	const [inicioPaginaAnos, setInicioPaginaAnos] = useState(() => (selecionada ?? hoje).getFullYear() - 5);
 	const containerRef = useRef<HTMLDivElement>(null);
 	
 	useEffect(() => {
 		const dataBase = selecionada ?? hoje;
 		setMesAtual(new Date(dataBase.getFullYear(), dataBase.getMonth(), 1));
 		setInicioPaginaAnos(dataBase.getFullYear() - 5);
-	}, [value, hoje, selecionada]);
+	}, [selecionada, hoje]);
 	
 	useEffect(() => {
 		if (!aberto) {
