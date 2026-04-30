@@ -1,38 +1,40 @@
 .detalhesAluguel {
   display: flex;
   flex-direction: column;
-    gap: 1.5rem;
 }
 
-.linha1 {
+/* Layout principal: campos à esquerda, resumo à direita */
+.conteudo {
   display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
 
-  @media (max-width: 1200px) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-  }
-}
-
-.linha2 {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 1rem;
-
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
 }
 
-.linha3 {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
+/* Coluna esquerda: linha de campos + observações */
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Linha com os 4 campos lado a lado */
+.linhacampos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .campo {
@@ -64,36 +66,34 @@
 }
 
 .textarea {
-    min-height: 88px;
-    resize: vertical;
+  min-height: 80px;
+  resize: vertical;
 }
 
-.hint {
-    font-size: 0.75rem;
-    color: #666;
-}
-
+/* Coluna direita: resumo de valores */
 .resumo {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-    min-width: 320px;
-  padding: 1rem;
+  min-width: 220px;
+  padding: 1rem 1.25rem;
   background-color: #f9f9f9;
   border: 1px solid #eee;
   border-radius: 4px;
+  align-self: stretch;
+  justify-content: center;
 }
 
-.linha,
+.linhaResumo,
 .linhaNegrito {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.linha {
-  font-size: 0.95rem;
+.linhaResumo {
+  font-size: 0.9rem;
 }
 
 .linhaNegrito {
@@ -105,15 +105,18 @@
 
 .rotulo {
   color: #666;
+  white-space: nowrap;
 }
 
 .valor {
   color: #333;
   text-align: right;
+  white-space: nowrap;
 }
 
 .valorTotal {
   color: #28a745;
   text-align: right;
   font-size: 1.1rem;
+  white-space: nowrap;
 }

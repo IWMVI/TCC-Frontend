@@ -13,6 +13,7 @@ interface CalendarioProps {
 	disabled?: boolean;
 	required?: boolean;
 	permitirPassado?: boolean;
+	clearable?: boolean;
 }
 
 type DiaCalendario = {
@@ -152,6 +153,7 @@ export function Calendario({
 							   disabled = false,
 							   required = false,
 							   permitirPassado = false,
+							   clearable = true,
 						   }: Readonly<CalendarioProps>) {
 	const hoje = useMemo(() => normalizeDate(new Date()), []);
 	const selecionada = useMemo(() => parseIsoDate(value), [value]);
@@ -297,22 +299,36 @@ export function Calendario({
 				{label}
 				{required ? <span className={styles.calendario__required}>*</span> : null}
 			</label>
-			
-			<button
-				id={id}
-				type="button"
-				className={styles.calendario__trigger}
-				onClick={abrirCalendario}
-				disabled={disabled}
-				aria-haspopup="dialog"
-				aria-expanded={aberto}
-			>
-        <span
-	        className={`${styles.calendario__value} ${!valorExibicao ? styles['calendario__value--placeholder'] : ''}`}>
-          {valorExibicao || placeholder}
-        </span>
-				<Calendar size={18} className={styles.calendario__icon}/>
-			</button>
+
+			<div className={styles.calendario__inputWrapper}>
+				<button
+					id={id}
+					type="button"
+					className={styles.calendario__trigger}
+					onClick={abrirCalendario}
+					disabled={disabled}
+					aria-haspopup="dialog"
+					aria-expanded={aberto}
+				>
+					<span className={`${styles.calendario__value} ${!valorExibicao ? styles['calendario__value--placeholder'] : ''}`}>
+						{valorExibicao || placeholder}
+					</span>
+					{clearable && valorExibicao && !disabled ? (
+						<span
+							role="button"
+							aria-label="Limpar data"
+							className={styles.calendario__clear}
+							onClick={(e) => { e.stopPropagation(); onChange(''); }}
+							onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onChange(''); } }}
+							tabIndex={0}
+						>
+							✕
+						</span>
+					) : (
+						<Calendar size={18} className={styles.calendario__icon} />
+					)}
+				</button>
+			</div>
 			
 			{aberto ? (
 				<div className={styles.calendario__popover} role="dialog" aria-label={`Selecionar data para ${label}`}>

@@ -32,6 +32,29 @@
 	transition: border-color 0.2s ease;
 }
 
+.calendario__inputWrapper {
+	position: relative;
+}
+
+.calendario__clear {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background-color: #ccc;
+	color: #fff;
+	font-size: 0.65rem;
+	line-height: 1;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: background-color 0.2s ease;
+}
+
+.calendario__clear:hover {
+	background-color: #999;
+}
 .calendario__trigger:focus {
     outline: none;
     border-color: #007bff;
