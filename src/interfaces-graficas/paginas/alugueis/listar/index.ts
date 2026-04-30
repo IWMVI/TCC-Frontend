@@ -1,0 +1,1 @@
+export { ListarAluguel } from './ListarAluguel';

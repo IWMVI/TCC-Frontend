@@ -52,7 +52,7 @@ export function ListarClientesExcluidos() {
     } finally {
       setCarregando(false);
     }
-  }, []);
+  }, [tamanhoPagina]);
 
   // Carregar dados iniciais
   useEffect(() => {

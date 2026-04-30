@@ -16,11 +16,12 @@ interface FormularioTrajeProps {
   estaEnviando: boolean;
   erro: string | null;
   onSubmit: (dados: TrajeRequest) => Promise<unknown>;
+  modoModal?: boolean;
+  onCancel?: () => void;
 }
 
 const MENSAGENS_VALIDACAO = {
   nomeObrigatorio: 'Nome é obrigatório',
-  descricaoObrigatoria: 'Descrição é obrigatória',
   tecidoObrigatorio: 'Tecido é obrigatório',
   tipoObrigatorio: 'Tipo do traje é obrigatório',
   tamanhoObrigatorio: 'Tamanho é obrigatório',
@@ -32,12 +33,20 @@ const MENSAGENS_VALIDACAO = {
   precoInvalido: 'Preço deve ser maior que zero',
 } as const;
 
+const TIPOS_POR_GENERO: Record<string, string[]> = {
+  Masculino: ['Blazer', 'Smoking', 'Paletó', 'Terno', 'Fraque'],
+  Feminino: ['Vestido', 'Saia', 'Blazer', 'Macacão', 'Conjunto'],
+  Neutro: ['Blazer', 'Macacão', 'Conjunto'],
+};
+
 export function FormularioTraje({
   titulo,
   trajeInicial = {},
   estaEnviando,
   erro,
   onSubmit,
+  modoModal = false,
+  onCancel,
 }: Readonly<FormularioTrajeProps>) {
   const navigate = useNavigate();
   const [opcoesEnum, setOpcoesEnum] = useState<EnumValues | null>(null);
@@ -65,11 +74,26 @@ export function FormularioTraje({
     }
   }, [trajeInicial.valorItem]);
 
+  useEffect(() => {
+    if (!opcoesEnum) {
+      return;
+    }
+
+    const generoSelecionado = formData.genero;
+    if (!generoSelecionado) {
+      return;
+    }
+
+    const tiposPermitidos = TIPOS_POR_GENERO[generoSelecionado] ?? opcoesEnum.tipoTraje;
+    if (formData.tipo && !tiposPermitidos.includes(formData.tipo)) {
+      setField('tipo', '');
+    }
+  }, [formData.genero, formData.tipo, opcoesEnum, setField]);
+
   const validar = useCallback((dados: TrajeRequest): boolean => {
     const erros: Partial<Record<keyof TrajeRequest, string>> = {};
 
     if (!dados.nome?.trim()) erros.nome = MENSAGENS_VALIDACAO.nomeObrigatorio;
-    if (!dados.descricao?.trim()) erros.descricao = MENSAGENS_VALIDACAO.descricaoObrigatoria;
     if (!dados.tecido) erros.tecido = MENSAGENS_VALIDACAO.tecidoObrigatorio;
     if (!dados.tipo) erros.tipo = MENSAGENS_VALIDACAO.tipoObrigatorio;
     if (!dados.tamanho) erros.tamanho = MENSAGENS_VALIDACAO.tamanhoObrigatorio;
@@ -128,12 +152,12 @@ export function FormularioTraje({
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!validar(formData)) return;
-      
+
       const dadosComImagem = {
         ...formData,
         imagemUrl: imagemPreview || formData.imagemUrl,
       };
-      
+
       await onSubmit(dadosComImagem);
     },
     [formData, validar, onSubmit, imagemPreview]
@@ -153,6 +177,17 @@ export function FormularioTraje({
     },
     [handleFileChange, setImagemPreview]
   );
+
+  const handleCancelar = useCallback(() => {
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+
+    navigate(TRAJE_CONSTANTS.ROUTES.LISTA);
+  }, [navigate, onCancel]);
+
+  const mostrarCancelar = !modoModal || Boolean(onCancel);
 
   const renderSelect = useCallback(
     (name: keyof TrajeRequest, label: string, options: string[], obrigatorio = false) => {
@@ -193,15 +228,21 @@ export function FormularioTraje({
     return <LoadingState mensagem="Carregando enums..." />;
   }
 
+  const tiposFiltrados = formData.genero
+    ? TIPOS_POR_GENERO[formData.genero] ?? opcoesEnum.tipoTraje
+    : opcoesEnum.tipoTraje;
+
   return (
     <div className={styles['formulario-traje']}>
-      <button
-        className={styles['formulario-traje__voltar']}
-        onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)}
-        type="button"
-      >
-        ← Voltar
-      </button>
+      {!modoModal && (
+        <button
+          className={styles['formulario-traje__voltar']}
+          onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)}
+          type="button"
+        >
+          ← Voltar
+        </button>
+      )}
 
       <section className={styles['formulario-traje__cabecalho']}>
         <h1 className={styles['formulario-traje__titulo']}>{titulo}</h1>
@@ -232,7 +273,7 @@ export function FormularioTraje({
 
             <div className={`${styles['formulario-traje__campo']} ${styles['formulario-traje__campo--full']}`}>
               <label htmlFor="descricao" className={styles['formulario-traje__label']}>
-                Descrição *
+                Descrição
               </label>
               <textarea
                 id="descricao"
@@ -254,8 +295,8 @@ export function FormularioTraje({
             </div>
 
             <div className={styles['formulario-traje__linha-dois']}>
-              {renderSelect('estampa', 'Estampa', opcoesEnum.estampa)}
-              {renderSelect('tipo', 'Tipo do traje', opcoesEnum.tipoTraje, true)}
+              {renderSelect('genero', 'Sexo', opcoesEnum.genero, true)}
+              {renderSelect('tipo', 'Tipo do traje', tiposFiltrados, true)}
             </div>
 
             <div className={styles['formulario-traje__linha-tres']}>
@@ -284,7 +325,7 @@ export function FormularioTraje({
 
             <div className={styles['formulario-traje__linha-tres']}>
               {renderSelect('status', 'Status', opcoesEnum.status, true)}
-              {renderSelect('genero', 'Sexo', opcoesEnum.genero, true)}
+              {renderSelect('estampa', 'Estampa', opcoesEnum.estampa)}
               {renderSelect('condicao', 'Condição', opcoesEnum.condicao, true)}
             </div>
           </div>
@@ -343,9 +384,11 @@ export function FormularioTraje({
         {erro && <div className={styles['formulario-traje__erro-geral']}>{erro}</div>}
 
         <div className={styles['formulario-traje__botoes']}>
-          <Botao tipo="secundario" onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)} disabled={estaEnviando}>
-            Cancelar
-          </Botao>
+          {mostrarCancelar && (
+            <Botao tipo="secundario" onClick={handleCancelar} disabled={estaEnviando}>
+              Cancelar
+            </Botao>
+          )}
           <Botao tipo="primario" tipoHtml="submit" disabled={estaEnviando}>
             {estaEnviando ? 'Salvando...' : 'Salvar'}
           </Botao>

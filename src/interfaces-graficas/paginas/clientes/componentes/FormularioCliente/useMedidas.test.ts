@@ -1,6 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { useMedidas, MEDIDAS_FEMININAS, MEDIDAS_MASCULINAS, MEDIDAS_PESSOA_JURIDICA } from './useMedidas';
 
+function criarEventoTecla(key: string): React.KeyboardEvent<HTMLElement> {
+  return { key, preventDefault: jest.fn() } as unknown as React.KeyboardEvent<HTMLElement>;
+}
+
 describe('useMedidas', () => {
   it('deve retornar MEDIDAS_FEMININAS quando sexo for feminino', () => {
     const { result } = renderHook(() => useMedidas('feminino'));
@@ -31,7 +35,7 @@ describe('useMedidas', () => {
     const { result } = renderHook(() => useMedidas('feminino'));
 
     act(() => {
-      result.current.handleMedidaKeyDown('cintura', { key: '8', preventDefault: jest.fn() } as any);
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('8'));
     });
 
     expect(result.current.medidas).toEqual({ cintura: 8 });
@@ -41,8 +45,8 @@ describe('useMedidas', () => {
     const { result } = renderHook(() => useMedidas('feminino'));
 
     act(() => {
-      result.current.handleMedidaKeyDown('cintura', { key: '8', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '0', preventDefault: jest.fn() } as any);
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('8'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('0'));
     });
 
     expect(result.current.medidas).toEqual({ cintura: 80 });
@@ -52,7 +56,7 @@ describe('useMedidas', () => {
     const { result } = renderHook(() => useMedidas('feminino', { cintura: 80 }));
 
     act(() => {
-      result.current.handleMedidaKeyDown('cintura', { key: 'Backspace', preventDefault: jest.fn() } as any);
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('Backspace'));
     });
 
     expect(result.current.medidas).toEqual({ cintura: 8 });
@@ -62,12 +66,12 @@ describe('useMedidas', () => {
     const { result } = renderHook(() => useMedidas('feminino'));
 
     act(() => {
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
-      result.current.handleMedidaKeyDown('cintura', { key: '9', preventDefault: jest.fn() } as any);
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
+      result.current.handleMedidaKeyDown('cintura', criarEventoTecla('9'));
     });
 
     expect(result.current.medidas.cintura).toBe(99999);

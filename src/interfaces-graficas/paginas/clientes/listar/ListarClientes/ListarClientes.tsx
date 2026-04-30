@@ -75,7 +75,7 @@ export function ListarClientes() {
       jaCarregouRef.current = true;
       carregarClientes();
     }
-  }, []);
+  }, [carregarClientes]);
 
   // Limpar requisições ao desmontar
   useEffect(() => {

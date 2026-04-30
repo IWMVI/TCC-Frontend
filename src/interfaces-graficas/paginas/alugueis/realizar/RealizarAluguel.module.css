@@ -1,0 +1,103 @@
+.realizarAluguel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.botaoVoltar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #666;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+  }
+}
+
+.titulo {
+  flex: 1;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    color: #666;
+    font-size: 0.95rem;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.selecoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 100%;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.secaoCliente,
+.secaoTraje {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTrajes {
+    max-height: 760px;
+    overflow-y: auto;
+}
+
+.detalhes {
+  width: 100%;
+}
+
+.acoes {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

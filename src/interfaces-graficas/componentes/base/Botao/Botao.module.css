@@ -11,6 +11,7 @@
   transition: all 0.2s;
   width: 100%;
   min-height: 44px;
+  cursor: pointer;
 }
 
 .botao:disabled {

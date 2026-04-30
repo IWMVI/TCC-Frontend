@@ -10,3 +10,13 @@ export type {
   MedidaMasculinaResponse,
 } from './Cliente';
 export type { Traje, TrajeRequest, TrajeResponse } from './Traje';
+export {StatusAluguel, TipoOcasiao} from './Aluguel';
+export type {
+  Aluguel,
+  AluguemItem,
+  AluguemRequest,
+	AluguemUpdateRequest,
+  AluguemItemRequest,
+  AluguemResponse,
+} from './Aluguel';
+export type { DevolucaoRequest, DevolucaoResponse } from './Devolucao';

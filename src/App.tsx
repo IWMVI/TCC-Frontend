@@ -11,6 +11,9 @@ import {ListarTrajes} from './interfaces-graficas/paginas/trajes/listar/ListarTr
 import {CriarTraje} from './interfaces-graficas/paginas/trajes/criar/CriarTraje';
 import {EditarTraje} from './interfaces-graficas/paginas/trajes/editar/EditarTraje';
 import {Alugueis} from './interfaces-graficas/paginas/alugueis/Alugueis';
+import {RealizarAluguel} from './interfaces-graficas/paginas/alugueis/realizar';
+import {ListarAluguel} from './interfaces-graficas/paginas/alugueis/listar';
+import {EditarAluguel} from './interfaces-graficas/paginas/alugueis/editar';
 import {ProvedorClientes, ProvedorTrajes} from './interfaces-graficas/contextos';
 
 function App() {
@@ -31,6 +34,9 @@ function App() {
             <Route path="trajes/novo" element={<CriarTraje />} />
             <Route path="trajes/:id/editar" element={<EditarTraje />} />
             <Route path="alugueis" element={<Alugueis />} />
+            <Route path="alugueis/novo" element={<RealizarAluguel />} />
+            <Route path="alugueis/listar" element={<ListarAluguel />} />
+            <Route path="alugueis/:id/editar" element={<EditarAluguel />} />
           </Route>
         </Routes>
       </ProvedorTrajes>

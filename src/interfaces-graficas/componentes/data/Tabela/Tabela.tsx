@@ -3,6 +3,8 @@ import styles from './Tabela.module.css';
 export interface Coluna<T> {
   chave: keyof T | 'acoes';
   titulo: string;
+  width?: string;
+  align?: 'left' | 'center' | 'right';
   render?: (item: T) => React.ReactNode;
 }
 
@@ -40,15 +42,27 @@ export function Tabela<T extends object>({
         <thead>
           <tr>
             {colunas.map((coluna) => (
-              <th key={String(coluna.chave)}>{coluna.titulo}</th>
+              <th
+                key={String(coluna.chave)}
+                style={{
+                  ...(coluna.width ? { width: coluna.width } : {}),
+                  ...(coluna.align ? { textAlign: coluna.align } : {}),
+                }}
+              >
+                {coluna.titulo}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
           {dados.map((item) => (
-            <tr key={(item as any).id ?? Math.random()}>
+            <tr key={(item as Record<string, unknown>).id as string}>
               {colunas.map((coluna) => (
-                <td key={String(coluna.chave)}>
+                <td
+                  key={String(coluna.chave)}
+                  className={coluna.chave === 'acoes' ? styles.tabela__td_acoes : undefined}
+                  style={coluna.align ? { textAlign: coluna.align } : undefined}
+                >
                   {coluna.render
                     ? coluna.render(item)
                     : String((item as Record<string, unknown>)[coluna.chave as string] ?? '')}
