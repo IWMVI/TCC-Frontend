@@ -18,7 +18,11 @@ export enum TipoOcasiao {
 
 export interface AluguemItem {
   trajeId: number;
-	nomeTraje: string;
+  nomeTraje: string;
+  tipo?: string;
+  tamanho?: string;
+  cor?: string;
+  valorItem?: number;
 }
 
 export interface Aluguel {

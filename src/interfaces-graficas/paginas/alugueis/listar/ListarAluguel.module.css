@@ -294,30 +294,274 @@
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
 }
 
-.modal-overlay > div {
+/* Container do modal de detalhes */
+.modal-detalhes-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 780px;
   max-height: 90vh;
   overflow-y: auto;
-  width: 100%;
-  max-width: 600px;
+  display: flex;
+  flex-direction: column;
 }
 
-.modal-acoes {
+/* Cabeçalho */
+.modal-detalhes-header {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-  justify-content: flex-end;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #eee;
+}
 
-  button {
-    margin: 0;
+.modal-detalhes-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.modal-detalhes-header__id {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-detalhes-header__nome {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.modal-detalhes-header__acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.modal-detalhes-header__fechar {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #888;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
   }
+}
+
+/* Corpo em duas colunas */
+.modal-detalhes-corpo {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 0;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-detalhes-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid #eee;
+
+  @media (max-width: 640px) {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+.modal-detalhes-col--resumo {
+  padding: 1.25rem 1.5rem;
+  background-color: #fafafa;
+  border-radius: 0 0 8px 0;
+}
+
+/* Seções */
+.modal-detalhes-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  & + & {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #eee;
+  }
+}
+
+.modal-detalhes-secao__titulo {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-detalhes-secao__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.3rem;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Grid de informações */
+.modal-detalhes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+}
+
+.modal-detalhe-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.modal-detalhe-item--full {
+  grid-column: 1 / -1;
+}
+
+.modal-detalhe-item__rotulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-detalhe-item__valor {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Lista de trajes */
+.modal-trajes-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.modal-traje-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  background: #f0f6ff;
+  border-left: 3px solid #007bff;
+  border-radius: 0 4px 4px 0;
+}
+
+.modal-traje-item__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-traje-item__id {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #007bff;
+  white-space: nowrap;
+}
+
+.modal-traje-item__nome {
+  font-size: 0.875rem;
+  color: #333;
+  font-weight: 600;
+  flex: 1;
+}
+
+.modal-traje-item__valor {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #28a745;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.modal-traje-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.modal-traje-tag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  background: #fff;
+  border: 1px solid #c8deff;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4a7fc1;
+}
+
+/* Resumo financeiro */
+.modal-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.modal-resumo-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.modal-resumo-desconto {
+  color: #dc3545;
+}
+
+.modal-resumo-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.6rem;
+  margin-top: 0.2rem;
+  border-top: 2px solid #ddd;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #28a745;
 }
 
 /* Filter panel */

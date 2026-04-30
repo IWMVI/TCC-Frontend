@@ -1,5 +1,5 @@
 import { IAluguemRepository, FiltrosAluguel } from '../../domain/interfaces';
-import { AluguemResponse } from '../../domain/entidades';
+import { AluguemResponse, StatusAluguel } from '../../domain/entidades';
 import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
 
 export class ListarAlugueisUseCase {
@@ -10,6 +10,10 @@ export class ListarAlugueisUseCase {
   }
 
   async executarComFiltros(filtros: FiltrosAluguel, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguemResponse>> {
-    return this.aluguelRepository.listarComFiltros(filtros, pagina, tamanho);
+    const filtrosComPadrao: FiltrosAluguel = {
+      status: StatusAluguel.ATIVO,
+      ...filtros,
+    };
+    return this.aluguelRepository.listarComFiltros(filtrosComPadrao, pagina, tamanho);
   }
 }

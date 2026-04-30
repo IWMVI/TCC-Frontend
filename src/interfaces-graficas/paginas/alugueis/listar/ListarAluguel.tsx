@@ -430,61 +430,125 @@ export function ListarAluguel() {
 
       {modalDetalhesAberto && aluguelDetalhes && (
         <div className={styles['modal-overlay']}>
-          <Card titulo="Detalhes do Aluguel">
-            <div className={styles['modal-detalhes']}>
-              <div className={styles['detalhes-secao']}>
-                <h3>Informações do Aluguel</h3>
-                <p>
-                  <strong>ID:</strong> {aluguelDetalhes.id}
-                </p>
-                <p>
-                  <strong>Cliente ID:</strong> {aluguelDetalhes.clienteId}
-                </p>
-                <p>
-                  <strong>Nome do Cliente:</strong> {aluguelDetalhes.nomeCliente}
-                </p>
-                <p>
-                  <strong>Data Retirada:</strong> {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
-                </p>
-                <p>
-                  <strong>Data de Devolução:</strong> {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
-                </p>
-                <p>
-                  <strong>Ocasião:</strong> {obterAliasTipoOcasiao(aluguelDetalhes.ocasiao)}
-                </p>
-                <p>
-                  <strong>Status:</strong> {aluguelDetalhes.status}
-                </p>
+          <div className={styles['modal-detalhes-container']}>
+            {/* Cabeçalho */}
+            <div className={styles['modal-detalhes-header']}>
+              <div className={styles['modal-detalhes-header__info']}>
+                <span className={styles['modal-detalhes-header__id']}>Aluguel #{aluguelDetalhes.id}</span>
+                <h2 className={styles['modal-detalhes-header__nome']}>{aluguelDetalhes.nomeCliente}</h2>
               </div>
-
-              {aluguelDetalhes.itens?.length > 0 && (
-                <div className={styles['detalhes-secao']}>
-                  <h3>Itens do Aluguel</h3>
-                  {aluguelDetalhes.itens.map((item, index) => (
-                    <div key={`${item.trajeId}-${index}`} className={styles['item-aluguel']}>
-                      <p>
-                        <strong>{item.nomeTraje}</strong>
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className={styles['detalhes-secao']}>
-                <h3>Resumo Financeiro</h3>
-                <p>
-                  <strong>Valor Desconto:</strong> R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}
-                </p>
-                <p className={styles.total}>
-                  <strong>Valor Total:</strong> R$ {aluguelDetalhes.valorTotal.toFixed(2)}
-                </p>
-              </div>
-
-              <div className={styles['modal-acoes']}>
-                <Botao onClick={() => setModalDetalhesAberto(false)}>Fechar</Botao>
+              <div className={styles['modal-detalhes-header__acoes']}>
+                {(() => {
+                  const classeMap: Record<StatusAluguel, string> = {
+                    [StatusAluguel.ATIVO]: styles['status-ativo'],
+                    [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
+                    [StatusAluguel.CANCELADO]: styles['status-cancelado'],
+                  };
+                  return (
+                    <span className={classeMap[aluguelDetalhes.status] ?? styles['status-ativo']}>
+                      {aluguelDetalhes.status}
+                    </span>
+                  );
+                })()}
+                <button
+                  type="button"
+                  className={styles['modal-detalhes-header__fechar']}
+                  onClick={() => setModalDetalhesAberto(false)}
+                  aria-label="Fechar"
+                >
+                  ✕
+                </button>
               </div>
             </div>
-          </Card>
+
+            {/* Corpo */}
+            <div className={styles['modal-detalhes-corpo']}>
+              {/* Coluna esquerda */}
+              <div className={styles['modal-detalhes-col']}>
+                <section className={styles['modal-detalhes-secao']}>
+                  <h3 className={styles['modal-detalhes-secao__titulo']}>Informações</h3>
+                  <div className={styles['modal-detalhes-grid']}>
+                    <div className={styles['modal-detalhe-item']}>
+                      <span className={styles['modal-detalhe-item__rotulo']}>Cliente ID</span>
+                      <span className={styles['modal-detalhe-item__valor']}>{aluguelDetalhes.clienteId}</span>
+                    </div>
+                    <div className={styles['modal-detalhe-item']}>
+                      <span className={styles['modal-detalhe-item__rotulo']}>Ocasião</span>
+                      <span className={styles['modal-detalhe-item__valor']}>{obterAliasTipoOcasiao(aluguelDetalhes.ocasiao)}</span>
+                    </div>
+                    <div className={styles['modal-detalhe-item']}>
+                      <span className={styles['modal-detalhe-item__rotulo']}>Data de Retirada</span>
+                      <span className={styles['modal-detalhe-item__valor']}>{new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <div className={styles['modal-detalhe-item']}>
+                      <span className={styles['modal-detalhe-item__rotulo']}>Data de Devolução</span>
+                      <span className={styles['modal-detalhe-item__valor']}>{new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <div className={styles['modal-detalhe-item']}>
+                      <span className={styles['modal-detalhe-item__rotulo']}>Data do Aluguel</span>
+                      <span className={styles['modal-detalhe-item__valor']}>{new Date(aluguelDetalhes.dataAluguel).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    {aluguelDetalhes.observacoes && (
+                      <div className={`${styles['modal-detalhe-item']} ${styles['modal-detalhe-item--full']}`}>
+                        <span className={styles['modal-detalhe-item__rotulo']}>Observações</span>
+                        <span className={styles['modal-detalhe-item__valor']}>{aluguelDetalhes.observacoes}</span>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {aluguelDetalhes.itens?.length > 0 && (
+                  <section className={styles['modal-detalhes-secao']}>
+                    <h3 className={styles['modal-detalhes-secao__titulo']}>
+                      Trajes
+                      <span className={styles['modal-detalhes-secao__badge']}>{aluguelDetalhes.itens.length}</span>
+                    </h3>
+                    <ul className={styles['modal-trajes-lista']}>
+                      {aluguelDetalhes.itens.map((item, index) => (
+                        <li key={`${item.trajeId}-${index}`} className={styles['modal-traje-item']}>
+                          <div className={styles['modal-traje-item__cabecalho']}>
+                            <span className={styles['modal-traje-item__id']}>#{item.trajeId}</span>
+                            <span className={styles['modal-traje-item__nome']}>{item.nomeTraje}</span>
+                            {item.valorItem != null && (
+                              <span className={styles['modal-traje-item__valor']}>
+                                R$ {item.valorItem.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles['modal-traje-item__tags']}>
+                            {item.tipo && <span className={styles['modal-traje-tag']}>{item.tipo}</span>}
+                            {item.tamanho && <span className={styles['modal-traje-tag']}>{item.tamanho}</span>}
+                            {item.cor && <span className={styles['modal-traje-tag']}>{item.cor}</span>}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
+
+              {/* Coluna direita — resumo financeiro */}
+              <div className={styles['modal-detalhes-col--resumo']}>
+                <section className={styles['modal-detalhes-secao']}>
+                  <h3 className={styles['modal-detalhes-secao__titulo']}>Resumo Financeiro</h3>
+                  <div className={styles['modal-resumo']}>
+                    <div className={styles['modal-resumo-linha']}>
+                      <span>Subtotal</span>
+                      <span>R$ {(aluguelDetalhes.valorTotal + (aluguelDetalhes.valorDesconto ?? 0)).toFixed(2)}</span>
+                    </div>
+                    <div className={styles['modal-resumo-linha']}>
+                      <span>Desconto</span>
+                      <span className={styles['modal-resumo-desconto']}>- R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}</span>
+                    </div>
+                    <div className={styles['modal-resumo-total']}>
+                      <span>Total</span>
+                      <span>R$ {aluguelDetalhes.valorTotal.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
