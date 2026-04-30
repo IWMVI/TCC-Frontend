@@ -1,9 +1,9 @@
 import { ClienteResponse } from './Cliente';
 
 export enum StatusAluguel {
-  ATIVO = 'ATIVO',
-  CONCLUIDO = 'CONCLUIDO',
-  CANCELADO = 'CANCELADO',
+  ATIVO = 'Ativo',
+  CONCLUIDO = 'Concluído',
+  CANCELADO = 'Cancelado',
 }
 
 export enum TipoOcasiao {

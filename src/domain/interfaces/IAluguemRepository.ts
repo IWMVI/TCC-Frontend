@@ -1,5 +1,13 @@
-import {AluguemRequest, AluguemResponse, AluguemUpdateRequest} from '../entidades';
+import {AluguemRequest, AluguemResponse, AluguemUpdateRequest, StatusAluguel, TipoOcasiao, DevolucaoRequest, DevolucaoResponse} from '../entidades';
 import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+
+export interface FiltrosAluguel {
+  status?: StatusAluguel;
+  clienteId?: number;
+  dataRetiradaInicio?: string;
+  dataRetiradaFim?: string;
+  ocasiao?: TipoOcasiao;
+}
 
 export interface IAluguemRepository {
   listar(
@@ -13,4 +21,7 @@ export interface IAluguemRepository {
 	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;
   deletar(id: number): Promise<void>;
   marcarComoConcluido(id: number): Promise<AluguemResponse>;
+  listarComFiltros(filtros: FiltrosAluguel, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguemResponse>>;
+  registrarDevolucao(aluguelId: number, dados: DevolucaoRequest): Promise<DevolucaoResponse>;
+  buscarAtivoByTrajeId(trajeId: number): Promise<AluguemResponse>;
 }
