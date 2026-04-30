@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { AluguemApiRepository } from '../../../../infrastructure/api';
 import { RegistrarDevolucaoUseCase } from '../../../../application/alugueis';
 import { DevolucaoRequest } from '../../../../domain/entidades';
+import { formatarMoedaBrPartindoDeDigitos, converterMoedaBrParaNumero } from '../../../utils/formatacoes';
+import { Calendario } from '../../../componentes';
 import styles from './FormularioDevolucao.module.css';
 
 interface FormularioDevolucaoProps {
@@ -36,7 +38,7 @@ export function FormularioDevolucao({ aluguelId, onSucesso, onCancelar }: Formul
       valido = false;
     }
 
-    if (valorMulta !== '' && Number(valorMulta) < 0) {
+    if (valorMulta !== '' && converterMoedaBrParaNumero(valorMulta) < 0) {
       setErroValorMulta('O valor da multa não pode ser negativo.');
       valido = false;
     }
@@ -49,7 +51,7 @@ export function FormularioDevolucao({ aluguelId, onSucesso, onCancelar }: Formul
 
     const dados: DevolucaoRequest = {
       dataDevolucao,
-      ...(valorMulta !== '' && { valorMulta: Number(valorMulta) }),
+      ...(valorMulta !== '' && { valorMulta: converterMoedaBrParaNumero(valorMulta) }),
       ...(observacoes.trim() !== '' && { observacoes: observacoes.trim() }),
     };
 
@@ -82,20 +84,16 @@ export function FormularioDevolucao({ aluguelId, onSucesso, onCancelar }: Formul
           )}
 
           <div className={styles['campo-grupo']}>
-            <label htmlFor="dataDevolucao" className={styles['campo-label']}>
-              Data de Devolução <span className={styles['obrigatorio']}>*</span>
-            </label>
-            <input
+            <Calendario
               id="dataDevolucao"
-              type="date"
+              label="Data de Devolução"
               value={dataDevolucao}
-              onChange={(e) => {
-                setDataDevolucao(e.target.value);
+              onChange={(data) => {
+                setDataDevolucao(data);
                 if (erroDataDevolucao) setErroDataDevolucao('');
               }}
-              className={`${styles['campo-input']} ${erroDataDevolucao ? styles['campo-input--erro'] : ''}`}
-              aria-describedby={erroDataDevolucao ? 'erro-dataDevolucao' : undefined}
-              aria-required="true"
+              required
+              permitirPassado
             />
             {erroDataDevolucao && (
               <span id="erro-dataDevolucao" className={styles['campo-erro']} role="alert">
@@ -104,18 +102,18 @@ export function FormularioDevolucao({ aluguelId, onSucesso, onCancelar }: Formul
             )}
           </div>
 
-          <div className={styles['campo-grupo']}>
+           <div className={styles['campo-grupo']}>
             <label htmlFor="valorMulta" className={styles['campo-label']}>
               Valor da Multa (R$)
             </label>
             <input
               id="valorMulta"
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="numeric"
               value={valorMulta}
               onChange={(e) => {
-                setValorMulta(e.target.value);
+                const formatado = formatarMoedaBrPartindoDeDigitos(e.target.value);
+                setValorMulta(formatado);
                 if (erroValorMulta) setErroValorMulta('');
               }}
               className={`${styles['campo-input']} ${erroValorMulta ? styles['campo-input--erro'] : ''}`}
