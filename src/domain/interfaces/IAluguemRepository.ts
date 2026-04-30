@@ -3,7 +3,7 @@ import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepositor
 
 export interface FiltrosAluguel {
   status?: StatusAluguel;
-  clienteId?: number;
+  nomeCliente?: string;
   dataRetiradaInicio?: string;
   dataRetiradaFim?: string;
   ocasiao?: TipoOcasiao;

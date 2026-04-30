@@ -141,7 +141,7 @@ export class AluguemApiRepository implements IAluguemRepository {
       const params: Record<string, string | number> = {};
 
       if (filtros.status != null) params['status'] = filtros.status;
-      if (filtros.clienteId != null) params['clienteId'] = filtros.clienteId;
+      if (filtros.nomeCliente != null) params['nomeCliente'] = filtros.nomeCliente;
       if (filtros.dataRetiradaInicio != null) params['dataRetiradaInicio'] = filtros.dataRetiradaInicio;
       if (filtros.dataRetiradaFim != null) params['dataRetiradaFim'] = filtros.dataRetiradaFim;
       if (filtros.ocasiao != null) params['ocasiao'] = filtros.ocasiao;
