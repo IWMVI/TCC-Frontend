@@ -201,7 +201,7 @@ export class AluguemApiRepository implements IAluguemRepository {
 		  return new FalhaConexao(error.message || 'Não foi possível conectar ao servidor');
       }
 
-      const dados = error.response.data as Record<string, any>;
+      const dados = error.response.data as Record<string, unknown>;
 		const mensagem = dados?.message || dados?.erro || mensagemPadrao;
 		return new FalhaRequisicao(mensagem, error.response.status);
     }

@@ -1,8 +1,9 @@
-import {AluguemRequest, AluguemResponse, AluguemUpdateRequest} from '../../domain/entidades';
+import { AluguemRequest, AluguemResponse, AluguemUpdateRequest } from '../../domain/entidades';
+import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
 
 export interface AluguemRepository {
   criar(dados: AluguemRequest): Promise<AluguemResponse>;
-  listar(busca?: string, pagina?: number, tamanho?: number): Promise<any>;
+  listar(busca?: string, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguemResponse>>;
   buscarPorId(id: number): Promise<AluguemResponse>;
 	
 	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;

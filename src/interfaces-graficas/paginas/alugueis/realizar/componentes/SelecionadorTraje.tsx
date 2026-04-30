@@ -194,7 +194,7 @@ export function SelecionadorTraje({
           <p className={styles.mensagem}>Nenhum traje selecionado</p>
         ) : (
           <div className={styles.lista}>
-            {itensSelecionados.map((item) => (
+            {itensSelecionados.map((item, index) => (
               <div key={item.trajeId} className={styles.itemLista}>
                 <div className={styles.infoItem}>
                   <p className={styles.nomeTraje}>{item.traje.nome}</p>
