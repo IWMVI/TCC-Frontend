@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw, MoreVertical } from 'lucide-react';
+import { Dropdown } from 'react-bootstrap';
 import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '../../../componentes';
 import {
 	ListarAlugueisUseCase,
@@ -208,40 +209,40 @@ export function ListarAluguel() {
       align: 'center' as const,
       render: (aluguel: AluguemResponse) => (
         <div className={styles['aluguel-acoes']}>
-          <button
-            type="button"
-            className={styles['botao-detalhes']}
-            onClick={() => verDetalhes(aluguel)}
-            title="Ver detalhes"
-          >
-            <Eye size={14} />
-          </button>
-          <button
-            type="button"
-            className={styles['botao-editar']}
-            onClick={() => navigate(`/alugueis/${aluguel.id}/editar`)}
-            title="Editar aluguel"
-          >
-            <Edit2 size={14} />
-          </button>
-          {aluguel.status === StatusAluguel.ATIVO && (
-            <button
-              type="button"
-              className={styles['botao-devolver']}
-              onClick={() => abrirModalDevolucao(aluguel)}
-              title="Registrar devolução"
+          <Dropdown align="end">
+            <Dropdown.Toggle
+              variant="light"
+              size="sm"
+              id={`acoes-${aluguel.id}`}
+              className={styles['acao-toggle']}
+              aria-label="Ações"
             >
-              <RotateCcw size={14} />
-            </button>
-          )}
-          <button
-            type="button"
-            className={styles['botao-excluir']}
-            onClick={() => abrirModalExclusao(aluguel)}
-            title="Excluir aluguel"
-          >
-            <Trash2 size={14} />
-          </button>
+              <MoreVertical size={16} />
+            </Dropdown.Toggle>
+            <Dropdown.Menu
+              renderOnMount
+              popperConfig={{ strategy: 'fixed' }}
+            >
+              <Dropdown.Item onClick={() => verDetalhes(aluguel)}>
+                <Eye size={14} className={styles['icone-detalhes']} />
+                <span className={styles['acao-texto']}>Ver detalhes</span>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate(`/alugueis/${aluguel.id}/editar`)}>
+                <Edit2 size={14} className={styles['icone-editar']} />
+                <span className={styles['acao-texto']}>Editar aluguel</span>
+              </Dropdown.Item>
+              {aluguel.status === StatusAluguel.ATIVO && (
+                <Dropdown.Item onClick={() => abrirModalDevolucao(aluguel)}>
+                  <RotateCcw size={14} className={styles['icone-devolver']} />
+                  <span className={styles['acao-texto']}>Registrar devolução</span>
+                </Dropdown.Item>
+              )}
+              <Dropdown.Item onClick={() => abrirModalExclusao(aluguel)}>
+                <Trash2 size={14} className={styles['icone-excluir']} />
+                <span className={styles['acao-texto']}>Excluir aluguel</span>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       ),
     },

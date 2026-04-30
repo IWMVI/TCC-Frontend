@@ -122,75 +122,42 @@
 
 .aluguel-acoes {
   display: flex;
-  gap: 0.375rem;
-  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-
-  button {
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
 }
 
-.botao-detalhes {
-  background-color: #007bff;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #0056b3;
-  }
+.aluguel-acoes :global(.btn).acao-toggle {
+  min-width: 0;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #AAA;
+  border-color: #AAA;
+  color: #fff;
 }
 
-.botao-editar {
-  background-color: #17a2b8;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #138496;
-  }
+.aluguel-acoes :global(.btn).acao-toggle:hover,
+.aluguel-acoes :global(.btn).acao-toggle:focus,
+.aluguel-acoes :global(.btn).acao-toggle:active,
+.aluguel-acoes :global(.show) > :global(.btn).acao-toggle {
+  background-color: #828282;
+  border-color: #828282;
+  color: #fff;
 }
 
-.botao-concluir {
-  background-color: #28a745;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #218838;
-  }
+.aluguel-acoes :global(.btn).acao-toggle::after {
+  display: none;
 }
 
-.botao-excluir {
-  background-color: #dc3545;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #c82333;
-  }
-}
-
-.botao-devolver {
-  background-color: #fd7e14;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #e8690a;
-  }
-}
+.icone-detalhes { color: #007bff; }
+.icone-editar   { color: #17a2b8; }
+.icone-devolver { color: #fd7e14; }
+.icone-excluir  { color: #dc3545; }
+.acao-texto     { margin-left: 0.5rem; }
 
 .status-ativo,
 .status-concluido,
