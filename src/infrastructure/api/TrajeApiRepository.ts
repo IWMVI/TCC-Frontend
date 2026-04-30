@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { ITrajeRepository } from '@domain/interfaces';
-import { TrajeRequest, TrajeResponse } from '@domain/entidades';
+import { PeriodoAlugado, TrajeRequest, TrajeResponse } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from './ClienteApiRepository';
 
@@ -150,6 +150,20 @@ export class TrajeApiRepository implements ITrajeRepository {
         throw new RecursoNaoEncontrado('Traje', trajeId);
       }
       throw this.criarErro(error_, 'Erro ao remover imagem');
+    }
+  }
+
+  async buscarPeriodosAlugados(trajeId: number): Promise<PeriodoAlugado[]> {
+    try {
+      const resposta = await this.trajeApi.get<PeriodoAlugado[]>(
+        `/trajes/${trajeId}/periodos-alugados`,
+      );
+      return resposta.data;
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        throw new RecursoNaoEncontrado('Traje', trajeId);
+      }
+      throw this.criarErro(error_, 'Erro ao buscar períodos alugados');
     }
   }
 

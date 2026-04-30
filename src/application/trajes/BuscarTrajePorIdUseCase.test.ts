@@ -17,6 +17,7 @@ describe('BuscarTrajePorIdUseCase', () => {
       deletar: jest.fn(),
       atualizarImagem: jest.fn(),
       removerImagem: jest.fn(),
+      buscarPeriodosAlugados: jest.fn(),
     };
 
     useCase = new BuscarTrajePorIdUseCase(mockTrajeRepositorio);

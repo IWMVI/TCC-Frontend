@@ -19,6 +19,11 @@ export interface Traje {
   dataCadastro?: string;
 }
 
+export interface PeriodoAlugado {
+  dataRetirada: string;
+  dataDevolucao: string;
+}
+
 export interface TrajeRequest {
   nome: string;
   descricao: string;

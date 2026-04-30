@@ -1,4 +1,4 @@
-import { TrajeRequest, TrajeResponse } from '../entidades';
+import { TrajeRequest, TrajeResponse, PeriodoAlugado } from '../entidades';
 import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
 
 export interface ITrajeRepository {
@@ -14,4 +14,5 @@ export interface ITrajeRepository {
   deletar(id: number): Promise<void>;
   atualizarImagem(trajeId: number, file: File): Promise<string>;
   removerImagem(trajeId: number): Promise<void>;
+  buscarPeriodosAlugados(trajeId: number): Promise<PeriodoAlugado[]>;
 }
