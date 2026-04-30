@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {ArrowLeft, Edit2, Trash2} from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw } from 'lucide-react';
 import { Botao, Card, Tabela, Modal, Paginacao } from '../../../componentes';
 import {
 	ListarAlugueisUseCase,
@@ -8,8 +8,10 @@ import {
 	BuscarAluguelPorIdUseCase,
 } from '../../../../application/alugueis';
 import { AluguemApiRepository } from '../../../../infrastructure/api';
-import {AluguemResponse} from '../../../../domain/entidades';
-import {obterAliasTipoOcasiao} from '../utils/ocasiao';
+import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../../../domain/entidades';
+import { FiltrosAluguel } from '../../../../domain/interfaces';
+import { obterAliasTipoOcasiao } from '../utils/ocasiao';
+import { FormularioDevolucao } from '../devolver/FormularioDevolucao';
 import styles from './ListarAluguel.module.css';
 
 const aluguelRepositorio = new AluguemApiRepository();
@@ -21,13 +23,20 @@ const TAMANHO_PAGINA_PADRAO = 10;
 
 export function ListarAluguel() {
   const navigate = useNavigate();
-  const [termoBusca, setTermoBusca] = useState('');
   const [alugueis, setAluguel] = useState<AluguemResponse[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [totalRegistros, setTotalRegistros] = useState(0);
   const [tamanhoPagina, setTamanhoPagina] = useState(TAMANHO_PAGINA_PADRAO);
+
+  // Filter panel state (Task 13.1)
+  const [painelFiltrosAberto, setPainelFiltrosAberto] = useState(false);
+  const [filtros, setFiltros] = useState<FiltrosAluguel>({ status: StatusAluguel.ATIVO });
+
+  // Devolver modal state (Task 13.3)
+  const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
+  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguemResponse | null>(null);
 
   const [modalAberto, setModalAberto] = useState(false);
   const [modalTitulo, setModalTitulo] = useState('');
@@ -37,49 +46,49 @@ export function ListarAluguel() {
   const [aluguelParaExcluir, setAluguelParaExcluir] = useState<AluguemResponse | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const jaCarregouRef = useRef(false);
-	
-	const carregarAluguel = useCallback(async (busca?: string, pagina?: number) => {
-		if (abortControllerRef.current) {
-			abortControllerRef.current.abort();
-		}
-		
-		abortControllerRef.current = new AbortController();
-		const signal = abortControllerRef.current.signal;
-		
-		setEstaCarregando(true);
-		try {
-			const resultado = await listarAlugueisUseCase.executar(
-				busca,
-				pagina ?? 0,
-				TAMANHO_PAGINA_PADRAO,
-			);
-			
-			if (!signal.aborted) {
-				setAluguel(resultado.content);
-				setTotalPaginas(resultado.totalPages);
-				setTotalRegistros(resultado.totalElements);
-				setTamanhoPagina(resultado.size);
-				setPaginaAtual(resultado.number);
-			}
-		} catch (erro) {
-			if (erro instanceof Error && erro.name !== 'AbortError') {
-				setModalTitulo('Erro');
-				setModalMensagem('Erro ao carregar aluguéis');
-				setModalAberto(true);
-			}
-		} finally {
-			if (!signal.aborted) {
-				setEstaCarregando(false);
-			}
-		}
-	}, []);
+  const filtrosRef = useRef<FiltrosAluguel>(filtros);
+  filtrosRef.current = filtros;
 
-  useEffect(() => {
-    if (!jaCarregouRef.current) {
-      jaCarregouRef.current = true;
-      carregarAluguel();
+  // Task 13.2: refactored to use executarComFiltros
+  const carregarAluguel = useCallback(async (filtrosParam?: FiltrosAluguel, pagina?: number) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
+
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    setEstaCarregando(true);
+    try {
+      const resultado = await listarAlugueisUseCase.executarComFiltros(
+        filtrosParam ?? filtrosRef.current,
+        pagina ?? 0,
+        TAMANHO_PAGINA_PADRAO,
+      );
+
+      if (!signal.aborted) {
+        setAluguel(resultado.content);
+        setTotalPaginas(resultado.totalPages);
+        setTotalRegistros(resultado.totalElements);
+        setTamanhoPagina(resultado.size);
+        setPaginaAtual(resultado.number);
+      }
+    } catch (erro) {
+      if (erro instanceof Error && erro.name !== 'AbortError') {
+        setModalTitulo('Erro');
+        setModalMensagem('Erro ao carregar aluguéis');
+        setModalAberto(true);
+      }
+    } finally {
+      if (!signal.aborted) {
+        setEstaCarregando(false);
+      }
+    }
+  }, []);
+
+  // Task 13.2: initialize with { status: StatusAluguel.ATIVO } on mount
+  useEffect(() => {
+    carregarAluguel({ status: StatusAluguel.ATIVO });
   }, [carregarAluguel]);
 
   useEffect(() => {
@@ -89,14 +98,6 @@ export function ListarAluguel() {
       }
     };
   }, []);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      carregarAluguel(termoBusca || undefined, 0);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [termoBusca, carregarAluguel]);
 
   async function verDetalhes(aluguel: AluguemResponse) {
     try {
@@ -123,7 +124,7 @@ export function ListarAluguel() {
     try {
       await deletarAluguemUseCase.executar(aluguelParaExcluir.id);
       setModalAberto(false);
-      carregarAluguel(termoBusca || undefined, paginaAtual);
+      carregarAluguel(filtros, paginaAtual);
       setModalTitulo('Sucesso');
       setModalMensagem('Aluguel excluído com sucesso');
       setModalAberto(true);
@@ -136,32 +137,54 @@ export function ListarAluguel() {
     }
   }
 
+  // Task 13.3: open devolver modal
+  function abrirModalDevolucao(aluguel: AluguemResponse) {
+    setAluguelParaDevolver(aluguel);
+    setModalDevolucaoAberto(true);
+  }
+
+  // Task 13.3: on success, close modal, show message, reload list
+  function handleDevolucaoSucesso() {
+    setModalDevolucaoAberto(false);
+    setAluguelParaDevolver(null);
+    setModalTitulo('Sucesso');
+    setModalMensagem('Devolução registrada com sucesso');
+    setModalAberto(true);
+    carregarAluguel(filtros, paginaAtual);
+  }
+
+  // Task 13.3: on cancel, close modal
+  function handleDevolucaoCancelar() {
+    setModalDevolucaoAberto(false);
+    setAluguelParaDevolver(null);
+  }
+
   const colunas = [
-    { chave: 'id' as keyof AluguemResponse, titulo: 'ID', width: '60px' },
+    { chave: 'id' as keyof AluguemResponse, titulo: 'ID' },
     {
-		chave: 'nomeCliente' as keyof AluguemResponse,
-		titulo: 'Nome do Cliente',
-		render: (aluguel: AluguemResponse) => aluguel.nomeCliente,
+      chave: 'nomeCliente' as keyof AluguemResponse,
+      titulo: 'Nome do Cliente',
+      render: (aluguel: AluguemResponse) => aluguel.nomeCliente,
     },
     {
       chave: 'dataRetirada' as keyof AluguemResponse,
       titulo: 'Data Retirada',
-		render: (aluguel: AluguemResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
+      render: (aluguel: AluguemResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
     },
     {
       chave: 'dataDevolucao' as keyof AluguemResponse,
-		titulo: 'Data de Devolução',
-		render: (aluguel: AluguemResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
+      titulo: 'Data de Devolução',
+      render: (aluguel: AluguemResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
     },
     {
-		chave: 'valorTotal' as keyof AluguemResponse,
-		titulo: 'Valor Total',
-		render: (aluguel: AluguemResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
+      chave: 'valorTotal' as keyof AluguemResponse,
+      titulo: 'Valor Total',
+      render: (aluguel: AluguemResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
     },
     {
       chave: 'acoes' as keyof AluguemResponse,
       titulo: 'Ações',
-		width: '220px',
+      align: 'center' as const,
       render: (aluguel: AluguemResponse) => (
         <div className={styles['aluguel-acoes']}>
           <button
@@ -170,7 +193,7 @@ export function ListarAluguel() {
             onClick={() => verDetalhes(aluguel)}
             title="Ver detalhes"
           >
-            Detalhes
+            <Eye size={14} />
           </button>
           <button
             type="button"
@@ -178,15 +201,25 @@ export function ListarAluguel() {
             onClick={() => navigate(`/alugueis/${aluguel.id}/editar`)}
             title="Editar aluguel"
           >
-            <Edit2 size={16} />
+            <Edit2 size={14} />
           </button>
+          {aluguel.status === StatusAluguel.ATIVO && (
+            <button
+              type="button"
+              className={styles['botao-devolver']}
+              onClick={() => abrirModalDevolucao(aluguel)}
+              title="Registrar devolução"
+            >
+              <RotateCcw size={14} />
+            </button>
+          )}
           <button
             type="button"
             className={styles['botao-excluir']}
             onClick={() => abrirModalExclusao(aluguel)}
             title="Excluir aluguel"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
       ),
@@ -212,6 +245,13 @@ export function ListarAluguel() {
           </div>
         </div>
         <div className={styles['listar-aluguel__acoes-header']}>
+          <Botao
+            tipo="secundario"
+            onClick={() => setPainelFiltrosAberto((prev) => !prev)}
+          >
+            <Filter size={16} />
+            Filtros
+          </Botao>
           <Link to="/alugueis/novo">
             <Botao>Novo Aluguel</Botao>
           </Link>
@@ -220,15 +260,122 @@ export function ListarAluguel() {
 
       <Card titulo="Lista de Aluguéis">
         <div className={styles['listar-aluguel__conteudo']}>
-          <div className={styles['listar-aluguel__busca']}>
-            <input
-              type="text"
-              placeholder="Buscar por nome do cliente ou ID..."
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              className={styles['listar-aluguel__input-busca']}
-            />
-          </div>
+
+          {/* Task 13.1: Conditional filter panel */}
+          {painelFiltrosAberto && (
+            <div className={styles['painel-filtros']}>
+              <div className={styles['painel-filtros__controles']}>
+
+                <div className={styles['filtro-campo']}>
+                  <label htmlFor="filtro-status">Status</label>
+                  <select
+                    id="filtro-status"
+                    className={styles['filtro-select']}
+                    value={filtros.status ?? ''}
+                    onChange={(e) =>
+                      setFiltros((prev) => ({
+                        ...prev,
+                        status: e.target.value ? (e.target.value as StatusAluguel) : undefined,
+                      }))
+                    }
+                  >
+                    <option value="">Todos</option>
+                    <option value={StatusAluguel.ATIVO}>Ativo</option>
+                    <option value={StatusAluguel.CONCLUIDO}>Concluído</option>
+                    <option value={StatusAluguel.CANCELADO}>Cancelado</option>
+                  </select>
+                </div>
+
+                <div className={styles['filtro-campo']}>
+                  <label htmlFor="filtro-clienteId">ID do Cliente</label>
+                  <input
+                    id="filtro-clienteId"
+                    type="number"
+                    className={styles['filtro-input']}
+                    value={filtros.clienteId ?? ''}
+                    min={1}
+                    placeholder="Ex: 42"
+                    onChange={(e) =>
+                      setFiltros((prev) => ({
+                        ...prev,
+                        clienteId: e.target.value ? Number(e.target.value) : undefined,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className={styles['filtro-campo']}>
+                  <label htmlFor="filtro-dataRetiradaInicio">Retirada — início</label>
+                  <input
+                    id="filtro-dataRetiradaInicio"
+                    type="date"
+                    className={styles['filtro-input']}
+                    value={filtros.dataRetiradaInicio ?? ''}
+                    onChange={(e) =>
+                      setFiltros((prev) => ({
+                        ...prev,
+                        dataRetiradaInicio: e.target.value || undefined,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className={styles['filtro-campo']}>
+                  <label htmlFor="filtro-dataRetiradaFim">Retirada — fim</label>
+                  <input
+                    id="filtro-dataRetiradaFim"
+                    type="date"
+                    className={styles['filtro-input']}
+                    value={filtros.dataRetiradaFim ?? ''}
+                    onChange={(e) =>
+                      setFiltros((prev) => ({
+                        ...prev,
+                        dataRetiradaFim: e.target.value || undefined,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className={styles['filtro-campo']}>
+                  <label htmlFor="filtro-ocasiao">Ocasião</label>
+                  <select
+                    id="filtro-ocasiao"
+                    className={styles['filtro-select']}
+                    value={filtros.ocasiao ?? ''}
+                    onChange={(e) =>
+                      setFiltros((prev) => ({
+                        ...prev,
+                        ocasiao: e.target.value ? (e.target.value as TipoOcasiao) : undefined,
+                      }))
+                    }
+                  >
+                    <option value="">Todas</option>
+                    {Object.values(TipoOcasiao).map((ocasiao) => (
+                      <option key={ocasiao} value={ocasiao}>
+                        {obterAliasTipoOcasiao(ocasiao)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles['painel-filtros__acoes']}>
+                <Botao tipo="primario" onClick={() => carregarAluguel(filtros, 0)}>
+                  Buscar
+                </Botao>
+                <Botao
+                  tipo="secundario"
+                  onClick={() => {
+                    const filtrosLimpos: FiltrosAluguel = { status: StatusAluguel.ATIVO };
+                    setFiltros(filtrosLimpos);
+                    carregarAluguel(filtrosLimpos, 0);
+                  }}
+                >
+                  Limpar Filtros
+                </Botao>
+              </div>
+            </div>
+          )}
 
           {estaCarregando ? (
             <p className={styles['listar-aluguel__mensagem']}>Carregando...</p>
@@ -242,7 +389,7 @@ export function ListarAluguel() {
                 totalPaginas={totalPaginas}
                 totalRegistros={totalRegistros}
                 tamanhoPagina={tamanhoPagina}
-                onPageChange={(pagina) => carregarAluguel(termoBusca || undefined, pagina)}
+                onPageChange={(pagina) => carregarAluguel(filtros, pagina)}
               />
             </>
           )}
@@ -273,33 +420,32 @@ export function ListarAluguel() {
                   <strong>ID:</strong> {aluguelDetalhes.id}
                 </p>
                 <p>
-					<strong>Cliente ID:</strong> {aluguelDetalhes.clienteId}
-				</p>
-				  <p>
-					  <strong>Nome do Cliente:</strong> {aluguelDetalhes.nomeCliente}
+                  <strong>Cliente ID:</strong> {aluguelDetalhes.clienteId}
                 </p>
                 <p>
-					<strong>Data Retirada:</strong> {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
+                  <strong>Nome do Cliente:</strong> {aluguelDetalhes.nomeCliente}
                 </p>
                 <p>
-					<strong>Data de
-		                Devolução:</strong> {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
+                  <strong>Data Retirada:</strong> {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
                 </p>
                 <p>
-					<strong>Ocasião:</strong> {obterAliasTipoOcasiao(aluguelDetalhes.ocasiao)}
+                  <strong>Data de Devolução:</strong> {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
+                </p>
+                <p>
+                  <strong>Ocasião:</strong> {obterAliasTipoOcasiao(aluguelDetalhes.ocasiao)}
                 </p>
                 <p>
                   <strong>Status:</strong> {aluguelDetalhes.status}
                 </p>
               </div>
-				
-				{aluguelDetalhes.itens?.length > 0 && (
+
+              {aluguelDetalhes.itens?.length > 0 && (
                 <div className={styles['detalhes-secao']}>
-					<h3>Itens do Aluguel</h3>
-					{aluguelDetalhes.itens.map((item, index) => (
-						<div key={`${item.trajeId}-${index}`} className={styles['item-aluguel']}>
+                  <h3>Itens do Aluguel</h3>
+                  {aluguelDetalhes.itens.map((item, index) => (
+                    <div key={`${item.trajeId}-${index}`} className={styles['item-aluguel']}>
                       <p>
-						  <strong>{item.nomeTraje}</strong>
+                        <strong>{item.nomeTraje}</strong>
                       </p>
                     </div>
                   ))}
@@ -309,10 +455,10 @@ export function ListarAluguel() {
               <div className={styles['detalhes-secao']}>
                 <h3>Resumo Financeiro</h3>
                 <p>
-					<strong>Valor Desconto:</strong> R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}
+                  <strong>Valor Desconto:</strong> R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}
                 </p>
-				  <p className={styles.total}>
-					  <strong>Valor Total:</strong> R$ {aluguelDetalhes.valorTotal.toFixed(2)}
+                <p className={styles.total}>
+                  <strong>Valor Total:</strong> R$ {aluguelDetalhes.valorTotal.toFixed(2)}
                 </p>
               </div>
 
@@ -322,6 +468,15 @@ export function ListarAluguel() {
             </div>
           </Card>
         </div>
+      )}
+
+      {/* Task 13.3: FormularioDevolucao modal */}
+      {modalDevolucaoAberto && aluguelParaDevolver && (
+        <FormularioDevolucao
+          aluguelId={aluguelParaDevolver.id}
+          onSucesso={handleDevolucaoSucesso}
+          onCancelar={handleDevolucaoCancelar}
+        />
       )}
     </div>
   );
