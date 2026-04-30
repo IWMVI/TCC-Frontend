@@ -196,6 +196,21 @@ export class AluguemApiRepository implements IAluguemRepository {
     }
   }
 
+  async gerarContratoPdf(id: number): Promise<Blob> {
+    try {
+      const resposta = await this.aluguelApi.get<Blob>(
+        `/alugueis/${id}/contrato`,
+        { responseType: 'blob' },
+      );
+      return resposta.data;
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        throw new RecursoNaoEncontrado('Aluguel', id);
+      }
+      throw this.criarErro(error_, 'Erro ao gerar contrato');
+    }
+  }
+
   private criarErro(error: unknown, mensagemPadrao: string): Error {
     if (isAxiosError(error)) {
       if (!error.response) {

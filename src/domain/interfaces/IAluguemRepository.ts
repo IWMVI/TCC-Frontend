@@ -25,4 +25,5 @@ export interface IAluguemRepository {
   listarComFiltros(filtros: FiltrosAluguel, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguemResponse>>;
   registrarDevolucao(aluguelId: number, dados: DevolucaoRequest): Promise<DevolucaoResponse>;
   buscarAtivoByTrajeId(trajeId: number): Promise<AluguemResponse>;
+  gerarContratoPdf(id: number): Promise<Blob>;
 }

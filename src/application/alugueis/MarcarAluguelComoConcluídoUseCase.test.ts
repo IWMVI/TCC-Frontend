@@ -14,6 +14,7 @@ describe('MarcarAluguelComoConcluídoUseCase', () => {
       buscarPorId: jest.fn(),
       atualizar: jest.fn(),
       deletar: jest.fn(),
+      gerarContratoPdf: jest.fn(),
     };
     useCase = new MarcarAluguelComoConcluídoUseCase(mockRepositorio);
   });
