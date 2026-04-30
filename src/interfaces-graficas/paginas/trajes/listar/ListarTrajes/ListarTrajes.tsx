@@ -78,7 +78,7 @@ export function ListarTrajes() {
     }, TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [termoBusca]);
+  }, [termoBusca, carregarTrajes]);
 
   const abrirModalExclusao = useCallback((traje: TrajeResponse) => {
     setTrajeParaExcluir(traje);
