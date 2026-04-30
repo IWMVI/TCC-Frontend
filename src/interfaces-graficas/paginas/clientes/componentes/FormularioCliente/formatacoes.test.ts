@@ -18,7 +18,7 @@ describe('formatarMedida', () => {
   });
 
   it('deve formatar número undefined como "0,00"', () => {
-    expect(formatarMedida(undefined as any)).toBe('0,00');
+    expect(formatarMedida(undefined)).toBe('0,00');
   });
 
   it('deve formatar número 1234 como "12,34"', () => {

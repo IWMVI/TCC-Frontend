@@ -63,7 +63,7 @@ describe('Tabela', () => {
   });
 
   it('deve renderizar célula vazia quando valor for undefined', () => {
-    const dadosComUndefined: DadoTeste[] = [{ id: 1, nome: 'João', email: '' as any }];
+    const dadosComUndefined: DadoTeste[] = [{ id: 1, nome: 'João', email: '' }];
 
     render(<Tabela colunas={colunas} dados={dadosComUndefined} />);
 

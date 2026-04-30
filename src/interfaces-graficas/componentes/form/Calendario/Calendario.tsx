@@ -167,7 +167,7 @@ export function Calendario({
 		const dataBase = selecionada ?? hoje;
 		setMesAtual(new Date(dataBase.getFullYear(), dataBase.getMonth(), 1));
 		setInicioPaginaAnos(dataBase.getFullYear() - 5);
-	}, [value]);
+	}, [value, hoje, selecionada]);
 	
 	useEffect(() => {
 		if (!aberto) {

@@ -56,7 +56,7 @@ export function Tabela<T extends object>({
         </thead>
         <tbody>
           {dados.map((item) => (
-            <tr key={(item as any).id ?? Math.random()}>
+            <tr key={(item as Record<string, unknown>).id as string}>
               {colunas.map((coluna) => (
                 <td
                   key={String(coluna.chave)}

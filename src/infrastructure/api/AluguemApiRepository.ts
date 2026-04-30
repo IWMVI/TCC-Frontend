@@ -202,7 +202,7 @@ export class AluguemApiRepository implements IAluguemRepository {
       }
 
       const dados = error.response.data as Record<string, unknown>;
-		const mensagem = dados?.message || dados?.erro || mensagemPadrao;
+		const mensagem = (dados?.message as string) || (dados?.erro as string) || mensagemPadrao;
 		return new FalhaRequisicao(mensagem, error.response.status);
     }
 	  
