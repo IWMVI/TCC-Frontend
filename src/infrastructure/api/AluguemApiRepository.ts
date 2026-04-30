@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, isAxiosError } from 'axios';
-import { IAluguemRepository } from '@domain/interfaces';
-import {AluguemRequest, AluguemResponse, AluguemUpdateRequest} from '@domain/entidades';
+import { IAluguemRepository, FiltrosAluguel } from '@domain/interfaces';
+import {AluguemRequest, AluguemResponse, AluguemUpdateRequest, DevolucaoRequest, DevolucaoResponse} from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from './ClienteApiRepository';
 
@@ -129,6 +129,69 @@ export class AluguemApiRepository implements IAluguemRepository {
         throw new RecursoNaoEncontrado('Aluguel', id);
       }
       throw this.criarErro(error_, 'Erro ao marcar aluguel como concluído');
+    }
+  }
+
+  async listarComFiltros(
+    filtros: FiltrosAluguel,
+    pagina: number = 0,
+    tamanho: number = 10,
+  ): Promise<PaginacaoResultado<AluguemResponse>> {
+    try {
+      const params: Record<string, string | number> = {};
+
+      if (filtros.status != null) params['status'] = filtros.status;
+      if (filtros.clienteId != null) params['clienteId'] = filtros.clienteId;
+      if (filtros.dataRetiradaInicio != null) params['dataRetiradaInicio'] = filtros.dataRetiradaInicio;
+      if (filtros.dataRetiradaFim != null) params['dataRetiradaFim'] = filtros.dataRetiradaFim;
+      if (filtros.ocasiao != null) params['ocasiao'] = filtros.ocasiao;
+
+      const resposta = await this.aluguelApi.get<AluguemResponse[]>('/alugueis', { params });
+
+      const inicio = pagina * tamanho;
+      const fim = inicio + tamanho;
+      const content = resposta.data.slice(inicio, fim);
+      const totalElements = resposta.data.length;
+      const totalPages = Math.ceil(totalElements / tamanho);
+
+      return {
+        content,
+        totalElements,
+        totalPages,
+        size: tamanho,
+        number: pagina,
+        first: pagina === 0,
+        last: pagina >= Math.max(totalPages - 1, 0),
+      };
+    } catch (error_) {
+      throw this.criarErro(error_, 'Erro ao listar aluguéis com filtros');
+    }
+  }
+
+  async registrarDevolucao(aluguelId: number, dados: DevolucaoRequest): Promise<DevolucaoResponse> {
+    try {
+      const resposta = await this.aluguelApi.post<DevolucaoResponse>(
+        `/alugueis/${aluguelId}/devolucao`,
+        dados,
+      );
+      return resposta.data;
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        throw new RecursoNaoEncontrado('Aluguel', aluguelId);
+      }
+      throw this.criarErro(error_, 'Erro ao registrar devolução');
+    }
+  }
+
+  async buscarAtivoByTrajeId(trajeId: number): Promise<AluguemResponse> {
+    try {
+      const resposta = await this.aluguelApi.get<AluguemResponse>(`/alugueis/traje/${trajeId}/ativo`);
+      return resposta.data;
+    } catch (error_) {
+      if (isAxiosError(error_) && error_.response?.status === 404) {
+        throw new RecursoNaoEncontrado('Aluguel ativo para o traje', trajeId);
+      }
+      throw this.criarErro(error_, 'Erro ao buscar aluguel ativo do traje');
     }
   }
 
