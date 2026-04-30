@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
-import {Calendar, ChevronLeft, ChevronRight} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './Calendario.module.css';
 
 interface CalendarioProps {
@@ -56,17 +56,17 @@ function isSameDate(a: Date, b: Date): boolean {
 }
 
 function startOfMonth(year: number, month: number): Date { return new Date(year, month, 1); }
-function endOfMonth(year: number, month: number): Date   { return new Date(year, month + 1, 0); }
-function startOfYear(year: number): Date                 { return new Date(year, 0, 1); }
-function endOfYear(year: number): Date                   { return new Date(year, 11, 31); }
+function endOfMonth(year: number, month: number): Date { return new Date(year, month + 1, 0); }
+function startOfYear(year: number): Date { return new Date(year, 0, 1); }
+function endOfYear(year: number): Date { return new Date(year, 11, 31); }
 
 function buildMonthGrid(baseDate: Date): DiaCalendario[] {
 	const ano = baseDate.getFullYear();
 	const mes = baseDate.getMonth();
 	const primeiroDiaMes = startOfMonth(ano, mes);
-	const ultimoDiaMes   = endOfMonth(ano, mes);
+	const ultimoDiaMes = endOfMonth(ano, mes);
 	const diaSemanaInicio = primeiroDiaMes.getDay();
-	const totalDiasMes    = ultimoDiaMes.getDate();
+	const totalDiasMes = ultimoDiaMes.getDate();
 	const dias: DiaCalendario[] = [];
 
 	for (let i = diaSemanaInicio - 1; i >= 0; i -= 1) {
@@ -109,9 +109,9 @@ interface PopoverPos {
 function calcularPosicao(trigger: HTMLElement): PopoverPos & { paraCima: boolean } {
 	const rect = trigger.getBoundingClientRect();
 	return {
-		top:      rect.bottom + 4,
-		left:     Math.max(0, Math.min(rect.left, window.innerWidth - 300)),
-		width:    Math.max(rect.width, 280),
+		top: rect.bottom + 4,
+		left: Math.max(0, Math.min(rect.left, window.innerWidth - 300)),
+		width: Math.max(rect.width, 280),
 		paraCima: false,
 	};
 }
@@ -127,19 +127,19 @@ export function Calendario({
 	permitirPassado = false,
 	clearable = true,
 }: Readonly<CalendarioProps>) {
-	const hoje        = useMemo(() => normalizeDate(new Date()), []);
+	const hoje = useMemo(() => normalizeDate(new Date()), []);
 	const selecionada = useMemo(() => parseIsoDate(value), [value]);
 	const minDateProp = min ? parseIsoDate(min) : null;
-	const maxDate     = max ? parseIsoDate(max) : null;
-	const minDate     = permitirPassado
+	const maxDate = max ? parseIsoDate(max) : null;
+	const minDate = permitirPassado
 		? (minDateProp ? normalizeDate(minDateProp) : new Date(0))
 		: (minDateProp && minDateProp > hoje ? normalizeDate(minDateProp) : hoje);
 
-	const [aberto, setAberto]                   = useState(false);
-	const [painel, setPainel]                   = useState<PainelCalendario>('dia');
-	const [mesAtual, setMesAtual]               = useState<Date>(() => selecionada ?? hoje);
+	const [aberto, setAberto] = useState(false);
+	const [painel, setPainel] = useState<PainelCalendario>('dia');
+	const [mesAtual, setMesAtual] = useState<Date>(() => selecionada ?? hoje);
 	const [inicioPaginaAnos, setInicioPaginaAnos] = useState(() => (selecionada ?? hoje).getFullYear() - 5);
-	const [pos, setPos]                         = useState<(PopoverPos & { paraCima: boolean }) | null>(null);
+	const [pos, setPos] = useState<(PopoverPos & { paraCima: boolean }) | null>(null);
 
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
@@ -189,22 +189,22 @@ export function Calendario({
 		};
 	}, [aberto]);
 
-	const diasDoMes      = useMemo(() => buildMonthGrid(mesAtual), [mesAtual]);
-	const anosDaPagina   = useMemo(() =>
+	const diasDoMes = useMemo(() => buildMonthGrid(mesAtual), [mesAtual]);
+	const anosDaPagina = useMemo(() =>
 		Array.from({ length: TAMANHO_PAGINA_ANOS }, (_, i) => inicioPaginaAnos + i),
-	[inicioPaginaAnos]);
-	const labelMes       = useMemo(() =>
+		[inicioPaginaAnos]);
+	const labelMes = useMemo(() =>
 		new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(mesAtual),
-	[mesAtual]);
-	const labelAno       = mesAtual.getFullYear();
-	const valorExibicao  = useMemo(() =>
+		[mesAtual]);
+	const labelAno = mesAtual.getFullYear();
+	const valorExibicao = useMemo(() =>
 		selecionada ? new Intl.DateTimeFormat('pt-BR').format(selecionada) : '',
-	[selecionada]);
+		[selecionada]);
 
-	const podeIrMesAnterior        = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() - 1, minDate, maxDate);
-	const podeIrMesSeguinte        = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() + 1, minDate, maxDate);
-	const podeIrAnoAnterior        = !isYearBlocked(mesAtual.getFullYear() - 1, minDate, maxDate);
-	const podeIrAnoSeguinte        = !isYearBlocked(mesAtual.getFullYear() + 1, minDate, maxDate);
+	const podeIrMesAnterior = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() - 1, minDate, maxDate);
+	const podeIrMesSeguinte = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() + 1, minDate, maxDate);
+	const podeIrAnoAnterior = !isYearBlocked(mesAtual.getFullYear() - 1, minDate, maxDate);
+	const podeIrAnoSeguinte = !isYearBlocked(mesAtual.getFullYear() + 1, minDate, maxDate);
 	const podeIrPaginaAnosAnterior = anosDaPagina.some((a) => !isYearBlocked(a - TAMANHO_PAGINA_ANOS, minDate, maxDate));
 	const podeIrPaginaAnosSeguinte = anosDaPagina.some((a) => !isYearBlocked(a + TAMANHO_PAGINA_ANOS, minDate, maxDate));
 
@@ -289,23 +289,22 @@ export function Calendario({
 			{painel === 'dia' && (
 				<>
 					<div className={styles.calendario__weekdays}>
-						{['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map((d) => (
+						{['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
 							<span key={d} className={styles.calendario__weekday}>{d}</span>
 						))}
 					</div>
 					<div className={styles.calendario__days}>
 						{diasDoMes.map(({ data, foraDoMesAtual }) => {
 							const selected = selecionada ? isSameDate(data, selecionada) : false;
-							const isToday  = isSameDate(data, hoje);
-							const blocked  = isDateBlocked(data, minDate, maxDate);
+							const isToday = isSameDate(data, hoje);
+							const blocked = isDateBlocked(data, minDate, maxDate);
 							return (
 								<button key={toIsoDate(data)} type="button"
 									className={[
 										styles.calendario__day,
-										foraDoMesAtual ? styles['calendario__day--outside']  : '',
-										selected        ? styles['calendario__day--selected'] : '',
-										isToday         ? styles['calendario__day--today']    : '',
-									].filter(Boolean).join(' ')}
+										foraDoMesAtual ? styles['calendario__day--outside'] : '',
+										selected ? styles['calendario__day--selected'] : '',
+										isToday ? styles['calendario__day--today'] : '', data.getDay() === 0 ? styles['calendario__day--sunday'] : '',].filter(Boolean).join(' ')}
 									onClick={() => selecionarData(data)}
 									disabled={blocked}>
 									{data.getDate()}
@@ -320,7 +319,7 @@ export function Calendario({
 				<div className={styles.calendario__grid}>
 					{MESES.map((mesNome, mesIndice) => {
 						const blocked = isMonthBlocked(mesAtual.getFullYear(), mesIndice, minDate, maxDate);
-						const active  = mesAtual.getMonth() === mesIndice;
+						const active = mesAtual.getMonth() === mesIndice;
 						return (
 							<button key={mesNome} type="button"
 								className={[styles.calendario__cell, active ? styles['calendario__cell--active'] : ''].filter(Boolean).join(' ')}
@@ -337,7 +336,7 @@ export function Calendario({
 				<div className={styles.calendario__grid}>
 					{anosDaPagina.map((ano) => {
 						const blocked = isYearBlocked(ano, minDate, maxDate);
-						const active  = mesAtual.getFullYear() === ano;
+						const active = mesAtual.getFullYear() === ano;
 						return (
 							<button key={ano} type="button"
 								className={[styles.calendario__cell, active ? styles['calendario__cell--active'] : ''].filter(Boolean).join(' ')}
