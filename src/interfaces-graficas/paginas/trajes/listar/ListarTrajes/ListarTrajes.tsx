@@ -8,6 +8,8 @@ import { ErrorMessage } from '@interfaces-graficas/componentes/feedback/ErrorMes
 import { useTrajes } from '@interfaces-graficas/contextos/ContextoTrajes';
 import { TrajeResponse } from '@domain/entidades';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
+import { AluguemApiRepository } from '@infrastructure/api';
+import { FormularioDevolucao } from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
 import styles from './ListarTrajes.module.css';
 
 export function ListarTrajes() {
@@ -21,6 +23,12 @@ export function ListarTrajes() {
   const [trajeSelecionado, setTrajeSelecionado] = useState<TrajeResponse | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [inicializou, setInicializou] = useState(false);
+
+  // Devolução
+  const aluguelRepositorio = useMemo(() => new AluguemApiRepository(), []);
+  const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
+  const [aluguelIdParaDevolver, setAluguelIdParaDevolver] = useState<number | null>(null);
+  const [estaBuscandoAluguel, setEstaBuscandoAluguel] = useState(false);
 
   const carregarDados = useCallback(
     (busca?: string, pagina?: number) => {
@@ -114,6 +122,19 @@ export function ListarTrajes() {
     setTrajeSelecionado(null);
   }, []);
 
+  const abrirDevolucao = useCallback(async (traje: TrajeResponse) => {
+    setEstaBuscandoAluguel(true);
+    try {
+      const aluguel = await aluguelRepositorio.buscarAtivoByTrajeId(traje.id);
+      setAluguelIdParaDevolver(aluguel.id);
+      setModalDevolucaoAberto(true);
+    } catch {
+      dispatch({ tipo: 'SET_ERRO', payload: `Nenhum aluguel ativo encontrado para o traje "${traje.nome}"` });
+    } finally {
+      setEstaBuscandoAluguel(false);
+    }
+  }, [aluguelRepositorio, dispatch]);
+
   const handleAtualizarImagem = useCallback(
     async (trajeId: number, file: File) => {
       try {
@@ -180,6 +201,17 @@ export function ListarTrajes() {
             >
               Editar
             </Link>
+            {traje.status === 'ALUGADO' && (
+              <button
+                type="button"
+                className={styles['listar-trajes__botao-devolver']}
+                onClick={() => abrirDevolucao(traje)}
+                disabled={estaBuscandoAluguel}
+                title="Registrar devolução"
+              >
+                Devolver
+              </button>
+            )}
             <button
               type="button"
               className={styles['listar-trajes__botao-excluir']}
@@ -192,7 +224,7 @@ export function ListarTrajes() {
         ),
       },
     ],
-    [abrirModalImagem, abrirModalExclusao]
+    [abrirModalImagem, abrirModalExclusao, abrirDevolucao, estaBuscandoAluguel]
   );
 
   const handleVoltar = useCallback(() => {
@@ -277,6 +309,21 @@ export function ListarTrajes() {
         aoAtualizarImagem={handleAtualizarImagem}
         aoRemoverImagem={handleRemoverImagem}
       />
+
+      {modalDevolucaoAberto && aluguelIdParaDevolver !== null && (
+        <FormularioDevolucao
+          aluguelId={aluguelIdParaDevolver}
+          onSucesso={() => {
+            setModalDevolucaoAberto(false);
+            setAluguelIdParaDevolver(null);
+            carregarDados(termoBusca || undefined, estado.paginaAtual);
+          }}
+          onCancelar={() => {
+            setModalDevolucaoAberto(false);
+            setAluguelIdParaDevolver(null);
+          }}
+        />
+      )}
     </div>
   );
 }

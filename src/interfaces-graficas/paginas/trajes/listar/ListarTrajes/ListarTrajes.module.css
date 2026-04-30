@@ -163,6 +163,21 @@
   color: white;
 }
 
+.listar-trajes__botao-devolver {
+  background-color: #fd7e14;
+  color: white;
+  border: none;
+}
+
+.listar-trajes__botao-devolver:hover:not(:disabled) {
+  background-color: #e8690a;
+}
+
+.listar-trajes__botao-devolver:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .listar-trajes__botao-imagem {
   width: 36px;
   height: 36px;
