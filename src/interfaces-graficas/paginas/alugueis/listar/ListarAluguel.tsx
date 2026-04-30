@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Paginacao } from '../../../componentes';
+import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '../../../componentes';
 import {
 	ListarAlugueisUseCase,
 	DeletarAluguemUseCase,
@@ -86,7 +86,7 @@ export function ListarAluguel() {
     }
   }, []);
 
-  // Task 13.2: initialize with { status: StatusAluguel.ATIVO } on mount
+  // Task 13.2: initialize with ATIVO status on mount
   useEffect(() => {
     carregarAluguel({ status: StatusAluguel.ATIVO });
   }, [carregarAluguel]);
@@ -160,26 +160,47 @@ export function ListarAluguel() {
   }
 
   const colunas = [
-    { chave: 'id' as keyof AluguemResponse, titulo: 'ID' },
+    { chave: 'id' as keyof AluguemResponse, titulo: 'ID', align: 'center' as const },
     {
       chave: 'nomeCliente' as keyof AluguemResponse,
       titulo: 'Nome do Cliente',
+      align: 'center' as const,
       render: (aluguel: AluguemResponse) => aluguel.nomeCliente,
     },
     {
       chave: 'dataRetirada' as keyof AluguemResponse,
       titulo: 'Data Retirada',
+      align: 'center' as const,
       render: (aluguel: AluguemResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
     },
     {
       chave: 'dataDevolucao' as keyof AluguemResponse,
       titulo: 'Data de Devolução',
+      align: 'center' as const,
       render: (aluguel: AluguemResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
     },
     {
       chave: 'valorTotal' as keyof AluguemResponse,
       titulo: 'Valor Total',
+      align: 'center' as const,
       render: (aluguel: AluguemResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
+    },
+    {
+      chave: 'status' as keyof AluguemResponse,
+      titulo: 'Status',
+      align: 'center' as const,
+      render: (aluguel: AluguemResponse) => {
+        const classeMap: Record<StatusAluguel, string> = {
+          [StatusAluguel.ATIVO]: styles['status-ativo'],
+          [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
+          [StatusAluguel.CANCELADO]: styles['status-cancelado'],
+        };
+        return (
+          <span className={classeMap[aluguel.status] ?? styles['status-ativo']}>
+            {aluguel.status}
+          </span>
+        );
+      },
     },
     {
       chave: 'acoes' as keyof AluguemResponse,
@@ -287,52 +308,49 @@ export function ListarAluguel() {
                 </div>
 
                 <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-clienteId">ID do Cliente</label>
+                  <label htmlFor="filtro-nomeCliente">Nome do Cliente</label>
                   <input
-                    id="filtro-clienteId"
-                    type="number"
+                    id="filtro-nomeCliente"
+                    type="text"
                     className={styles['filtro-input']}
-                    value={filtros.clienteId ?? ''}
-                    min={1}
-                    placeholder="Ex: 42"
+                    value={filtros.nomeCliente ?? ''}
+                    placeholder="Ex: João Silva"
                     onChange={(e) =>
                       setFiltros((prev) => ({
                         ...prev,
-                        clienteId: e.target.value ? Number(e.target.value) : undefined,
+                        nomeCliente: e.target.value || undefined,
                       }))
                     }
                   />
                 </div>
 
                 <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-dataRetiradaInicio">Retirada — início</label>
-                  <input
+                  <Calendario
                     id="filtro-dataRetiradaInicio"
-                    type="date"
-                    className={styles['filtro-input']}
+                    label="Retirada — início"
                     value={filtros.dataRetiradaInicio ?? ''}
-                    onChange={(e) =>
+                    onChange={(valor) =>
                       setFiltros((prev) => ({
                         ...prev,
-                        dataRetiradaInicio: e.target.value || undefined,
+                        dataRetiradaInicio: valor || undefined,
                       }))
                     }
+                    permitirPassado
                   />
                 </div>
 
                 <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-dataRetiradaFim">Retirada — fim</label>
-                  <input
+                  <Calendario
                     id="filtro-dataRetiradaFim"
-                    type="date"
-                    className={styles['filtro-input']}
+                    label="Retirada — fim"
                     value={filtros.dataRetiradaFim ?? ''}
-                    onChange={(e) =>
+                    onChange={(valor) =>
                       setFiltros((prev) => ({
                         ...prev,
-                        dataRetiradaFim: e.target.value || undefined,
+                        dataRetiradaFim: valor || undefined,
                       }))
                     }
+                    permitirPassado
                   />
                 </div>
 
