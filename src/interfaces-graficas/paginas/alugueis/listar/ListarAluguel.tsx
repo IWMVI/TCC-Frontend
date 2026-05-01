@@ -5,20 +5,20 @@ import { Dropdown } from 'react-bootstrap';
 import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '../../../componentes';
 import {
 	ListarAlugueisUseCase,
-	DeletarAluguemUseCase,
+	DeletarAluguelUseCase,
 	BuscarAluguelPorIdUseCase,
 	GerarContratoAluguelUseCase,
 } from '../../../../application/alugueis';
-import { AluguemApiRepository } from '../../../../infrastructure/api';
-import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../../../domain/entidades';
+import { AluguelApiRepository } from '../../../../infrastructure/api';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../../../domain/entidades';
 import { FiltrosAluguel } from '../../../../domain/interfaces';
 import { obterAliasTipoOcasiao } from '../utils/ocasiao';
 import { FormularioDevolucao } from '../devolver/FormularioDevolucao';
 import styles from './ListarAluguel.module.css';
 
-const aluguelRepositorio = new AluguemApiRepository();
+const aluguelRepositorio = new AluguelApiRepository();
 const listarAlugueisUseCase = new ListarAlugueisUseCase(aluguelRepositorio);
-const deletarAluguemUseCase = new DeletarAluguemUseCase(aluguelRepositorio);
+const deletarAluguelUseCase = new DeletarAluguelUseCase(aluguelRepositorio);
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
 const gerarContratoUseCase = new GerarContratoAluguelUseCase(aluguelRepositorio);
 
@@ -26,7 +26,7 @@ const TAMANHO_PAGINA_PADRAO = 10;
 
 export function ListarAluguel() {
   const navigate = useNavigate();
-  const [alugueis, setAluguel] = useState<AluguemResponse[]>([]);
+  const [alugueis, setAluguel] = useState<AluguelResponse[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(0);
@@ -39,14 +39,14 @@ export function ListarAluguel() {
 
   // Devolver modal state (Task 13.3)
   const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
-  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguemResponse | null>(null);
+  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguelResponse | null>(null);
 
   const [modalAberto, setModalAberto] = useState(false);
   const [modalTitulo, setModalTitulo] = useState('');
   const [modalMensagem, setModalMensagem] = useState('');
   const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
-  const [aluguelDetalhes, setAluguelDetalhes] = useState<AluguemResponse | null>(null);
-  const [aluguelParaExcluir, setAluguelParaExcluir] = useState<AluguemResponse | null>(null);
+  const [aluguelDetalhes, setAluguelDetalhes] = useState<AluguelResponse | null>(null);
+  const [aluguelParaExcluir, setAluguelParaExcluir] = useState<AluguelResponse | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const filtrosRef = useRef<FiltrosAluguel>(filtros);
@@ -102,7 +102,7 @@ export function ListarAluguel() {
     };
   }, []);
 
-  async function verDetalhes(aluguel: AluguemResponse) {
+  async function verDetalhes(aluguel: AluguelResponse) {
     try {
       const detalhes = await buscarAluguelPorIdUseCase.executar(aluguel.id);
       setAluguelDetalhes(detalhes);
@@ -114,7 +114,7 @@ export function ListarAluguel() {
     }
   }
 
-  async function gerarContrato(aluguel: AluguemResponse) {
+  async function gerarContrato(aluguel: AluguelResponse) {
     try {
       const blob = await gerarContratoUseCase.executar(aluguel.id);
       const url = URL.createObjectURL(blob);
@@ -127,7 +127,7 @@ export function ListarAluguel() {
     }
   }
 
-  function abrirModalExclusao(aluguel: AluguemResponse) {
+  function abrirModalExclusao(aluguel: AluguelResponse) {
     setAluguelParaExcluir(aluguel);
     setModalTitulo('Confirmar Exclusão');
     setModalMensagem(`Tem certeza que deseja excluir o aluguel ID ${aluguel.id}?`);
@@ -138,7 +138,7 @@ export function ListarAluguel() {
     if (!aluguelParaExcluir) return;
 
     try {
-      await deletarAluguemUseCase.executar(aluguelParaExcluir.id);
+      await deletarAluguelUseCase.executar(aluguelParaExcluir.id);
       setModalAberto(false);
       carregarAluguel(filtros, paginaAtual);
       setModalTitulo('Sucesso');
@@ -154,7 +154,7 @@ export function ListarAluguel() {
   }
 
   // Task 13.3: open devolver modal
-  function abrirModalDevolucao(aluguel: AluguemResponse) {
+  function abrirModalDevolucao(aluguel: AluguelResponse) {
     setAluguelParaDevolver(aluguel);
     setModalDevolucaoAberto(true);
   }
@@ -176,36 +176,36 @@ export function ListarAluguel() {
   }
 
   const colunas = [
-    { chave: 'id' as keyof AluguemResponse, titulo: 'ID', align: 'center' as const },
+    { chave: 'id' as keyof AluguelResponse, titulo: 'ID', align: 'center' as const },
     {
-      chave: 'nomeCliente' as keyof AluguemResponse,
+      chave: 'nomeCliente' as keyof AluguelResponse,
       titulo: 'Nome do Cliente',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => aluguel.nomeCliente,
+      render: (aluguel: AluguelResponse) => aluguel.nomeCliente,
     },
     {
-      chave: 'dataRetirada' as keyof AluguemResponse,
+      chave: 'dataRetirada' as keyof AluguelResponse,
       titulo: 'Data Retirada',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
+      render: (aluguel: AluguelResponse) => new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
     },
     {
-      chave: 'dataDevolucao' as keyof AluguemResponse,
+      chave: 'dataDevolucao' as keyof AluguelResponse,
       titulo: 'Data de Devolução',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
+      render: (aluguel: AluguelResponse) => new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
     },
     {
-      chave: 'valorTotal' as keyof AluguemResponse,
+      chave: 'valorTotal' as keyof AluguelResponse,
       titulo: 'Valor Total',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
+      render: (aluguel: AluguelResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
     },
     {
-      chave: 'status' as keyof AluguemResponse,
+      chave: 'status' as keyof AluguelResponse,
       titulo: 'Status',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => {
+      render: (aluguel: AluguelResponse) => {
         const classeMap: Record<StatusAluguel, string> = {
           [StatusAluguel.ATIVO]: styles['status-ativo'],
           [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
@@ -219,10 +219,10 @@ export function ListarAluguel() {
       },
     },
     {
-      chave: 'acoes' as keyof AluguemResponse,
+      chave: 'acoes' as keyof AluguelResponse,
       titulo: 'Ações',
       align: 'center' as const,
-      render: (aluguel: AluguemResponse) => (
+      render: (aluguel: AluguelResponse) => (
         <div className={styles['aluguel-acoes']}>
           <Dropdown align="end">
             <Dropdown.Toggle

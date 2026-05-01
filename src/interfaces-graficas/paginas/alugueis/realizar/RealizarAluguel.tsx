@@ -2,11 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Modal, Botao, Card } from '../../../componentes';
-import { CriarAluguemUseCase } from '../../../../application/alugueis';
-import { AluguemApiRepository } from '../../../../infrastructure/api';
+import { CriarAluguelUseCase } from '../../../../application/alugueis';
+import { AluguelApiRepository } from '../../../../infrastructure/api';
 import {
-	AluguemRequest,
-	AluguemItemRequest,
+	AluguelRequest,
+	AluguelItemRequest,
 	ClienteResponse,
 	TipoOcasiao,
 	Traje,
@@ -21,8 +21,8 @@ import {
 } from '../../../utils/formatacoes';
 import styles from './RealizarAluguel.module.css';
 
-const aluguelRepositorio = new AluguemApiRepository();
-const criarAluguemUseCase = new CriarAluguemUseCase(aluguelRepositorio);
+const aluguelRepositorio = new AluguelApiRepository();
+const criarAluguelUseCase = new CriarAluguelUseCase(aluguelRepositorio);
 
 interface ItemSelecionado {
   trajeId: number;
@@ -140,11 +140,11 @@ export function RealizarAluguel() {
     try {
       setEstaEnviando(true);
 		
-		const itens: AluguemItemRequest[] = itensSelecionados.map((item) => ({
+		const itens: AluguelItemRequest[] = itensSelecionados.map((item) => ({
         trajeId: item.trajeId,
       }));
 
-      const dados: AluguemRequest = {
+      const dados: AluguelRequest = {
         clienteId: clienteSelecionado.id,
         dataRetirada,
         dataDevolucao,
@@ -154,7 +154,7 @@ export function RealizarAluguel() {
         itens,
       };
 
-      await criarAluguemUseCase.executar(dados);
+      await criarAluguelUseCase.executar(dados);
       setModalTitulo('Sucesso');
       setModalMensagem('Aluguel realizado com sucesso.');
       setModalAberto(true);

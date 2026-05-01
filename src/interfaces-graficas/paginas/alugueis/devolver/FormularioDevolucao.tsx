@@ -1,20 +1,20 @@
 import { useState } from 'react';
-import { AluguemApiRepository } from '../../../../infrastructure/api';
+import { AluguelApiRepository } from '../../../../infrastructure/api';
 import { RegistrarDevolucaoUseCase } from '../../../../application/alugueis';
 import { CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest } from '../../../../domain/entidades';
-import { AluguemItem } from '../../../../domain/entidades/Aluguel';
+import { AluguelItem } from '../../../../domain/entidades/Aluguel';
 import { formatarMoedaBrPartindoDeDigitos, converterMoedaBrParaNumero } from '../../../utils/formatacoes';
 import { Calendario } from '../../../componentes';
 import styles from './FormularioDevolucao.module.css';
 
 interface FormularioDevolucaoProps {
   aluguelId: number;
-  itens: AluguemItem[];
+  itens: AluguelItem[];
   onSucesso: () => void;
   onCancelar: () => void;
 }
 
-const aluguelRepositorio = new AluguemApiRepository();
+const aluguelRepositorio = new AluguelApiRepository();
 const registrarDevolucaoUseCase = new RegistrarDevolucaoUseCase(aluguelRepositorio);
 
 const OPCOES_CONDICAO: { valor: CondicaoTraje; rotulo: string }[] = [

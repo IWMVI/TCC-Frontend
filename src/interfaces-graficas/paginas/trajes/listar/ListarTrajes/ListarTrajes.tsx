@@ -6,9 +6,9 @@ import type { Coluna } from '@interfaces-graficas/componentes/data/Tabela';
 import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
 import { ErrorMessage } from '@interfaces-graficas/componentes/feedback/ErrorMessage';
 import { useTrajes } from '@interfaces-graficas/contextos/ContextoTrajes';
-import { AluguemResponse, TrajeResponse } from '@domain/entidades';
+import { AluguelResponse, TrajeResponse } from '@domain/entidades';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
-import { AluguemApiRepository } from '@infrastructure/api';
+import { AluguelApiRepository } from '@infrastructure/api';
 import { FormularioDevolucao } from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
 import styles from './ListarTrajes.module.css';
 
@@ -25,9 +25,9 @@ export function ListarTrajes() {
   const [inicializou, setInicializou] = useState(false);
 
   // Devolução
-  const aluguelRepositorio = useMemo(() => new AluguemApiRepository(), []);
+  const aluguelRepositorio = useMemo(() => new AluguelApiRepository(), []);
   const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
-  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguemResponse | null>(null);
+  const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguelResponse | null>(null);
   const [estaBuscandoAluguel, setEstaBuscandoAluguel] = useState(false);
 
   const carregarDados = useCallback(

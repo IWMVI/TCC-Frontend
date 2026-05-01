@@ -4,14 +4,14 @@ import {ArrowLeft} from 'lucide-react';
 import {Modal, Botao, Card} from '../../../componentes';
 import {
 	BuscarAluguelPorIdUseCase,
-	AtualizarAluguemUseCase,
+	AtualizarAluguelUseCase,
 } from '../../../../application/alugueis';
 import {BuscarTrajePorIdUseCase} from '../../../../application/trajes';
-import {AluguemApiRepository, TrajeApiRepository} from '../../../../infrastructure/api';
+import {AluguelApiRepository, TrajeApiRepository} from '../../../../infrastructure/api';
 import {
-	AluguemItemRequest,
-	AluguemResponse,
-	AluguemUpdateRequest,
+	AluguelItemRequest,
+	AluguelResponse,
+	AluguelUpdateRequest,
 	StatusAluguel,
 	TipoOcasiao,
 	Traje,
@@ -28,10 +28,10 @@ import {obterTipoOcasiaoPorValor} from '../utils/ocasiao';
 import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '../utils/status';
 import styles from './EditarAluguel.module.css';
 
-const aluguelRepositorio = new AluguemApiRepository();
+const aluguelRepositorio = new AluguelApiRepository();
 const trajeRepositorio = new TrajeApiRepository();
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
-const atualizarAluguemUseCase = new AtualizarAluguemUseCase(aluguelRepositorio);
+const atualizarAluguelUseCase = new AtualizarAluguelUseCase(aluguelRepositorio);
 const buscarTrajePorIdUseCase = new BuscarTrajePorIdUseCase(trajeRepositorio);
 
 interface ItemSelecionado {
@@ -44,7 +44,7 @@ export function EditarAluguel() {
 	const {id} = useParams<{id: string}>();
 	const aluguelId = parseInt(id || '0', 10);
 
-	const [aluguel, setAluguel] = useState<AluguemResponse | null>(null);
+	const [aluguel, setAluguel] = useState<AluguelResponse | null>(null);
 	const [estaCarregando, setEstaCarregando] = useState(true);
 	const [estaEnviando, setEstaEnviando] = useState(false);
 
@@ -192,11 +192,11 @@ export function EditarAluguel() {
 		try {
 			setEstaEnviando(true);
 
-			const itens: AluguemItemRequest[] = itensSelecionados.map((item) => ({
+			const itens: AluguelItemRequest[] = itensSelecionados.map((item) => ({
 				trajeId: item.trajeId,
 			}));
 
-			const dados: AluguemUpdateRequest = {
+			const dados: AluguelUpdateRequest = {
 				dataRetirada,
 				dataDevolucao,
 				observacoes: observacoes.trim() || undefined,
@@ -206,7 +206,7 @@ export function EditarAluguel() {
 				itens,
 			};
 
-			await atualizarAluguemUseCase.executar(aluguelId, dados);
+			await atualizarAluguelUseCase.executar(aluguelId, dados);
 			setModalTitulo('Sucesso');
 			setModalMensagem('Aluguel atualizado com sucesso.');
 			setModalAberto(true);
