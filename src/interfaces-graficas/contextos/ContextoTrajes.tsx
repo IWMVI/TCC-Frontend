@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
-import { TrajeRequest, TrajeResponse } from '../../domain/entidades';
+import { TrajeRequest, TrajeResponse } from '@domain/entidades';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import {
   listarTrajesUseCase,

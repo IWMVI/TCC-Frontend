@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import styles from './Calendario.module.css';
+import styles from '@/interfaces-graficas/componentes/form/Calendario/Calendario.module.css';
 
 interface CalendarioProps {
 	id: string;

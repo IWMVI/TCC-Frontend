@@ -1,7 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import {UserPlus, Users} from 'lucide-react';
-import {CardNavegacao} from '../../componentes/base/CardNavegacao';
-import styles from './Alugueis.module.css';
+import {CardNavegacao} from '@/interfaces-graficas/componentes/base/CardNavegacao';
+import styles from '@/interfaces-graficas/paginas/alugueis/Alugueis.module.css';
 
 export function Alugueis() {
     const navegar = useNavigate();

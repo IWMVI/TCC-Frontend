@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { Card } from './Card';
+import { Card } from '@/interfaces-graficas/componentes/layout/Card/Card';
 
 describe('Card', () => {
   it('deve renderizar o título', () => {

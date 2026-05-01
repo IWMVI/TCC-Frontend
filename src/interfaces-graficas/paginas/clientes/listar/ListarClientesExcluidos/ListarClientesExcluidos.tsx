@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { Card, Tabela, Modal, Paginacao } from '../../../../componentes';
-import { useClientes } from '../../../../contextos/ContextoClientes';
+import { Card, Tabela, Modal, Paginacao } from '@/interfaces-graficas/componentes';
+import { useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
 import {
   ListarClientesExcluidosUseCase,
   RecuperarClienteUseCase,
-} from '../../../../../application/clientes';
-import { ClienteApiRepository } from '../../../../../infrastructure/api';
-import { ClienteResponse } from '../../../../../domain/entidades';
-import { mascararCpfCnpj, mascararCelular } from '../../../../utils/formatacoes';
-import styles from './ListarClientesExcluidos.module.css';
+} from '@application/clientes';
+import { ClienteApiRepository } from '@infrastructure/api';
+import { ClienteResponse } from '@domain/entidades';
+import { mascararCpfCnpj, mascararCelular } from '@/interfaces-graficas/utils/formatacoes';
+import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos.module.css';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesExcluidosUseCase = new ListarClientesExcluidosUseCase(clienteRepositorio);

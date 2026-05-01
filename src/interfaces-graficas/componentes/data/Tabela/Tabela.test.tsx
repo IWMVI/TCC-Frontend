@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { Tabela, Coluna } from './Tabela';
+import { Tabela, Coluna } from '@/interfaces-graficas/componentes/data/Tabela/Tabela';
 
 interface DadoTeste {
   id: number;

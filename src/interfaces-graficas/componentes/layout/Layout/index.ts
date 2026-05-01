@@ -1,1 +1,1 @@
-export { Layout } from './Layout';
+export { Layout } from '@/interfaces-graficas/componentes/layout/Layout/Layout';

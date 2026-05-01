@@ -1,8 +1,8 @@
-import {TipoOcasiao} from '../../../../../domain/entidades';
-import {Calendario} from '../../../../componentes';
-import {converterMoedaBrParaNumero} from '../../../../utils/formatacoes';
-import {obterAliasTipoOcasiao} from '../../utils/ocasiao';
-import styles from './DetalhesAluguel.module.css';
+import {TipoOcasiao} from '@domain/entidades';
+import {Calendario} from '@/interfaces-graficas/componentes';
+import {converterMoedaBrParaNumero} from '@/interfaces-graficas/utils/formatacoes';
+import {obterAliasTipoOcasiao} from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
+import styles from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel.module.css';
 
 interface Props {
   dataRetirada: string;

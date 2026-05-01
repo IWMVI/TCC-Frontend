@@ -1,4 +1,4 @@
-import {StatusAluguel} from '../../../../domain/entidades';
+import {StatusAluguel} from '@domain/entidades';
 
 const STATUS_ALUGUEL_ALIAS: Record<StatusAluguel, string> = {
 	[StatusAluguel.ATIVO]: 'Ativo',

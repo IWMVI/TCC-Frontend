@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormularioTraje } from '../../componentes';
-import { Modal } from '../../../../componentes/feedback/Modal/Modal';
+import { FormularioTraje } from '@/interfaces-graficas/paginas/trajes/componentes';
+import { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';
 import { criarTrajeUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
 import { TrajeRequest, TrajeResponse } from '@domain/entidades';
 

@@ -1,4 +1,4 @@
-import styles from './LoadingState.module.css';
+import styles from '@/interfaces-graficas/componentes/feedback/LoadingState/LoadingState.module.css';
 
 interface LoadingStateProps {
   mensagem?: string;

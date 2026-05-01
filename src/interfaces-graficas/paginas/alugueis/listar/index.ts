@@ -1,1 +1,1 @@
-export { ListarAluguel } from './ListarAluguel';
+export { ListarAluguel } from '@/interfaces-graficas/paginas/alugueis/listar/ListarAluguel';

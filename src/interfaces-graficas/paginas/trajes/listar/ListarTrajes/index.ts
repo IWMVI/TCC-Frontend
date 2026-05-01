@@ -1,1 +1,1 @@
-export { ListarTrajes } from './ListarTrajes';
+export { ListarTrajes } from '@/interfaces-graficas/paginas/trajes/listar/ListarTrajes/ListarTrajes';

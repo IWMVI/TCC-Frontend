@@ -1,7 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import {UserPlus, Users} from 'lucide-react';
-import {CardNavegacao} from '../../componentes/base/CardNavegacao';
-import styles from './Clientes.module.css';
+import {CardNavegacao} from '@/interfaces-graficas/componentes/base/CardNavegacao';
+import styles from '@/interfaces-graficas/paginas/clientes/Clientes.module.css';
 
 export function Clientes() {
     const navegar = useNavigate();

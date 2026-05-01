@@ -1,1 +1,1 @@
-export { FormularioCliente } from './FormularioCliente';
+export { FormularioCliente } from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/FormularioCliente';

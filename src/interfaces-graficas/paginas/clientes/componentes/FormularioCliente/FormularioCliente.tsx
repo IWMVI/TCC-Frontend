@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Botao } from '../../../../componentes/base/Botao';
-import { ClienteRequest, ClienteResponse, SiglaEstado } from '../../../../../domain/entidades';
-import { ClienteApiRepository } from '../../../../../infrastructure/api';
+import { Botao } from '@/interfaces-graficas/componentes/base/Botao';
+import { ClienteRequest, ClienteResponse, SiglaEstado } from '@domain/entidades';
+import { ClienteApiRepository } from '@infrastructure/api';
 import {
   mascararCelular,
   mascararCep,
   mascararCpfCnpj,
   mascararTelefone,
-} from '../../../../utils/formatacoes';
-import { formatarMedida } from './formatacoes';
-import styles from './FormularioCliente.module.css';
+} from '@/interfaces-graficas/utils/formatacoes';
+import { formatarMedida } from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/formatacoes';
+import styles from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/FormularioCliente.module.css';
 
 const medidaApi = new ClienteApiRepository();
 

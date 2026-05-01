@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { ProvedorClientes, useClientes } from './ContextoClientes';
-import { ClienteResponse } from '../../domain/entidades';
-import { SiglaEstado } from '../../domain/entidades/Cliente';
+import { ProvedorClientes, useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
+import { ClienteResponse } from '@domain/entidades';
+import { SiglaEstado } from '@domain/entidades/Cliente';
 
 describe('ContextoClientes', () => {
   function TestComponent() {

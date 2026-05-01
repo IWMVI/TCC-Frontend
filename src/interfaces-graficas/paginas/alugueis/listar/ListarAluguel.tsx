@@ -2,19 +2,19 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit2, Trash2, Filter, Eye, RotateCcw, MoreVertical, FileText } from 'lucide-react';
 import { Dropdown } from 'react-bootstrap';
-import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '../../../componentes';
+import { Botao, Card, Tabela, Modal, Paginacao, Calendario } from '@/interfaces-graficas/componentes';
 import {
 	ListarAlugueisUseCase,
 	DeletarAluguelUseCase,
 	BuscarAluguelPorIdUseCase,
 	GerarContratoAluguelUseCase,
-} from '../../../../application/alugueis';
-import { AluguelApiRepository } from '../../../../infrastructure/api';
-import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../../../domain/entidades';
-import { FiltrosAluguel } from '../../../../domain/interfaces';
-import { obterAliasTipoOcasiao } from '../utils/ocasiao';
-import { FormularioDevolucao } from '../devolver/FormularioDevolucao';
-import styles from './ListarAluguel.module.css';
+} from '@application/alugueis';
+import { AluguelApiRepository } from '@infrastructure/api';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
+import { FiltrosAluguel } from '@domain/interfaces';
+import { obterAliasTipoOcasiao } from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
+import { FormularioDevolucao } from '@/interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
+import styles from '@/interfaces-graficas/paginas/alugueis/listar/ListarAluguel.module.css';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const listarAlugueisUseCase = new ListarAlugueisUseCase(aluguelRepositorio);

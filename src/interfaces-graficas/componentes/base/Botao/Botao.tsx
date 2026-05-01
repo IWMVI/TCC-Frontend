@@ -1,4 +1,4 @@
-import styles from './Botao.module.css';
+import styles from '@/interfaces-graficas/componentes/base/Botao/Botao.module.css';
 
 interface BotaoProps {
   children: React.ReactNode;

@@ -1,1 +1,1 @@
-export { EditarCliente } from './EditarCliente';
+export { EditarCliente } from '@/interfaces-graficas/paginas/clientes/editar/EditarCliente/EditarCliente';

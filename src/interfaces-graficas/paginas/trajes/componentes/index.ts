@@ -1,1 +1,1 @@
-export { FormularioTraje } from './FormularioTraje';
+export { FormularioTraje } from '@/interfaces-graficas/paginas/trajes/componentes/FormularioTraje';

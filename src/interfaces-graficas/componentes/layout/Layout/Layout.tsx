@@ -1,7 +1,7 @@
 import {Outlet} from 'react-router-dom';
-import { useTema } from '../../../contextos/ContextoTema';
+import { useTema } from '@/interfaces-graficas/contextos/ContextoTema';
 import { Moon, Sun } from 'lucide-react';
-import styles from './Layout.module.css';
+import styles from '@/interfaces-graficas/componentes/layout/Layout/Layout.module.css';
 
 export function Layout() {
   const { tema, alternarTema } = useTema();

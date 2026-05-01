@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import styles from './Paginacao.module.css';
+import styles from '@/interfaces-graficas/componentes/base/Paginacao/Paginacao.module.css';
 
 interface PaginacaoProps {
   paginaAtual: number;

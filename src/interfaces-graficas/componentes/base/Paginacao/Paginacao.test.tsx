@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Paginacao } from './Paginacao';
+import { Paginacao } from '@/interfaces-graficas/componentes/base/Paginacao/Paginacao';
 
 describe('Paginacao', () => {
   const defaultProps = {

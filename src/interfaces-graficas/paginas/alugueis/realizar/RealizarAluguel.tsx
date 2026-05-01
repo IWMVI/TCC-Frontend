@@ -1,25 +1,25 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Modal, Botao, Card } from '../../../componentes';
-import { CriarAluguelUseCase } from '../../../../application/alugueis';
-import { AluguelApiRepository } from '../../../../infrastructure/api';
+import { Modal, Botao, Card } from '@/interfaces-graficas/componentes';
+import { CriarAluguelUseCase } from '@application/alugueis';
+import { AluguelApiRepository } from '@infrastructure/api';
 import {
 	AluguelRequest,
 	AluguelItemRequest,
 	ClienteResponse,
 	TipoOcasiao,
 	Traje,
-} from '../../../../domain/entidades';
-import { SelecionadorCliente } from './componentes/SelecionadorCliente';
-import { SelecionadorTraje } from './componentes/SelecionadorTraje';
-import { DetalhesAluguel } from './componentes/DetalhesAluguel';
+} from '@domain/entidades';
+import { SelecionadorCliente } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorCliente';
+import { SelecionadorTraje } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
+import { DetalhesAluguel } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
 import {
 	converterMoedaBrParaNumero,
 	formatarMoedaBrPartindoDeDigitos,
 	formatarNumeroParaMoedaBr,
-} from '../../../utils/formatacoes';
-import styles from './RealizarAluguel.module.css';
+} from '@/interfaces-graficas/utils/formatacoes';
+import styles from '@/interfaces-graficas/paginas/alugueis/realizar/RealizarAluguel.module.css';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const criarAluguelUseCase = new CriarAluguelUseCase(aluguelRepositorio);

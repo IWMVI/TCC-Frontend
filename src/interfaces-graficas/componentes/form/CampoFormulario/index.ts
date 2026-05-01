@@ -1,1 +1,1 @@
-export { CampoFormulario } from './CampoFormulario';
+export { CampoFormulario } from '@/interfaces-graficas/componentes/form/CampoFormulario/CampoFormulario';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormularioTraje } from '../../componentes';
-import { LoadingState } from '../../../../componentes/feedback/LoadingState';
+import { FormularioTraje } from '@/interfaces-graficas/paginas/trajes/componentes';
+import { LoadingState } from '@/interfaces-graficas/componentes/feedback/LoadingState';
 import { atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
 import { TrajeRequest } from '@domain/entidades';
 

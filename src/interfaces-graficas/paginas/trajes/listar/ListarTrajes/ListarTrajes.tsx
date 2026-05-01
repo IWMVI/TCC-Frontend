@@ -10,7 +10,7 @@ import { AluguelResponse, TrajeResponse } from '@domain/entidades';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import { AluguelApiRepository } from '@infrastructure/api';
 import { FormularioDevolucao } from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
-import styles from './ListarTrajes.module.css';
+import styles from '@/interfaces-graficas/paginas/trajes/listar/ListarTrajes/ListarTrajes.module.css';
 
 export function ListarTrajes() {
   const navigate = useNavigate();

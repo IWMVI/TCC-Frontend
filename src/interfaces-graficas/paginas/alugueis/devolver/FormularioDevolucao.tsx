@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { AluguelApiRepository } from '../../../../infrastructure/api';
-import { RegistrarDevolucaoUseCase } from '../../../../application/alugueis';
-import { CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest } from '../../../../domain/entidades';
-import { AluguelItem } from '../../../../domain/entidades/Aluguel';
-import { formatarMoedaBrPartindoDeDigitos, converterMoedaBrParaNumero } from '../../../utils/formatacoes';
-import { Calendario } from '../../../componentes';
-import styles from './FormularioDevolucao.module.css';
+import { AluguelApiRepository } from '@infrastructure/api';
+import { RegistrarDevolucaoUseCase } from '@application/alugueis';
+import { CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest } from '@domain/entidades';
+import { AluguelItem } from '@domain/entidades/Aluguel';
+import { formatarMoedaBrPartindoDeDigitos, converterMoedaBrParaNumero } from '@/interfaces-graficas/utils/formatacoes';
+import { Calendario } from '@/interfaces-graficas/componentes';
+import styles from '@/interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao.module.css';
 
 interface FormularioDevolucaoProps {
   aluguelId: number;

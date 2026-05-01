@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { ProvedorTrajes, useTrajes } from './ContextoTrajes';
-import { TrajeResponse } from '../../domain/entidades';
+import { ProvedorTrajes, useTrajes } from '@/interfaces-graficas/contextos/ContextoTrajes';
+import { TrajeResponse } from '@domain/entidades';
 import { act } from 'react';
 
 jest.mock('@application/trajes/TrajeDependencies', () => ({

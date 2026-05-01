@@ -1,2 +1,2 @@
-export { ProvedorClientes, useClientes } from './ContextoClientes';
-export { ProvedorTrajes, useTrajes } from './ContextoTrajes';
+export { ProvedorClientes, useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
+export { ProvedorTrajes, useTrajes } from '@/interfaces-graficas/contextos/ContextoTrajes';

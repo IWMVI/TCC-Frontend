@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import styles from './ModalVisualizacaoImagem.module.css';
-import { Modal } from '../Modal/Modal';
+import styles from '@/interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem/ModalVisualizacaoImagem.module.css';
+import { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';
 import { X, Upload, Trash2 } from 'lucide-react';
 
 interface ModalVisualizacaoImagemProps {

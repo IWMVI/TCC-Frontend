@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useMedidas, MEDIDAS_FEMININAS, MEDIDAS_MASCULINAS, MEDIDAS_PESSOA_JURIDICA } from './useMedidas';
+import { useMedidas, MEDIDAS_FEMININAS, MEDIDAS_MASCULINAS, MEDIDAS_PESSOA_JURIDICA } from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/useMedidas';
 
 function criarEventoTecla(key: string): React.KeyboardEvent<HTMLElement> {
   return { key, preventDefault: jest.fn() } as unknown as React.KeyboardEvent<HTMLElement>;

@@ -1,1 +1,1 @@
-export { Card } from './Card';
+export { Card } from '@/interfaces-graficas/componentes/layout/Card/Card';

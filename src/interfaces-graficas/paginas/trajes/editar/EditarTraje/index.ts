@@ -1,1 +1,1 @@
-export { EditarTraje } from './EditarTraje';
+export { EditarTraje } from '@/interfaces-graficas/paginas/trajes/editar/EditarTraje/EditarTraje';

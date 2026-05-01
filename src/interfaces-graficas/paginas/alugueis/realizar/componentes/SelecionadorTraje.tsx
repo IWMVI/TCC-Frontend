@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
-import { PeriodoAlugado, Traje } from '../../../../../domain/entidades';
-import { ListarTrajesUseCase } from '../../../../../application/trajes';
-import { TrajeApiRepository } from '../../../../../infrastructure/api';
-import { CriarTraje } from '../../../trajes/criar/CriarTraje/CriarTraje';
-import { Botao } from '../../../../componentes';
-import { ModalFormulario } from '../../../../componentes/feedback/ModalFormulario/ModalFormulario';
-import styles from './SelecionadorTraje.module.css';
+import { PeriodoAlugado, Traje } from '@domain/entidades';
+import { ListarTrajesUseCase } from '@application/trajes';
+import { TrajeApiRepository } from '@infrastructure/api';
+import { CriarTraje } from '@/interfaces-graficas/paginas/trajes/criar/CriarTraje/CriarTraje';
+import { Botao } from '@/interfaces-graficas/componentes';
+import { ModalFormulario } from '@/interfaces-graficas/componentes/feedback/ModalFormulario/ModalFormulario';
+import styles from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje.module.css';
 
 const trajeRepositorio = new TrajeApiRepository();
 const listarTrajesUseCase = new ListarTrajesUseCase(trajeRepositorio);

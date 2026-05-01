@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Botao } from './Botao';
+import { Botao } from '@/interfaces-graficas/componentes/base/Botao/Botao';
 
 describe('Botao', () => {
   it('deve renderizar children corretamente', () => {

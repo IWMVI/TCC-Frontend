@@ -1,4 +1,4 @@
-import styles from './Modal.module.css';
+import styles from '@/interfaces-graficas/componentes/feedback/Modal/Modal.module.css';
 
 interface ModalProps {
   titulo: string;

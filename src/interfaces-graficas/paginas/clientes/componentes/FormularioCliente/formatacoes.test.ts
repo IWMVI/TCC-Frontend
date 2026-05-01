@@ -1,4 +1,4 @@
-import { formatarMedida } from './formatacoes';
+import { formatarMedida } from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/formatacoes';
 
 describe('formatarMedida', () => {
   it('deve formatar número 100 como "1,00"', () => {

@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Users } from 'lucide-react';
-import { CardNavegacao } from '../../componentes/base/CardNavegacao';
+import { CardNavegacao } from '@/interfaces-graficas/componentes/base/CardNavegacao';
 import { TRAJE_CONSTANTS } from '@application/trajes';
-import styles from './Trajes.module.css';
+import styles from '@/interfaces-graficas/paginas/trajes/Trajes.module.css';
 
 export function Trajes() {
     const navegar = useNavigate();

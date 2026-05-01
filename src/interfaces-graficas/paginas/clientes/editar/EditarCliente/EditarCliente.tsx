@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {FormularioCliente} from '../../componentes';
+import {FormularioCliente} from '@/interfaces-graficas/paginas/clientes/componentes';
 import {AtualizarClienteUseCase, BuscarClientePorIdUseCase} from '@application/clientes';
 import {ClienteApiRepository} from '@infrastructure/api';
 import {ClienteRequest, Endereco, MedidaFemininaResponse, MedidaMasculinaResponse} from '@domain/entidades';
-import {mascararCelular, mascararCep, mascararCpfCnpj} from '../../../../utils/formatacoes';
-import styles from './EditarCliente.module.css';
+import {mascararCelular, mascararCep, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
+import styles from '@/interfaces-graficas/paginas/clientes/editar/EditarCliente/EditarCliente.module.css';
 
 const clienteRepositorio = new ClienteApiRepository();
 const buscarClienteUseCase = new BuscarClientePorIdUseCase(clienteRepositorio);

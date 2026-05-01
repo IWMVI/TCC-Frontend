@@ -1,1 +1,1 @@
-export {CardNavegacao} from './CardNavegacao';
+export {CardNavegacao} from '@/interfaces-graficas/componentes/base/CardNavegacao/CardNavegacao';

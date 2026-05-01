@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormularioCliente } from '../../componentes';
-import { Modal } from '../../../../componentes/feedback/Modal/Modal';
-import { CriarClienteUseCase } from '../../../../../application/clientes';
-import { ClienteApiRepository } from '../../../../../infrastructure/api';
-import { ClienteRequest, ClienteResponse } from '../../../../../domain/entidades';
+import { FormularioCliente } from '@/interfaces-graficas/paginas/clientes/componentes';
+import { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';
+import { CriarClienteUseCase } from '@application/clientes';
+import { ClienteApiRepository } from '@infrastructure/api';
+import { ClienteRequest, ClienteResponse } from '@domain/entidades';
 
 const clienteRepositorio = new ClienteApiRepository();
 const criarClienteUseCase = new CriarClienteUseCase(clienteRepositorio);

@@ -1,6 +1,6 @@
 import {useNavigate} from 'react-router-dom';
-import {Botao} from '../Botao';
-import styles from './CardNavegacao.module.css';
+import {Botao} from '@/interfaces-graficas/componentes/base/Botao';
+import styles from '@/interfaces-graficas/componentes/base/CardNavegacao/CardNavegacao.module.css';
 
 interface CardNavegacaoProps {
     icone: React.ReactNode;

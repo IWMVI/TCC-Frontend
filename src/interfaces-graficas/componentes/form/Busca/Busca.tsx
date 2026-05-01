@@ -1,4 +1,4 @@
-import styles from './Busca.module.css';
+import styles from '@/interfaces-graficas/componentes/form/Busca/Busca.module.css';
 
 interface BuscaProps {
   valor: string;

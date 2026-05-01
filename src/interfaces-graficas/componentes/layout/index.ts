@@ -1,2 +1,2 @@
-export { Layout } from './Layout';
-export { Card } from './Card';
+export { Layout } from '@/interfaces-graficas/componentes/layout/Layout';
+export { Card } from '@/interfaces-graficas/componentes/layout/Card';

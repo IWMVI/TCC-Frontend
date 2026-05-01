@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '../../../../componentes';
-import { useClientes } from '../../../../contextos/ContextoClientes';
-import { ListarClientesUseCase, DeletarClienteUseCase } from '../../../../../application/clientes';
-import { ClienteApiRepository } from '../../../../../infrastructure/api';
-import { ClienteResponse } from '../../../../../domain/entidades';
-import { mascararCpfCnpj, mascararCelular } from '../../../../utils/formatacoes';
-import styles from './ListarClientes.module.css';
+import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '@/interfaces-graficas/componentes';
+import { useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
+import { ListarClientesUseCase, DeletarClienteUseCase } from '@application/clientes';
+import { ClienteApiRepository } from '@infrastructure/api';
+import { ClienteResponse } from '@domain/entidades';
+import { mascararCpfCnpj, mascararCelular } from '@/interfaces-graficas/utils/formatacoes';
+import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientes/ListarClientes.module.css';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesUseCase = new ListarClientesUseCase(clienteRepositorio);

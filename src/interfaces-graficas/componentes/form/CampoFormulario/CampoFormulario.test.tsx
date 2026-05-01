@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { CampoFormulario } from './CampoFormulario';
+import { CampoFormulario } from '@/interfaces-graficas/componentes/form/CampoFormulario/CampoFormulario';
 
 describe('CampoFormulario', () => {
   const defaultProps: {

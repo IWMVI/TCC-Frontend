@@ -1,1 +1,1 @@
-export { Modal } from './Modal';
+export { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';

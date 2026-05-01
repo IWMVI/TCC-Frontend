@@ -1,1 +1,1 @@
-export { CriarTraje } from './CriarTraje';
+export { CriarTraje } from '@/interfaces-graficas/paginas/trajes/criar/CriarTraje/CriarTraje';

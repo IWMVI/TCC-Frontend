@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import styles from './ErrorMessage.module.css';
+import styles from '@/interfaces-graficas/componentes/feedback/ErrorMessage/ErrorMessage.module.css';
 
 interface ErrorMessageProps {
   mensagem: string;

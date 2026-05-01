@@ -8,7 +8,7 @@ import { TrajeRequest } from '@domain/entidades';
 import { enumApiRepository, EnumValues } from '@infrastructure/api';
 import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import { useFormTraje, formatarValorDigitado, useImageHandler } from '@application/trajes/hooks';
-import styles from './FormularioTraje.module.css';
+import styles from '@/interfaces-graficas/paginas/trajes/componentes/FormularioTraje/FormularioTraje.module.css';
 
 interface FormularioTrajeProps {
   titulo: string;

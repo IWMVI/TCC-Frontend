@@ -1,4 +1,4 @@
-import {TipoOcasiao} from '../../../../domain/entidades';
+import {TipoOcasiao} from '@domain/entidades';
 
 const TIPO_OCASIAO_ALIAS: Record<TipoOcasiao, string> = {
 	[TipoOcasiao.CASAMENTO]: 'Casamento',

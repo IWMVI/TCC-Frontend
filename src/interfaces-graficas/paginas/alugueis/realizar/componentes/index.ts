@@ -1,3 +1,3 @@
-export { SelecionadorCliente } from './SelecionadorCliente';
-export { SelecionadorTraje } from './SelecionadorTraje';
-export { DetalhesAluguel } from './DetalhesAluguel';
+export { SelecionadorCliente } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorCliente';
+export { SelecionadorTraje } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
+export { DetalhesAluguel } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';

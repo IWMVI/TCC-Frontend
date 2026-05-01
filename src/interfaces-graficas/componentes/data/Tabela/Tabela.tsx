@@ -1,4 +1,4 @@
-import styles from './Tabela.module.css';
+import styles from '@/interfaces-graficas/componentes/data/Tabela/Tabela.module.css';
 
 export interface Coluna<T> {
   chave: keyof T | 'acoes';

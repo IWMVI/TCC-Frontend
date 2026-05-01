@@ -3,7 +3,7 @@ import {
   mascararCelular,
   mascararTelefone,
   mascararCep,
-} from './formatacoes';
+} from '@/interfaces-graficas/utils/formatacoes';
 
 describe('mascararCpfCnpj', () => {
   it('deve formatar CPF corretamente', () => {

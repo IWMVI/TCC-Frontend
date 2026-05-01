@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { CardNavegacao } from './CardNavegacao';
+import { CardNavegacao } from '@/interfaces-graficas/componentes/base/CardNavegacao/CardNavegacao';
 import { BrowserRouter } from 'react-router-dom';
 
 describe('CardNavegacao', () => {

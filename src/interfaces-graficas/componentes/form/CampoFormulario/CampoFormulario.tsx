@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './CampoFormulario.module.css';
+import styles from '@/interfaces-graficas/componentes/form/CampoFormulario/CampoFormulario.module.css';
 
 interface CampoFormularioProps {
   label: string;

@@ -1,1 +1,1 @@
-export {Calendario} from './Calendario';
+export {Calendario} from '@/interfaces-graficas/componentes/form/Calendario/Calendario';

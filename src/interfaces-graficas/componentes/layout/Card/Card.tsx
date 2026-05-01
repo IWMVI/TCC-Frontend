@@ -1,4 +1,4 @@
-import styles from './Card.module.css';
+import styles from '@/interfaces-graficas/componentes/layout/Card/Card.module.css';
 
 interface CardProps {
   titulo: string;

@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { ClienteResponse } from '../../../../../domain/entidades';
-import { ListarClientesUseCase } from '../../../../../application/clientes';
-import { ClienteApiRepository } from '../../../../../infrastructure/api';
-import { CriarCliente } from '../../../clientes/criar/CriarCliente/CriarCliente';
-import { Tabela } from '../../../../componentes';
-import { ModalFormulario } from '../../../../componentes/feedback/ModalFormulario/ModalFormulario';
-import { mascararCpfCnpj, mascararCelular } from '../../../../utils/formatacoes';
-import styles from './SelecionadorCliente.module.css';
+import { ClienteResponse } from '@domain/entidades';
+import { ListarClientesUseCase } from '@application/clientes';
+import { ClienteApiRepository } from '@infrastructure/api';
+import { CriarCliente } from '@/interfaces-graficas/paginas/clientes/criar/CriarCliente/CriarCliente';
+import { Tabela } from '@/interfaces-graficas/componentes';
+import { ModalFormulario } from '@/interfaces-graficas/componentes/feedback/ModalFormulario/ModalFormulario';
+import { mascararCpfCnpj, mascararCelular } from '@/interfaces-graficas/utils/formatacoes';
+import styles from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorCliente.module.css';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesUseCase = new ListarClientesUseCase(clienteRepositorio);

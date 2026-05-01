@@ -1,6 +1,6 @@
 import {ClipboardList, Shirt, Users} from 'lucide-react';
-import {CardNavegacao} from '../../../componentes/base/CardNavegacao';
-import styles from './Dashboard.module.css';
+import {CardNavegacao} from '@/interfaces-graficas/componentes/base/CardNavegacao';
+import styles from '@/interfaces-graficas/paginas/dashboard/Dashboard/Dashboard.module.css';
 
 const ITENS_NAVEGACAO = [
     {

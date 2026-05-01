@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Busca } from './Busca';
+import { Busca } from '@/interfaces-graficas/componentes/form/Busca/Busca';
 
 describe('Busca', () => {
   const defaultProps = {

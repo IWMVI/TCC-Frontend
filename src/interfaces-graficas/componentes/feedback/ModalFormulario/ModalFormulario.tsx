@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { X } from 'lucide-react';
-import styles from './ModalFormulario.module.css';
+import styles from '@/interfaces-graficas/componentes/feedback/ModalFormulario/ModalFormulario.module.css';
 
 interface ModalFormularioProps {
     titulo: string;

@@ -1,13 +1,13 @@
 import {useState, useEffect, useCallback} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {ArrowLeft} from 'lucide-react';
-import {Modal, Botao, Card} from '../../../componentes';
+import {Modal, Botao, Card} from '@/interfaces-graficas/componentes';
 import {
 	BuscarAluguelPorIdUseCase,
 	AtualizarAluguelUseCase,
-} from '../../../../application/alugueis';
-import {BuscarTrajePorIdUseCase} from '../../../../application/trajes';
-import {AluguelApiRepository, TrajeApiRepository} from '../../../../infrastructure/api';
+} from '@application/alugueis';
+import {BuscarTrajePorIdUseCase} from '@application/trajes';
+import {AluguelApiRepository, TrajeApiRepository} from '@infrastructure/api';
 import {
 	AluguelItemRequest,
 	AluguelResponse,
@@ -15,18 +15,18 @@ import {
 	StatusAluguel,
 	TipoOcasiao,
 	Traje,
-} from '../../../../domain/entidades';
+} from '@domain/entidades';
 import {
 	converterMoedaBrParaNumero,
 	formatarMoedaBrPartindoDeDigitos,
 	formatarNumeroParaMoedaBr,
 	mascararCpfCnpj,
-} from '../../../utils/formatacoes';
-import {SelecionadorTraje} from '../realizar/componentes/SelecionadorTraje';
-import {DetalhesAluguel} from '../realizar/componentes/DetalhesAluguel';
-import {obterTipoOcasiaoPorValor} from '../utils/ocasiao';
-import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '../utils/status';
-import styles from './EditarAluguel.module.css';
+} from '@/interfaces-graficas/utils/formatacoes';
+import {SelecionadorTraje} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
+import {DetalhesAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
+import {obterTipoOcasiaoPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
+import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/status';
+import styles from '@/interfaces-graficas/paginas/alugueis/editar/EditarAluguel.module.css';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const trajeRepositorio = new TrajeApiRepository();
