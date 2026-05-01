@@ -1,9 +1,10 @@
 # TCC Frontend
 
-Sistema de Locação de Trajes a Rigor - Frontend Electron
+Sistema de Locação de Trajes a Rigor — Frontend Electron/Web.
 
 ## Sumário
 
+- [Funcionalidades](#funcionalidades)
 - [Tecnologias](#tecnologias)
 - [Arquitetura](#arquitetura-clean-architecture)
 - [Princípios Aplicados](#princípios-aplicados)
@@ -16,15 +17,27 @@ Sistema de Locação de Trajes a Rigor - Frontend Electron
 
 ---
 
+## Funcionalidades
+
+Três domínios principais, todos com CRUD completo, filtros e paginação:
+
+- **Clientes** — cadastro, edição, listagem com busca, exclusão lógica e recuperação, busca de CEP via viaCEP, registro de medidas masculinas/femininas.
+- **Trajes** — cadastro/edição com upload de imagem, listagem com filtros (tipo, cor, tamanho, status), calendário de disponibilidade.
+- **Aluguéis** — criação com selecionador de trajes (foto + disponibilidade), listagem com filtros (status, cliente, datas, ocasião), edição, **registro de devolução** com condição por traje, **geração de contrato em PDF** (abre em nova aba) e exclusão.
+
+---
+
 ## Tecnologias
 
-- **Electron 33+** - Runtime desktop
-- **React 18** - Biblioteca de UI
-- **TypeScript** - Linguagem
-- **Vite** - Bundler
-- **React Router** - Roteamento
-- **Axios** - Cliente HTTP
-- **Zod** - Validação
+- **Electron 33+** — runtime desktop (também roda no navegador via Vite)
+- **React 18** + **TypeScript 5**
+- **Vite 6** — bundler e dev server
+- **React Router 6** — roteamento
+- **React Bootstrap** + **Bootstrap 5** — UI
+- **Axios** — cliente HTTP
+- **Zod** — validação de schemas
+- **lucide-react** — ícones
+- **electron-log** — logging
 
 ---
 
@@ -32,33 +45,39 @@ Sistema de Locação de Trajes a Rigor - Frontend Electron
 
 ```
 src/
-├── dominio/                    # Camada interna (innermost)
-│   ├── entidades/              # Entidades do negócio
-│   ├── interfaces/             # Contratos (abstrações)
-│   └── erros/                 # Erros de domínio
+├── domain/                      # Camada interna (regras de negócio puras)
+│   ├── entidades/               # Models (Cliente, Aluguel, Traje, etc.)
+│   ├── interfaces/              # Contratos dos repositórios
+│   └── erros/                   # Erros de domínio (FalhaConexao, RecursoNaoEncontrado, …)
 │
-├── aplicacao/                  # Casos de uso
-│   └── clientes/              # Operações de cliente
+├── application/                 # Casos de uso (orquestração)
+│   ├── alugueis/                # Criar, Listar, Editar, Devolver, GerarContrato, …
+│   ├── clientes/                # Cadastrar, Editar, Excluir, Recuperar, BuscarCep, …
+│   └── trajes/                  # CRUD + Disponibilidade
 │
-├── infraestrutura/             # Implementações externas
-│   └── api/                   # Cliente API REST
+├── infrastructure/              # Implementações externas
+│   └── api/                     # Repositórios Axios (Aluguem, Cliente, Traje, Enum)
 │
-└── interfaces-graficas/        # Camada externa (UI)
-    ├── componentes/           # Componentes React reutilizáveis
-    ├── contextos/            # React Context (estado global)
-    ├── paginas/              # Telas/pages
-    └── estilos/              # CSS
+├── interfaces-graficas/         # Camada externa (UI)
+│   ├── componentes/             # Botão, Card, Tabela, Modal, Calendário, Layout, …
+│   ├── paginas/                 # alugueis/, clientes/, trajes/, dashboard/
+│   └── utils/                   # Helpers de formatação, alias de enums
+│
+├── App.tsx                      # Setup das rotas
+└── main.tsx                     # Entry point Vite/React
 ```
+
+A regra é: **dependências apontam de fora para dentro**. `interfaces-graficas` depende de `application`, que depende de `domain`. `infrastructure` implementa interfaces de `domain` e é injetada pelas páginas.
 
 ---
 
 ## Princípios Aplicados
 
-- **S** - Single Responsibility (cada módulo tem uma responsabilidade)
-- **O** - Open/Closed (extensível sem modificar código existente)
-- **L** - Liskov Substitution (interfaces bem definidas)
-- **I** - Interface Segregation (contratos focados)
-- **D** - Dependency Inversion (dependências de abstrações)
+- **S** — Single Responsibility (cada use case faz uma coisa só)
+- **O** — Open/Closed (novos casos de uso sem alterar repositórios)
+- **L** — Liskov Substitution (qualquer implementação de `IAluguemRepository` funciona nos use cases)
+- **I** — Interface Segregation (contratos focados por domínio)
+- **D** — Dependency Inversion (use cases dependem de interfaces, não de Axios)
 
 ---
 
@@ -67,62 +86,57 @@ src/
 ### Pré-requisitos
 
 - Node.js 18+
-- Backend TCC rodando em http://localhost:8080
+- Backend TCC rodando em `http://localhost:8080`
 
 ### Instalação
 
 ```bash
-cd tcc-frontend
 npm install
 ```
 
 ### Desenvolvimento
 
 ```bash
-# Executar frontend React (Vite)
+# Web (Vite, abre em http://localhost:5173)
 npm run dev
 
-# Executar com Electron
+# Desktop (Electron)
 npm run dev:electron
 ```
 
 ### Build
 
 ```bash
-# Build para produção
+# Build completo (Vite + Electron Builder)
 npm run build
+
+# Apenas Vite (web)
+npm run build:vite
 ```
 
-O executável será gerado em `release/`.
+O instalador desktop é gerado em `release/`.
 
 ---
 
 ## Testes
 
-O projeto utiliza **Jest** com **React Testing Library**.
-
-### Executar Testes
+Stack: **Jest** + **React Testing Library** + **jest-environment-jsdom**.
 
 ```bash
-# Executar testes
-npm run test
-
-# Executar em modo watch
-npm run test:watch
-
-# Executar com coverage
-npm run test:coverage
+npm run test            # roda todos
+npm run test:watch      # modo watch
+npm run test:coverage   # coverage em coverage/
 ```
 
 ### Configuração
 
-- `jest.config.ts` - Configuração principal
-- `src/setupTests.ts` - Setup com jest-dom
-- `src/__mocks__/` - Mocks para arquivos estáticos
+- `jest.config.cjs` — configuração principal (transforms, moduleNameMapper, setup)
+- `src/setupTests.ts` — extensões `@testing-library/jest-dom`
+- `src/__mocks__/` — mocks de assets estáticos (CSS, imagens)
 
 ### Cobertura
 
-O projeto possui threshold mínimo de **50%** de cobertura. O relatório é gerado em `coverage/`.
+Threshold mínimo de **50%**. Casos de uso (`application/`) e repositórios (`infrastructure/api/`) têm cobertura próxima de 100%.
 
 ---
 
@@ -131,53 +145,54 @@ O projeto possui threshold mínimo de **50%** de cobertura. O relatório é gera
 ### ESLint
 
 ```bash
-# Verificar erros
-npm run lint
-
-# Corrigir automaticamente
-npm run lint:fix
+npm run lint            # checagem
+npm run lint:fix        # autofix
 ```
+
+Plugins ativos: `@typescript-eslint`, `react`, `react-hooks`, `react-refresh`, `jsx-a11y`, `prettier`.
 
 ### Prettier
 
 ```bash
-# Formatar código
-npm run prettier
-
-# Verificar formatação
-npm run prettier:check
+npm run prettier        # formata src/**
+npm run prettier:check  # apenas verifica
 ```
 
 ### TypeScript
 
 ```bash
-# Verificar tipos
-npm run typecheck
+npm run typecheck       # tsc --noEmit
 ```
 
 ---
 
 ## CI/CD
 
-O projeto possui workflows do GitHub Actions em `.github/workflows/`:
+Workflows do GitHub Actions em `.github/workflows/`:
 
-### Pipelines
+| Workflow | Etapas |
+|----------|--------|
+| `ci.yml` | Lint → typecheck → testes com coverage → build Vite → build Electron |
+| `code-quality.yml` | ESLint + TypeScript |
 
-1. **ci.yml** - Pipeline principal
-   - Lint + TypeScript check
-   - Testes com coverage
-   - Build Vite
-   - Build Electron App
+**Executores:** Ubuntu latest, Node 20, com cache de `node_modules`.
 
-2. **code-quality.yml** - Análise de qualidade
-   - ESLint
-   - TypeScript
+---
 
-### Executores
+## Scripts Disponíveis
 
-- Ubuntu latest
-- Node.js 20
-- Cache de dependências
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Dev server Vite |
+| `npm run dev:electron` | Dev server + Electron |
+| `npm run build` | Build de produção (Vite + Electron Builder) |
+| `npm run build:vite` | Apenas build web |
+| `npm run preview` | Preview do build Vite |
+| `npm run electron` | Roda Electron contra o build atual |
+| `npm run lint` / `lint:fix` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run test` / `test:watch` / `test:coverage` | Jest |
+| `npm run prettier` / `prettier:check` | Prettier |
 
 ---
 
@@ -186,40 +201,30 @@ O projeto possui workflows do GitHub Actions em `.github/workflows/`:
 ```
 electron/
 ├── main.ts         # Processo principal (main process)
-└── preload.ts      # Bridge seguro IPC (preload script)
+└── preload.ts      # Bridge IPC seguro (preload script)
 ```
 
 ### Segurança
 
-- `contextIsolation: true` - Isolamento de contexto
-- `nodeIntegration: false` - Sem acesso direto ao Node.js
-- `sandbox: true` - Sandboxed renderer
-- `contextBridge` - Exposição segura de APIs
-
----
-
-## Scripts Disponíveis
-
-| Script | Descrição |
-|--------|-----------|
-| `npm run dev` | Iniciar servidor Vite |
-| `npm run dev:electron` | Iniciar com Electron |
-| `npm run build` | Build de produção |
-| `npm run build:vite` | Apenas build Vite |
-| `npm run lint` | Verificar código |
-| `npm run lint:fix` | Corrigir código |
-| `npm run typecheck` | Verificar tipos |
-| `npm run test` | Executar testes |
-| `npm run test:watch` | Testes em modo watch |
-| `npm run test:coverage` | Testes com coverage |
-| `npm run prettier` | Formatar código |
-| `npm run prettier:check` | Verificar formatação |
+- `contextIsolation: true` — isolamento de contexto
+- `nodeIntegration: false` — sem acesso direto ao Node.js
+- `sandbox: true` — renderer em sandbox
+- `contextBridge` — exposição segura de APIs
 
 ---
 
 ## Configuração da API
 
-O backend padrão está configurado em `http://localhost:8080/api`.
+Por padrão, os repositórios apontam para `http://localhost:8080`. Os arquivos relevantes:
 
-Para alterar, modifique a constante `API_BASE_URL` em:
-`src/infraestrutura/api/ClienteApiRepositorio.ts`
+- `src/infrastructure/api/AluguemApiRepository.ts`
+- `src/infrastructure/api/ClienteApiRepository.ts`
+- `src/infrastructure/api/TrajeApiRepository.ts`
+- `src/infrastructure/api/EnumApiRepository.ts`
+
+### Endpoints consumidos (backend)
+
+- `GET/POST/PUT/DELETE /alugueis` + `/alugueis/{id}/devolucao` + `/alugueis/{id}/contrato` (PDF)
+- `GET/POST/PUT/DELETE /clientes` + `/clientes/{id}/recuperar`
+- `GET/POST/PUT/DELETE /trajes` + `/trajes/{id}/imagem`
+- `GET /enums/...` para selects
