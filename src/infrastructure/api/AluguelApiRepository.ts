@@ -1,12 +1,12 @@
 import axios, { AxiosInstance, isAxiosError } from 'axios';
-import { IAluguemRepository, FiltrosAluguel } from '@domain/interfaces';
-import {AluguemRequest, AluguemResponse, AluguemUpdateRequest, DevolucaoRequest, DevolucaoResponse} from '@domain/entidades';
+import { IAluguelRepository, FiltrosAluguel } from '@domain/interfaces';
+import {AluguelRequest, AluguelResponse, AluguelUpdateRequest, DevolucaoRequest, DevolucaoResponse} from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from './ClienteApiRepository';
 
 const API_BASE_URL = 'http://localhost:8080';
 
-export class AluguemApiRepository implements IAluguemRepository {
+export class AluguelApiRepository implements IAluguelRepository {
   private readonly aluguelApi: AxiosInstance;
 
   constructor(baseUrl: string = API_BASE_URL) {
@@ -23,9 +23,9 @@ export class AluguemApiRepository implements IAluguemRepository {
     busca?: string,
     pagina: number = 0,
     tamanho: number = 10,
-  ): Promise<PaginacaoResultado<AluguemResponse>> {
+  ): Promise<PaginacaoResultado<AluguelResponse>> {
     try {
-		const resposta = await this.aluguelApi.get<AluguemResponse[]>('/alugueis');
+		const resposta = await this.aluguelApi.get<AluguelResponse[]>('/alugueis');
 		const termoBusca = busca?.trim().toLowerCase();
 		
 		const filtrados = termoBusca
@@ -56,9 +56,9 @@ export class AluguemApiRepository implements IAluguemRepository {
     }
   }
 
-  async buscarPorId(id: number): Promise<AluguemResponse> {
+  async buscarPorId(id: number): Promise<AluguelResponse> {
     try {
-      const resposta = await this.aluguelApi.get<AluguemResponse>(`/alugueis/${id}`);
+      const resposta = await this.aluguelApi.get<AluguelResponse>(`/alugueis/${id}`);
       return resposta.data;
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
@@ -68,7 +68,7 @@ export class AluguemApiRepository implements IAluguemRepository {
     }
   }
 
-  async criar(dados: AluguemRequest): Promise<AluguemResponse> {
+  async criar(dados: AluguelRequest): Promise<AluguelResponse> {
     try {
 		const payload = {
 			clienteId: dados.clienteId,
@@ -80,14 +80,14 @@ export class AluguemApiRepository implements IAluguemRepository {
 			itens: dados.itens,
 		};
 		
-		const resposta = await this.aluguelApi.post<AluguemResponse>('/alugueis', payload);
+		const resposta = await this.aluguelApi.post<AluguelResponse>('/alugueis', payload);
       return resposta.data;
     } catch (error_) {
       throw this.criarErro(error_, 'Erro ao criar aluguel');
     }
   }
 	
-	async atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse> {
+	async atualizar(id: number, dados: AluguelUpdateRequest): Promise<AluguelResponse> {
     try {
 		const payload = {
 			dataRetirada: dados.dataRetirada,
@@ -99,7 +99,7 @@ export class AluguemApiRepository implements IAluguemRepository {
 			itens: dados.itens,
 		};
 		
-		const resposta = await this.aluguelApi.put<AluguemResponse>(`/alugueis/${id}`, payload);
+		const resposta = await this.aluguelApi.put<AluguelResponse>(`/alugueis/${id}`, payload);
       return resposta.data;
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
@@ -120,9 +120,9 @@ export class AluguemApiRepository implements IAluguemRepository {
     }
   }
 
-  async marcarComoConcluido(id: number): Promise<AluguemResponse> {
+  async marcarComoConcluido(id: number): Promise<AluguelResponse> {
     try {
-		const resposta = await this.aluguelApi.put<AluguemResponse>(`/alugueis/${id}/concluir`);
+		const resposta = await this.aluguelApi.put<AluguelResponse>(`/alugueis/${id}/concluir`);
       return resposta.data;
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
@@ -136,7 +136,7 @@ export class AluguemApiRepository implements IAluguemRepository {
     filtros: FiltrosAluguel,
     pagina: number = 0,
     tamanho: number = 10,
-  ): Promise<PaginacaoResultado<AluguemResponse>> {
+  ): Promise<PaginacaoResultado<AluguelResponse>> {
     try {
       const params: Record<string, string | number> = {};
 
@@ -147,7 +147,7 @@ export class AluguemApiRepository implements IAluguemRepository {
       if (filtros.dataRetiradaFim != null) params['dataRetiradaFim'] = filtros.dataRetiradaFim;
       if (filtros.ocasiao != null) params['ocasiao'] = filtros.ocasiao;
 
-      const resposta = await this.aluguelApi.get<AluguemResponse[]>('/alugueis', { params });
+      const resposta = await this.aluguelApi.get<AluguelResponse[]>('/alugueis', { params });
 
       const inicio = pagina * tamanho;
       const fim = inicio + tamanho;
@@ -184,9 +184,9 @@ export class AluguemApiRepository implements IAluguemRepository {
     }
   }
 
-  async buscarAtivoByTrajeId(trajeId: number): Promise<AluguemResponse> {
+  async buscarAtivoByTrajeId(trajeId: number): Promise<AluguelResponse> {
     try {
-      const resposta = await this.aluguelApi.get<AluguemResponse>(`/alugueis/traje/${trajeId}/ativo`);
+      const resposta = await this.aluguelApi.get<AluguelResponse>(`/alugueis/traje/${trajeId}/ativo`);
       return resposta.data;
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {

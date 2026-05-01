@@ -1,7 +1,7 @@
 import {
-  AluguemRequest,
-  AluguemResponse,
-  AluguemUpdateRequest,
+  AluguelRequest,
+  AluguelResponse,
+  AluguelUpdateRequest,
   CondicaoTraje,
   DevolucaoRequest,
   DevolucaoResponse,
@@ -10,7 +10,7 @@ import {
 } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { AxiosInstance } from 'axios';
-import { AluguemApiRepository } from './AluguemApiRepository';
+import { AluguelApiRepository } from './AluguelApiRepository';
 
 interface MockAxiosError extends Error {
   isAxiosError?: boolean;
@@ -24,16 +24,16 @@ interface MockAxiosError extends Error {
   code?: string;
 }
 
-describe('AluguemApiRepository', () => {
+describe('AluguelApiRepository', () => {
   const baseUrl = 'http://localhost:8080';
-  let repositorio: AluguemApiRepository;
+  let repositorio: AluguelApiRepository;
 
   beforeEach(() => {
-    repositorio = new AluguemApiRepository(baseUrl);
+    repositorio = new AluguelApiRepository(baseUrl);
     jest.clearAllMocks();
   });
 
-  const aluguelResponse: AluguemResponse = {
+  const aluguelResponse: AluguelResponse = {
     id: 1,
     clienteId: 1,
     nomeCliente: 'Cliente Teste',
@@ -197,7 +197,7 @@ describe('AluguemApiRepository', () => {
   // ===================== criar =====================
 
   describe('criar', () => {
-    const request: AluguemRequest = {
+    const request: AluguelRequest = {
       clienteId: 1,
       dataRetirada: '2026-05-01',
       dataDevolucao: '2026-05-10',
@@ -258,7 +258,7 @@ describe('AluguemApiRepository', () => {
   // ===================== atualizar =====================
 
   describe('atualizar', () => {
-    const updateRequest: AluguemUpdateRequest = {
+    const updateRequest: AluguelUpdateRequest = {
       dataRetirada: '2026-05-02',
       dataDevolucao: '2026-05-12',
       ocasiao: TipoOcasiao.FORMATURA,
