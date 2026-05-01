@@ -1,4 +1,4 @@
-import { FalhaValidacao, RecursoNaoEncontrado, FalhaRequisicao, FalhaConexao } from './FalhaValidacao';
+import { FalhaValidacao, RecursoNaoEncontrado, FalhaRequisicao, FalhaConexao } from '@/domain/erros/FalhaValidacao';
 
 describe('FalhaValidacao', () => {
   it('deve criar erro com mensagem e erros vazios por padrão', () => {

@@ -5,8 +5,8 @@ import {
   MedidaFemininaResponse,
   MedidaMasculinaRequest,
   MedidaMasculinaResponse,
-} from '../entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+} from '@/domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export interface IClienteRepository {
   listar(

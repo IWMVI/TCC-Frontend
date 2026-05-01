@@ -1,5 +1,5 @@
-import { TrajeRequest, TrajeResponse, PeriodoAlugado } from '../entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+import { TrajeRequest, TrajeResponse, PeriodoAlugado } from '@/domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export interface ITrajeRepository {
   listar(

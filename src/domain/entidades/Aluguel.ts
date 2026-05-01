@@ -1,4 +1,4 @@
-import { ClienteResponse } from './Cliente';
+import { ClienteResponse } from '@/domain/entidades/Cliente';
 
 export enum StatusAluguel {
   ATIVO = 'Ativo',

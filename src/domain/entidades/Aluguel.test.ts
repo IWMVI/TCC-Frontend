@@ -1,4 +1,4 @@
-import { StatusAluguel, TipoOcasiao } from './Aluguel';
+import { StatusAluguel, TipoOcasiao } from '@/domain/entidades/Aluguel';
 
 describe('StatusAluguel', () => {
   it('deve possuir valores legíveis para interface do usuário', () => {

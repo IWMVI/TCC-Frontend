@@ -1,5 +1,5 @@
-import {AluguelRequest, AluguelResponse, AluguelUpdateRequest, StatusAluguel, TipoOcasiao, DevolucaoRequest, DevolucaoResponse} from '../entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+import {AluguelRequest, AluguelResponse, AluguelUpdateRequest, StatusAluguel, TipoOcasiao, DevolucaoRequest, DevolucaoResponse} from '@/domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export interface FiltrosAluguel {
   status?: StatusAluguel;

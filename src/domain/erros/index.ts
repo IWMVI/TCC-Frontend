@@ -1,1 +1,1 @@
-export { FalhaValidacao, RecursoNaoEncontrado, FalhaRequisicao, FalhaConexao } from './FalhaValidacao';
+export { FalhaValidacao, RecursoNaoEncontrado, FalhaRequisicao, FalhaConexao } from '@/domain/erros/FalhaValidacao';

@@ -1,4 +1,4 @@
-import { Cliente, SiglaEstado } from '../entidades/Cliente';
+import { Cliente, SiglaEstado } from '@/domain/entidades/Cliente';
 
 describe('Cliente Entity', () => {
   const clienteValido: Cliente = {

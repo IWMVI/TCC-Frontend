@@ -1,4 +1,4 @@
-export { SiglaEstado } from './Cliente';
+export { SiglaEstado } from '@/domain/entidades/Cliente';
 export type {
   Cliente,
   ClienteRequest,
@@ -8,9 +8,9 @@ export type {
   MedidaMasculinaRequest,
   MedidaFemininaResponse,
   MedidaMasculinaResponse,
-} from './Cliente';
-export type { Traje, TrajeRequest, TrajeResponse, PeriodoAlugado } from './Traje';
-export {StatusAluguel, TipoOcasiao} from './Aluguel';
+} from '@/domain/entidades/Cliente';
+export type { Traje, TrajeRequest, TrajeResponse, PeriodoAlugado } from '@/domain/entidades/Traje';
+export {StatusAluguel, TipoOcasiao} from '@/domain/entidades/Aluguel';
 export type {
   Aluguel,
   AluguelItem,
@@ -18,6 +18,6 @@ export type {
 	AluguelUpdateRequest,
   AluguelItemRequest,
   AluguelResponse,
-} from './Aluguel';
-export type { DevolucaoRequest, DevolucaoResponse, ItemDevolucaoRequest } from './Devolucao';
-export { CondicaoTraje } from './Devolucao';
+} from '@/domain/entidades/Aluguel';
+export type { DevolucaoRequest, DevolucaoResponse, ItemDevolucaoRequest } from '@/domain/entidades/Devolucao';
+export { CondicaoTraje } from '@/domain/entidades/Devolucao';
