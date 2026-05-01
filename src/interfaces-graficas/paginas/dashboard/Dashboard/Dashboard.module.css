@@ -17,13 +17,13 @@
 .dashboard__titulo {
     font-size: 1.25rem;
   font-weight: 700;
-    color: #1a1a1a;
+    color: var(--foreground);
     margin: 0 0 0.5rem;
 }
 
 .dashboard__subtitulo {
   font-size: 0.875rem;
-    color: #888888;
+    color: var(--muted-foreground);
     margin: 0;
 }
 

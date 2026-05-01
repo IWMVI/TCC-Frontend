@@ -20,13 +20,14 @@
   border-radius: var(--raio-borda);
   font-size: 0.9375rem;
   transition: all 0.2s;
-  background-color: white;
+  background-color: var(--input-background);
+  color: var(--foreground);
 }
 
 .busca__input:focus {
   outline: none;
   border-color: var(--cor-primaria);
-  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+  box-shadow: 0 0 0 3px rgba(3, 2, 19, 0.1);
 }
 
 .busca__input::placeholder {

@@ -145,7 +145,7 @@
 
 .listar-trajes__botao-editar {
   background-color: var(--cor-primaria, #007bff);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .listar-trajes__botao-editar:hover {
@@ -160,17 +160,17 @@
 
 .listar-trajes__botao-excluir:hover {
   background-color: var(--cor-erro, #dc3545);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .listar-trajes__botao-devolver {
-  background-color: #fd7e14;
-  color: white;
+  background-color: var(--cor-aviso);
+  color: var(--primary-foreground);
   border: none;
 }
 
 .listar-trajes__botao-devolver:hover:not(:disabled) {
-  background-color: #e8690a;
+  background-color: var(--cor-aviso);
 }
 
 .listar-trajes__botao-devolver:disabled {

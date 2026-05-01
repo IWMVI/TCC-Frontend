@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './interfaces-graficas/estilos/global.css';
+import { ProvedorTema } from './interfaces-graficas/contextos/ContextoTema';
 
 const router = {
   future: {
@@ -14,8 +15,10 @@ const router = {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter {...router}>
-      <App />
-    </BrowserRouter>
+    <ProvedorTema>
+      <BrowserRouter {...router}>
+        <App />
+      </BrowserRouter>
+    </ProvedorTema>
   </React.StrictMode>
 );

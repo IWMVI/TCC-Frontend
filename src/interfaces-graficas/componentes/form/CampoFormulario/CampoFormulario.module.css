@@ -26,10 +26,23 @@
     box-shadow 0.2s;
 }
 
+.campo-formulario__input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  font-size: 1rem;
+  background-color: var(--input-background);
+  color: var(--foreground);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
 .campo-formulario__input:focus {
   outline: none;
   border-color: var(--cor-primaria);
-  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+  box-shadow: 0 0 0 3px rgba(3, 2, 19, 0.1);
 }
 
 .campo-formulario--erro .campo-formulario__input {
@@ -37,7 +50,7 @@
 }
 
 .campo-formulario--erro .campo-formulario__input:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  box-shadow: 0 0 0 3px rgba(212, 24, 61, 0.1);
 }
 
 .campo-formulario__erro {

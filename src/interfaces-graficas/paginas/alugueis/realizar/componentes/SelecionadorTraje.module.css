@@ -17,7 +17,7 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
@@ -30,14 +30,14 @@
 .input {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: var(--cor-info);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
   }
 }
@@ -45,7 +45,7 @@
 .icone {
   position: absolute;
   right: 0.75rem;
-  color: #999;
+  color: var(--muted-foreground);
   pointer-events: none;
 }
 
@@ -56,8 +56,8 @@
   flex-direction: column;
   gap: 0.875rem;
   padding: 1rem;
-  background-color: #f0f8ff;
-  border: 1px solid #bde4ff;
+  background-color: var(--accent);
+  border: 1px solid var(--ring);
   border-radius: 8px;
 }
 
@@ -77,13 +77,13 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #0066cc;
+    color: var(--cor-info);
   }
 
   p {
     margin: 0;
     font-size: 0.8rem;
-    color: #555;
+    color: var(--muted-foreground);
   }
 }
 
@@ -99,8 +99,8 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 8px;
   max-height: 400px;
   overflow-y: auto;
@@ -108,17 +108,17 @@
   h3 {
     margin: 0;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
 .mensagem {
   margin: 0;
   padding: 1rem;
-  background-color: #f0f0f0;
+  background-color: var(--muted);
   border-radius: 4px 4px 0 0;
   text-align: center;
-  color: #666;
+  color: var(--muted-foreground);
   font-size: 0.875rem;
 }
 
@@ -135,7 +135,7 @@
   gap: 0.375rem;
   padding: 0.5rem 1rem;
   background-color: var(--cor-primaria);
-  color: #fff;
+  color: var(--primary-foreground);
   border: none;
   border-radius: 0 0 var(--raio-borda) var(--raio-borda);
   font-size: 0.875rem;
@@ -162,8 +162,8 @@
 
 .card {
   padding: 0.75rem;
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 8px;
   transition: box-shadow 0.15s ease;
 
@@ -184,8 +184,8 @@
   height: 56px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
-  background: #f5f5f5;
+  border: 1px solid var(--border);
+  background: var(--background);
 }
 
 .cardFotoImg {
@@ -215,7 +215,7 @@
 .cardNome {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #222;
+  color: var(--foreground);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -223,13 +223,13 @@
 
 .cardMeta {
   font-size: 0.75rem;
-  color: #777;
+  color: var(--muted-foreground);
 }
 
 .cardPreco {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #28a745;
+  color: var(--cor-sucesso);
 }
 
 .cardAcoes {
@@ -241,8 +241,8 @@
 
 .botaoSelecionar {
   padding: 0.4rem 0.875rem;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--cor-info);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -251,7 +251,7 @@
   transition: background-color 0.2s ease;
   white-space: nowrap;
 
-  &:hover { background-color: #0056b3; }
+  &:hover { background-color: var(--cor-info); }:hover { background-color: var(--cor-info); }
 }
 
 /* ── Botão de disponibilidade ───────────────────────────────────────────────── */
@@ -273,18 +273,18 @@
 }
 
 .btnDisponibilidadeCarregando {
-  background: #e9ecef;
-  color: #666;
+  background: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .btnDisponibilidadeLivre {
-  background: #d4edda;
-  color: #155724;
+  background: var(--cor-sucesso-bg);
+  color: var(--cor-sucesso-texto);
 }
 
 .btnDisponibilidadeOcupado {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--cor-erro-bg);
+  color: var(--cor-erro-texto);
 }
 
 .btnDisponibilidadeIconeCal {
@@ -298,8 +298,8 @@
   position: fixed;
   z-index: 9999;
   width: 320px;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   padding: 0.875rem;
@@ -325,7 +325,7 @@
 .popoverTitulo {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #333;
+  color: var(--foreground);
   padding-bottom: 0.4rem;
   border-bottom: 1px solid #eee;
 }
@@ -347,7 +347,7 @@
 .calMesTitulo {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #555;
+  color: var(--muted-foreground);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -362,7 +362,7 @@
 .calDiaSemana {
   font-size: 0.58rem;
   font-weight: 700;
-  color: #aaa;
+  color: var(--muted-foreground);
   text-align: center;
 }
 
@@ -376,10 +376,10 @@
   line-height: 1.4;
 }
 
-.calDiaPassado  { color: #ccc; }
-.calDiaLivre    { background: #d4edda; color: #155724; font-weight: 600; }
-.calDiaOcupado  { background: #f8d7da; color: #721c24; font-weight: 700; }
-.calDiaHoje     { outline: 2px solid #007bff; outline-offset: -1px; border-radius: 3px; }
+.calDiaPassado  { color: var(--muted-foreground); }
+.calDiaLivre    { background: var(--cor-sucesso-bg); color: var(--cor-sucesso-texto); font-weight: 600; }
+.calDiaOcupado  { background: var(--cor-erro-bg); color: var(--cor-erro-texto); font-weight: 700; }
+.calDiaHoje     { outline: 2px solid var(--cor-info); outline-offset: -1px; border-radius: 3px; }
 
 .calCarregando {
   display: flex;
@@ -391,15 +391,15 @@
 
 .calCarregandoTexto {
   font-size: 0.78rem;
-  color: #888;
+  color: var(--muted-foreground);
 }
 
 .calSpinner {
   display: inline-block;
   width: 13px;
   height: 13px;
-  border: 2px solid #ddd;
-  border-top-color: #007bff;
+  border: 2px solid var(--border);
+  border-top-color: var(--cor-info);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
@@ -414,7 +414,7 @@
   gap: 0.75rem;
   flex-wrap: wrap;
   padding-top: 0.3rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--muted);
 }
 
 .calLegendaLivre,
@@ -424,7 +424,7 @@
   align-items: center;
   gap: 0.3rem;
   font-size: 0.67rem;
-  color: #555;
+  color: var(--muted-foreground);
 
   &::before {
     content: '';
@@ -435,9 +435,9 @@
   }
 }
 
-.calLegendaLivre::before   { background: #d4edda; }
-.calLegendaOcupado::before { background: #f8d7da; }
-.calLegendaPassado::before { background: #eee; }
+.calLegendaLivre::before   { background: var(--cor-sucesso-bg); }
+.calLegendaOcupado::before { background: var(--cor-erro-bg); }
+.calLegendaPassado::before { background: var(--border); }
 
 /* ── Trajes selecionados ────────────────────────────────────────────────────── */
 
@@ -446,14 +446,14 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 8px;
 
   h3 {
     margin: 0;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
@@ -470,8 +470,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background-color: white;
-  border: 1px solid #e0e0e0;
+  background-color: var(--input-background);
+  border: 1px solid var(--border);
   border-radius: 4px;
 }
 
@@ -486,21 +486,21 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #333;
+  color: var(--foreground);
 }
 
 .detalhes {
   margin: 0;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--muted-foreground);
   display: flex;
   gap: 1rem;
 }
 
 .botaoRemover {
   padding: 0.5rem;
-  background-color: #ff6b6b;
-  color: white;
+  background-color: var(--cor-erro);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -508,5 +508,5 @@
   align-items: center;
   justify-content: center;
 
-  &:hover { background-color: #e05555; }
+  &:hover { background-color: var(--cor-erro); }:hover { background-color: var(--cor-erro); }
 }

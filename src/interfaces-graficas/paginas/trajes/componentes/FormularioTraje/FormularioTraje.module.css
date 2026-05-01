@@ -160,7 +160,7 @@
   justify-content: center;
   padding: var(--espacamento-xs, 0.5rem) var(--espacamento-md, 1rem);
   background-color: var(--cor-primaria, #007bff);
-  color: white;
+  color: var(--primary-foreground);
   border-radius: var(--raio-borda, 4px);
   cursor: pointer;
   font-size: var(--tamanho-fonte-sm, 0.9rem);

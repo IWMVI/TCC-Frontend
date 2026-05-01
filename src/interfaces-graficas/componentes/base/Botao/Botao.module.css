@@ -21,7 +21,7 @@
 
 .botao--primario {
   background-color: var(--cor-primaria);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .botao--primario:hover:not(:disabled) {
@@ -36,16 +36,16 @@
 
 .botao--secundario:hover:not(:disabled) {
   background-color: var(--cor-primaria);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .botao--perigo {
   background-color: var(--cor-erro);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .botao--perigo:hover:not(:disabled) {
-  background-color: #c82333;
+  background-color: var(--cor-erro);
 }
 
 @media (min-width: 576px) {

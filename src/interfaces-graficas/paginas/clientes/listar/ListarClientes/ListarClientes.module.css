@@ -74,10 +74,10 @@
 .listar-clientes__erro {
   padding: 0.625rem;
   margin-bottom: 0.75rem;
-  background-color: #f8d7da;
+  background-color: var(--cor-erro-bg);
   border: 1px solid #f5c6cb;
   border-radius: var(--raio-borda);
-  color: #721c24;
+  color: var(--cor-erro-texto);
   font-size: 0.8125rem;
 }
 
@@ -136,7 +136,7 @@
 
 .listar-clientes__botao-editar {
   background-color: var(--cor-primaria);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .listar-clientes__botao-editar:hover {
@@ -151,7 +151,7 @@
 
 .listar-clientes__botao-excluir:hover {
   background-color: var(--cor-erro);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 /* Paginação */

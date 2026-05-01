@@ -20,7 +20,7 @@
     background: none;
     border: none;
     font-size: 0.875rem;
-    color: #444;
+    color: var(--foreground);
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -28,7 +28,7 @@
 }
 
 .clientes__voltar:hover {
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: var(--muted);
 }
 
 .clientes__cabecalho {
@@ -38,13 +38,13 @@
 .clientes__titulo {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--foreground);
     margin: 0 0 0.4rem;
 }
 
 .clientes__subtitulo {
     font-size: 0.875rem;
-    color: #888;
+    color: var(--muted-foreground);
     margin: 0;
 }
 

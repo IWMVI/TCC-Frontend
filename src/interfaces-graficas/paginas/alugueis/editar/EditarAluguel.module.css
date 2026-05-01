@@ -3,8 +3,9 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2rem;
-  background-color: #f5f5f5;
+  background-color: var(--background);
   min-height: 100vh;
+  color: var(--foreground);
 }
 
 .header {
@@ -25,31 +26,31 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background-color: transparent;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #666;
+  color: var(--muted-foreground);
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f0f0f0;
-    border-color: #999;
+    background-color: var(--muted);
+    border-color: var(--muted-foreground);
   }
 }
 
 .titulo {
-  flex: 1;
+  flex:1;
 
   h1 {
     margin: 0;
     font-size: 2rem;
-    color: #333;
+    color: var(--foreground);
   }
 
   p {
     margin: 0.5rem 0 0;
-    color: #666;
+    color: var(--muted-foreground);
     font-size: 0.95rem;
   }
 }
@@ -94,7 +95,7 @@
   p {
     margin: 0;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
@@ -106,21 +107,22 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
 .input {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 0.875rem;
-  background-color: white;
+  background-color: var(--input-background);
+  color: var(--foreground);
 
   &:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: var(--cor-info);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 }
 
@@ -129,7 +131,7 @@
   gap: 1rem;
   justify-content: flex-end;
   padding-top: 1rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -145,9 +147,9 @@
   text-align: center;
   padding: 2rem;
   font-size: 1rem;
-  color: #666;
+  color: var(--muted-foreground);
 }
 
 .erro {
-  color: #dc3545;
+  color: var(--cor-erro);
 }

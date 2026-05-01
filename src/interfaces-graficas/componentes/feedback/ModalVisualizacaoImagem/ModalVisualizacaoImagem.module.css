@@ -129,7 +129,7 @@
 
 .modal__botaoUpload {
   background-color: var(--cor-primaria);
-  color: white;
+  color: var(--primary-foreground);
   flex: 1;
   justify-content: center;
 }
@@ -146,7 +146,7 @@
 
 .modal__botaoRemover:hover {
   background-color: var(--cor-erro);
-  color: white;
+  color: var(--primary-foreground);
 }
 
 .modal__inputFile {

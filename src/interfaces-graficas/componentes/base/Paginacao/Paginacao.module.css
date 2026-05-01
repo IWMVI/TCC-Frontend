@@ -31,7 +31,7 @@
   height: 1.75rem;
   padding: 0.25rem;
   border: 1px solid var(--cor-borda);
-  background: white;
+  background: var(--card);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8125rem;
@@ -54,7 +54,7 @@
 .paginacao__botao--ativo {
   background: var(--cor-primaria);
   border-color: var(--cor-primaria);
-  color: white;
+  color: var(--primary-foreground);
   font-weight: 600;
 }
 
@@ -69,7 +69,7 @@
   border-radius: 4px;
   font-size: 0.8125rem;
   margin-left: 0.5rem;
-  background: white;
+  background: var(--input-background);
   cursor: pointer;
-  color: var(--cor-texto);
+  color: var(--foreground);
 }

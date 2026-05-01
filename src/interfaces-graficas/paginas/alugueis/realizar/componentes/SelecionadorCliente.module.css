@@ -22,7 +22,7 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
@@ -35,14 +35,14 @@
 .input {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: var(--cor-info);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
   }
 }
@@ -50,7 +50,7 @@
 .icone {
   position: absolute;
   right: 0.75rem;
-  color: #999;
+  color: var(--muted-foreground);
   pointer-events: none;
 }
 
@@ -59,14 +59,14 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #f0f8ff;
+  background-color: var(--accent);
   border: 1px solid #bde4ff;
   border-radius: 4px;
 
   h3 {
     margin: 0;
     font-size: 0.95rem;
-    color: #0066cc;
+    color: var(--cor-info);
   }
 }
 
@@ -78,18 +78,18 @@
   p {
     margin: 0;
     font-size: 0.875rem;
-    color: #333;
+    color: var(--foreground);
 
     strong {
-      color: #0066cc;
+      color: var(--cor-info);
     }
   }
 }
 
 .botaoRemover {
   padding: 0.5rem 1rem;
-  background-color: #ff6b6b;
-  color: white;
+  background-color: var(--cor-erro);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -98,7 +98,7 @@
   margin-top: 0.5rem;
 
   &:hover {
-    background-color: #ff5252;
+    background-color: var(--cor-erro);
   }
 }
 
@@ -107,24 +107,24 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 4px;
 
   h3 {
     margin: 0;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--foreground);
   }
 }
 
 .mensagem {
   margin: 0;
   padding: 1rem;
-  background-color: #f0f0f0;
+  background-color: var(--muted);
   border-radius: 4px 4px 0 0;
   text-align: center;
-  color: #666;
+  color: var(--muted-foreground);
   font-size: 0.875rem;
   flex: 1;
 }
@@ -142,7 +142,7 @@
   gap: 0.375rem;
   padding: 0.5rem 1rem;
   background-color: var(--cor-primaria);
-  color: #fff;
+  color: var(--primary-foreground);
   border: none;
   border-radius: 0 0 var(--raio-borda) var(--raio-borda);
   font-size: 0.875rem;
@@ -160,8 +160,8 @@
 
 .botaoSelecionar {
   padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--cor-info);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -169,10 +169,10 @@
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: var(--cor-info);
   }
 
   &:active {
-    background-color: #004085;
+    background-color: var(--cor-info);
   }
 }
