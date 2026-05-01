@@ -1,9 +1,9 @@
-import { DeletarAluguemUseCase } from './DeletarAluguemUseCase';
-import { AluguemRepository } from './CriarAluguemUseCase';
+import { DeletarAluguelUseCase } from './DeletarAluguelUseCase';
+import { AluguelRepository } from './CriarAluguelUseCase';
 
-describe('DeletarAluguemUseCase', () => {
-  let mockRepositorio: jest.Mocked<AluguemRepository>;
-  let useCase: DeletarAluguemUseCase;
+describe('DeletarAluguelUseCase', () => {
+  let mockRepositorio: jest.Mocked<AluguelRepository>;
+  let useCase: DeletarAluguelUseCase;
 
   beforeEach(() => {
     mockRepositorio = {
@@ -15,7 +15,7 @@ describe('DeletarAluguemUseCase', () => {
       marcarComoConcluido: jest.fn(),
       gerarContratoPdf: jest.fn(),
     };
-    useCase = new DeletarAluguemUseCase(mockRepositorio);
+    useCase = new DeletarAluguelUseCase(mockRepositorio);
   });
 
   describe('executar', () => {

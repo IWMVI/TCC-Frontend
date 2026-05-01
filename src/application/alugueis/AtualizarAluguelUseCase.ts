@@ -1,10 +1,10 @@
-import {AluguemResponse, AluguemUpdateRequest} from '../../domain/entidades';
-import { AluguemRepository } from './CriarAluguemUseCase';
+import {AluguelResponse, AluguelUpdateRequest} from '../../domain/entidades';
+import { AluguelRepository } from './CriarAluguelUseCase';
 
-export class AtualizarAluguemUseCase {
-  constructor(private aluguelRepository: AluguemRepository) {}
+export class AtualizarAluguelUseCase {
+  constructor(private aluguelRepository: AluguelRepository) {}
 	
-	async executar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse> {
+	async executar(id: number, dados: AluguelUpdateRequest): Promise<AluguelResponse> {
     if (!id || id <= 0) {
       throw new Error('ID de aluguel inválido');
     }

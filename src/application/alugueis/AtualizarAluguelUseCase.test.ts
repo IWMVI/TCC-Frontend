@@ -1,10 +1,10 @@
-import { AtualizarAluguemUseCase } from './AtualizarAluguemUseCase';
-import { AluguemRepository } from './CriarAluguemUseCase';
-import { AluguemResponse, AluguemUpdateRequest, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { AtualizarAluguelUseCase } from './AtualizarAluguelUseCase';
+import { AluguelRepository } from './CriarAluguelUseCase';
+import { AluguelResponse, AluguelUpdateRequest, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
 
-describe('AtualizarAluguemUseCase', () => {
-  let mockRepositorio: jest.Mocked<AluguemRepository>;
-  let useCase: AtualizarAluguemUseCase;
+describe('AtualizarAluguelUseCase', () => {
+  let mockRepositorio: jest.Mocked<AluguelRepository>;
+  let useCase: AtualizarAluguelUseCase;
 
   beforeEach(() => {
     mockRepositorio = {
@@ -16,10 +16,10 @@ describe('AtualizarAluguemUseCase', () => {
       marcarComoConcluido: jest.fn(),
       gerarContratoPdf: jest.fn(),
     };
-    useCase = new AtualizarAluguemUseCase(mockRepositorio);
+    useCase = new AtualizarAluguelUseCase(mockRepositorio);
   });
 
-  const dadosValidos: AluguemUpdateRequest = {
+  const dadosValidos: AluguelUpdateRequest = {
     dataRetirada: '2026-05-10',
     dataDevolucao: '2026-05-15',
     ocasiao: TipoOcasiao.CASAMENTO,
@@ -27,7 +27,7 @@ describe('AtualizarAluguemUseCase', () => {
     itens: [{ trajeId: 10 }],
   };
 
-  const responseMock: AluguemResponse = {
+  const responseMock: AluguelResponse = {
     id: 1,
     clienteId: 1,
     nomeCliente: 'Cliente Teste',

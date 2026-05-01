@@ -1,21 +1,21 @@
-import { AluguemRequest, AluguemResponse, AluguemUpdateRequest } from '../../domain/entidades';
+import { AluguelRequest, AluguelResponse, AluguelUpdateRequest } from '../../domain/entidades';
 import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
 
-export interface AluguemRepository {
-  criar(dados: AluguemRequest): Promise<AluguemResponse>;
-  listar(busca?: string, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguemResponse>>;
-  buscarPorId(id: number): Promise<AluguemResponse>;
+export interface AluguelRepository {
+  criar(dados: AluguelRequest): Promise<AluguelResponse>;
+  listar(busca?: string, pagina?: number, tamanho?: number): Promise<PaginacaoResultado<AluguelResponse>>;
+  buscarPorId(id: number): Promise<AluguelResponse>;
 	
-	atualizar(id: number, dados: AluguemUpdateRequest): Promise<AluguemResponse>;
+	atualizar(id: number, dados: AluguelUpdateRequest): Promise<AluguelResponse>;
   deletar(id: number): Promise<void>;
-  marcarComoConcluido(id: number): Promise<AluguemResponse>;
+  marcarComoConcluido(id: number): Promise<AluguelResponse>;
   gerarContratoPdf(id: number): Promise<Blob>;
 }
 
-export class CriarAluguemUseCase {
-  constructor(private aluguelRepository: AluguemRepository) {}
+export class CriarAluguelUseCase {
+  constructor(private aluguelRepository: AluguelRepository) {}
 
-  async executar(dados: AluguemRequest): Promise<AluguemResponse> {
+  async executar(dados: AluguelRequest): Promise<AluguelResponse> {
     if (!dados.clienteId || dados.clienteId <= 0) {
       throw new Error('Cliente inválido');
     }

@@ -1,7 +1,7 @@
-import { AluguemRepository } from './CriarAluguemUseCase';
+import { AluguelRepository } from './CriarAluguelUseCase';
 
-export class DeletarAluguemUseCase {
-  constructor(private aluguelRepository: AluguemRepository) {}
+export class DeletarAluguelUseCase {
+  constructor(private aluguelRepository: AluguelRepository) {}
 
   async executar(id: number): Promise<void> {
     if (!id || id <= 0) {
