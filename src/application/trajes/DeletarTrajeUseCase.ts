@@ -1,4 +1,4 @@
-import { ITrajeRepository } from '../../domain/interfaces';
+import { ITrajeRepository } from '@domain/interfaces';
 
 export class DeletarTrajeUseCase {
   constructor(private readonly trajeRepositorio: ITrajeRepository) {}

@@ -1,7 +1,7 @@
-import { BuscarClientePorIdUseCase } from './BuscarClientePorIdUseCase';
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteResponse, SiglaEstado } from '../../domain/entidades';
-import { FalhaRequisicao, FalhaConexao, RecursoNaoEncontrado } from '../../domain/erros';
+import { BuscarClientePorIdUseCase } from '@/application/clientes/BuscarClientePorIdUseCase';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteResponse, SiglaEstado } from '@domain/entidades';
+import { FalhaRequisicao, FalhaConexao, RecursoNaoEncontrado } from '@domain/erros';
 
 describe('BuscarClientePorIdUseCase', () => {
   let mockClienteRepositorio: jest.Mocked<IClienteRepository>;

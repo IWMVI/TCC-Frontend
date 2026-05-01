@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useDebounce, useDebouncedCallback } from './useDebounce';
+import { useDebounce, useDebouncedCallback } from '@/application/trajes/hooks/useDebounce';
 
 describe('useDebounce', () => {
   it('deve retornar o valor inicial imediatamente', () => {

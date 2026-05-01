@@ -1,4 +1,4 @@
-import { AluguelRepository } from './CriarAluguelUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
 
 export class GerarContratoAluguelUseCase {
   constructor(private aluguelRepository: AluguelRepository) {}

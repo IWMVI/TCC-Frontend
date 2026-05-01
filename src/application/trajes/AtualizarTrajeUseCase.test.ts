@@ -1,7 +1,7 @@
-import { AtualizarTrajeUseCase } from './AtualizarTrajeUseCase';
-import { ITrajeRepository } from '../../domain/interfaces';
-import { TrajeRequest, TrajeResponse } from '../../domain/entidades';
-import { FalhaConexao, FalhaRequisicao } from '../../domain/erros';
+import { AtualizarTrajeUseCase } from '@/application/trajes/AtualizarTrajeUseCase';
+import { ITrajeRepository } from '@domain/interfaces';
+import { TrajeRequest, TrajeResponse } from '@domain/entidades';
+import { FalhaConexao, FalhaRequisicao } from '@domain/erros';
 
 describe('AtualizarTrajeUseCase', () => {
   let mockTrajeRepositorio: jest.Mocked<ITrajeRepository>;

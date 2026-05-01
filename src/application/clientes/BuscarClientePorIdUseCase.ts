@@ -1,6 +1,6 @@
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteResponse } from '../../domain/entidades';
-import { RecursoNaoEncontrado } from '../../domain/erros';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteResponse } from '@domain/entidades';
+import { RecursoNaoEncontrado } from '@domain/erros';
 
 export class BuscarClientePorIdUseCase {
   constructor(private readonly clienteRepositorio: IClienteRepository) {}

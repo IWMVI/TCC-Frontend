@@ -1,6 +1,6 @@
-import { ListarAlugueisUseCase } from './ListarAlugueisUseCase';
-import { IAluguelRepository, FiltrosAluguel } from '../../domain/interfaces';
-import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { ListarAlugueisUseCase } from '@/application/alugueis/ListarAlugueisUseCase';
+import { IAluguelRepository, FiltrosAluguel } from '@domain/interfaces';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 
 describe('ListarAlugueisUseCase', () => {
   let mockRepositorio: jest.Mocked<IAluguelRepository>;

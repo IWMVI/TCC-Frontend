@@ -1,7 +1,7 @@
-import { BuscarTrajePorIdUseCase } from './BuscarTrajePorIdUseCase';
-import { ITrajeRepository } from '../../domain/interfaces';
-import { TrajeResponse } from '../../domain/entidades';
-import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '../../domain/erros';
+import { BuscarTrajePorIdUseCase } from '@/application/trajes/BuscarTrajePorIdUseCase';
+import { ITrajeRepository } from '@domain/interfaces';
+import { TrajeResponse } from '@domain/entidades';
+import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 
 describe('BuscarTrajePorIdUseCase', () => {
   let mockTrajeRepositorio: jest.Mocked<ITrajeRepository>;

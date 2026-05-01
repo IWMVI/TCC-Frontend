@@ -1,6 +1,6 @@
-import { DeletarClienteUseCase } from './DeletarClienteUseCase';
-import { IClienteRepository } from '../../domain/interfaces';
-import { FalhaRequisicao, FalhaConexao, RecursoNaoEncontrado } from '../../domain/erros';
+import { DeletarClienteUseCase } from '@/application/clientes/DeletarClienteUseCase';
+import { IClienteRepository } from '@domain/interfaces';
+import { FalhaRequisicao, FalhaConexao, RecursoNaoEncontrado } from '@domain/erros';
 
 describe('DeletarClienteUseCase', () => {
   let mockClienteRepositorio: jest.Mocked<IClienteRepository>;

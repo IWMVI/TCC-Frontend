@@ -1,6 +1,6 @@
-import { IAluguelRepository, FiltrosAluguel } from '../../domain/interfaces';
-import { AluguelResponse, StatusAluguel } from '../../domain/entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+import { IAluguelRepository, FiltrosAluguel } from '@domain/interfaces';
+import { AluguelResponse, StatusAluguel } from '@domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export class ListarAlugueisUseCase {
   constructor(private aluguelRepository: IAluguelRepository) {}

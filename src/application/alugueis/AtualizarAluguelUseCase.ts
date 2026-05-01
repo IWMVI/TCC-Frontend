@@ -1,5 +1,5 @@
-import {AluguelResponse, AluguelUpdateRequest} from '../../domain/entidades';
-import { AluguelRepository } from './CriarAluguelUseCase';
+import {AluguelResponse, AluguelUpdateRequest} from '@domain/entidades';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
 
 export class AtualizarAluguelUseCase {
   constructor(private aluguelRepository: AluguelRepository) {}

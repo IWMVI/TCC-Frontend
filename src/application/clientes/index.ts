@@ -1,7 +1,7 @@
-export { CriarClienteUseCase } from './CriarClienteUseCase';
-export { AtualizarClienteUseCase } from './AtualizarClienteUseCase';
-export { BuscarClientePorIdUseCase } from './BuscarClientePorIdUseCase';
-export { DeletarClienteUseCase } from './DeletarClienteUseCase';
-export { ListarClientesUseCase } from './ListarClientesUseCase';
-export { ListarClientesExcluidosUseCase } from './ListarClientesExcluidosUseCase';
-export { RecuperarClienteUseCase } from './RecuperarClienteUseCase';
+export { CriarClienteUseCase } from '@/application/clientes/CriarClienteUseCase';
+export { AtualizarClienteUseCase } from '@/application/clientes/AtualizarClienteUseCase';
+export { BuscarClientePorIdUseCase } from '@/application/clientes/BuscarClientePorIdUseCase';
+export { DeletarClienteUseCase } from '@/application/clientes/DeletarClienteUseCase';
+export { ListarClientesUseCase } from '@/application/clientes/ListarClientesUseCase';
+export { ListarClientesExcluidosUseCase } from '@/application/clientes/ListarClientesExcluidosUseCase';
+export { RecuperarClienteUseCase } from '@/application/clientes/RecuperarClienteUseCase';

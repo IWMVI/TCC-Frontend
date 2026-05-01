@@ -1,6 +1,6 @@
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteRequest, ClienteResponse } from '../../domain/entidades';
-import { RecursoNaoEncontrado } from '../../domain/erros';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteRequest, ClienteResponse } from '@domain/entidades';
+import { RecursoNaoEncontrado } from '@domain/erros';
 
 export class AtualizarClienteUseCase {
   constructor(private readonly clienteRepositorio: IClienteRepository) {}

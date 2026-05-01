@@ -1,5 +1,5 @@
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteRequest, ClienteResponse } from '../../domain/entidades';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteRequest, ClienteResponse } from '@domain/entidades';
 
 export class CriarClienteUseCase {
   constructor(private readonly clienteRepositorio: IClienteRepository) {}

@@ -1,6 +1,6 @@
-import { RegistrarDevolucaoUseCase } from './RegistrarDevolucaoUseCase';
-import { IAluguelRepository } from '../../domain/interfaces';
-import { CondicaoTraje, DevolucaoRequest, DevolucaoResponse } from '../../domain/entidades';
+import { RegistrarDevolucaoUseCase } from '@/application/alugueis/RegistrarDevolucaoUseCase';
+import { IAluguelRepository } from '@domain/interfaces';
+import { CondicaoTraje, DevolucaoRequest, DevolucaoResponse } from '@domain/entidades';
 
 describe('RegistrarDevolucaoUseCase', () => {
   let mockRepositorio: jest.Mocked<IAluguelRepository>;

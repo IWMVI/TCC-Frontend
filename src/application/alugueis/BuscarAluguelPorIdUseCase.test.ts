@@ -1,6 +1,6 @@
-import { BuscarAluguelPorIdUseCase } from './BuscarAluguelPorIdUseCase';
-import { AluguelRepository } from './CriarAluguelUseCase';
-import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { BuscarAluguelPorIdUseCase } from '@/application/alugueis/BuscarAluguelPorIdUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 
 describe('BuscarAluguelPorIdUseCase', () => {
   let mockRepositorio: jest.Mocked<AluguelRepository>;

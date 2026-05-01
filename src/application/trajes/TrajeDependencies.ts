@@ -1,10 +1,10 @@
 import { TrajeApiRepository } from '@infrastructure/api';
 import { ITrajeRepository } from '@domain/interfaces';
-import { ListarTrajesUseCase } from './ListarTrajesUseCase';
-import { BuscarTrajePorIdUseCase } from './BuscarTrajePorIdUseCase';
-import { CriarTrajeUseCase } from './CriarTrajeUseCase';
-import { AtualizarTrajeUseCase } from './AtualizarTrajeUseCase';
-import { DeletarTrajeUseCase } from './DeletarTrajeUseCase';
+import { ListarTrajesUseCase } from '@/application/trajes/ListarTrajesUseCase';
+import { BuscarTrajePorIdUseCase } from '@/application/trajes/BuscarTrajePorIdUseCase';
+import { CriarTrajeUseCase } from '@/application/trajes/CriarTrajeUseCase';
+import { AtualizarTrajeUseCase } from '@/application/trajes/AtualizarTrajeUseCase';
+import { DeletarTrajeUseCase } from '@/application/trajes/DeletarTrajeUseCase';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 

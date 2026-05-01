@@ -1,5 +1,5 @@
-import { CriarAluguelUseCase, AluguelRepository } from './CriarAluguelUseCase';
-import { AluguelRequest, AluguelResponse, TipoOcasiao, StatusAluguel } from '../../domain/entidades';
+import { CriarAluguelUseCase, AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
+import { AluguelRequest, AluguelResponse, TipoOcasiao, StatusAluguel } from '@domain/entidades';
 
 describe('CriarAluguelUseCase', () => {
   let mockRepositorio: jest.Mocked<AluguelRepository>;

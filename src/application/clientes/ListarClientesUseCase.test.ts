@@ -1,8 +1,8 @@
-import { ListarClientesUseCase } from './ListarClientesUseCase';
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteResponse, SiglaEstado } from '../../domain/entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
-import { FalhaConexao, FalhaRequisicao } from '../../domain/erros';
+import { ListarClientesUseCase } from '@/application/clientes/ListarClientesUseCase';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteResponse, SiglaEstado } from '@domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
+import { FalhaConexao, FalhaRequisicao } from '@domain/erros';
 
 describe('ListarClientesUseCase', () => {
   let mockClienteRepositorio: jest.Mocked<IClienteRepository>;

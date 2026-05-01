@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useFormTraje, formatarValorDigitado } from './useFormTraje';
+import { useFormTraje, formatarValorDigitado } from '@/application/trajes/hooks/useFormTraje';
 
 describe('useFormTraje', () => {
   it('deve retornar estado inicial correto', () => {

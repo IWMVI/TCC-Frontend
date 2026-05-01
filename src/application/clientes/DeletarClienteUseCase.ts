@@ -1,5 +1,5 @@
-import { IClienteRepository } from '../../domain/interfaces';
-import { RecursoNaoEncontrado } from '../../domain/erros';
+import { IClienteRepository } from '@domain/interfaces';
+import { RecursoNaoEncontrado } from '@domain/erros';
 
 export class DeletarClienteUseCase {
   constructor(private readonly clienteRepositorio: IClienteRepository) {}

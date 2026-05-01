@@ -1,4 +1,4 @@
-export { useFormTraje, formatarValorDigitado } from './useFormTraje';
-export { useValidacaoTraje } from './useValidacaoTraje';
-export { useImageHandler } from './useImageHandler';
-export { useDebounce, useDebouncedCallback } from './useDebounce';
+export { useFormTraje, formatarValorDigitado } from '@/application/trajes/hooks/useFormTraje';
+export { useValidacaoTraje } from '@/application/trajes/hooks/useValidacaoTraje';
+export { useImageHandler } from '@/application/trajes/hooks/useImageHandler';
+export { useDebounce, useDebouncedCallback } from '@/application/trajes/hooks/useDebounce';

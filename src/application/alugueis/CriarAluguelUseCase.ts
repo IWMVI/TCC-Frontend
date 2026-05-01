@@ -1,5 +1,5 @@
-import { AluguelRequest, AluguelResponse, AluguelUpdateRequest } from '../../domain/entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+import { AluguelRequest, AluguelResponse, AluguelUpdateRequest } from '@domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export interface AluguelRepository {
   criar(dados: AluguelRequest): Promise<AluguelResponse>;

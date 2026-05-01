@@ -1,5 +1,5 @@
-import { ITrajeRepository } from '../../domain/interfaces';
-import { TrajeRequest, TrajeResponse } from '../../domain/entidades';
+import { ITrajeRepository } from '@domain/interfaces';
+import { TrajeRequest, TrajeResponse } from '@domain/entidades';
 
 export class AtualizarTrajeUseCase {
   constructor(private readonly trajeRepositorio: ITrajeRepository) {}

@@ -1,5 +1,5 @@
-import { DeletarAluguelUseCase } from './DeletarAluguelUseCase';
-import { AluguelRepository } from './CriarAluguelUseCase';
+import { DeletarAluguelUseCase } from '@/application/alugueis/DeletarAluguelUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
 
 describe('DeletarAluguelUseCase', () => {
   let mockRepositorio: jest.Mocked<AluguelRepository>;

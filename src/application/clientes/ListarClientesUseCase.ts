@@ -1,6 +1,6 @@
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteResponse } from '../../domain/entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteResponse } from '@domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
 
 export class ListarClientesUseCase {
   constructor(private readonly clienteRepositorio: IClienteRepository) {}

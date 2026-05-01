@@ -1,4 +1,4 @@
-import { AluguelRepository } from './CriarAluguelUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
 
 export class DeletarAluguelUseCase {
   constructor(private aluguelRepository: AluguelRepository) {}

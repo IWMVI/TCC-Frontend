@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { useValidacaoTraje } from './useValidacaoTraje';
+import { useValidacaoTraje } from '@/application/trajes/hooks/useValidacaoTraje';
 import { TrajeRequest } from '@domain/entidades';
 
 describe('useValidacaoTraje', () => {

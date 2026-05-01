@@ -1,7 +1,7 @@
-import { CriarClienteUseCase } from './CriarClienteUseCase';
-import { IClienteRepository } from '../../domain/interfaces';
-import { ClienteRequest, ClienteResponse, SiglaEstado } from '../../domain/entidades';
-import { FalhaConexao, FalhaRequisicao } from '../../domain/erros';
+import { CriarClienteUseCase } from '@/application/clientes/CriarClienteUseCase';
+import { IClienteRepository } from '@domain/interfaces';
+import { ClienteRequest, ClienteResponse, SiglaEstado } from '@domain/entidades';
+import { FalhaConexao, FalhaRequisicao } from '@domain/erros';
 
 describe('CriarClienteUseCase', () => {
   let mockClienteRepositorio: jest.Mocked<IClienteRepository>;

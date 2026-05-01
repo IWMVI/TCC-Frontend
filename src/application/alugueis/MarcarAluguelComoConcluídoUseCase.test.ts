@@ -1,6 +1,6 @@
-import { MarcarAluguelComoConcluídoUseCase } from './MarcarAluguelComoConcluídoUseCase';
-import { AluguelRepository } from './CriarAluguelUseCase';
-import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { MarcarAluguelComoConcluídoUseCase } from '@/application/alugueis/MarcarAluguelComoConcluídoUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 
 describe('MarcarAluguelComoConcluídoUseCase', () => {
   let mockRepositorio: jest.Mocked<AluguelRepository>;

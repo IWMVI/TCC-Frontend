@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useImageHandler } from './useImageHandler';
+import { useImageHandler } from '@/application/trajes/hooks/useImageHandler';
 
 describe('useImageHandler', () => {
   it('deve retornar valores iniciais corretos', () => {

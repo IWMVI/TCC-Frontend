@@ -1,8 +1,8 @@
-import { ListarTrajesUseCase } from './ListarTrajesUseCase';
-import { ITrajeRepository } from '../../domain/interfaces';
-import { TrajeResponse } from '../../domain/entidades';
-import { PaginacaoResultado } from '../../infrastructure/api/ClienteApiRepository';
-import { FalhaConexao, FalhaRequisicao } from '../../domain/erros';
+import { ListarTrajesUseCase } from '@/application/trajes/ListarTrajesUseCase';
+import { ITrajeRepository } from '@domain/interfaces';
+import { TrajeResponse } from '@domain/entidades';
+import { PaginacaoResultado } from '@infrastructure/api/ClienteApiRepository';
+import { FalhaConexao, FalhaRequisicao } from '@domain/erros';
 
 describe('ListarTrajesUseCase', () => {
   let mockTrajeRepositorio: jest.Mocked<ITrajeRepository>;

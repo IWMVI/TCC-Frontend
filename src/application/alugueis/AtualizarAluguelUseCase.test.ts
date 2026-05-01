@@ -1,6 +1,6 @@
-import { AtualizarAluguelUseCase } from './AtualizarAluguelUseCase';
-import { AluguelRepository } from './CriarAluguelUseCase';
-import { AluguelResponse, AluguelUpdateRequest, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { AtualizarAluguelUseCase } from '@/application/alugueis/AtualizarAluguelUseCase';
+import { AluguelRepository } from '@/application/alugueis/CriarAluguelUseCase';
+import { AluguelResponse, AluguelUpdateRequest, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 
 describe('AtualizarAluguelUseCase', () => {
   let mockRepositorio: jest.Mocked<AluguelRepository>;
