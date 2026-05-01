@@ -56,7 +56,7 @@ src/
 │   └── trajes/                  # CRUD + Disponibilidade
 │
 ├── infrastructure/              # Implementações externas
-│   └── api/                     # Repositórios Axios (Aluguem, Cliente, Traje, Enum)
+│   └── api/                     # Repositórios Axios (Aluguel, Cliente, Traje, Enum)
 │
 ├── interfaces-graficas/         # Camada externa (UI)
 │   ├── componentes/             # Botão, Card, Tabela, Modal, Calendário, Layout, …
@@ -75,7 +75,7 @@ A regra é: **dependências apontam de fora para dentro**. `interfaces-graficas`
 
 - **S** — Single Responsibility (cada use case faz uma coisa só)
 - **O** — Open/Closed (novos casos de uso sem alterar repositórios)
-- **L** — Liskov Substitution (qualquer implementação de `IAluguemRepository` funciona nos use cases)
+- **L** — Liskov Substitution (qualquer implementação de `IAluguelRepository` funciona nos use cases)
 - **I** — Interface Segregation (contratos focados por domínio)
 - **D** — Dependency Inversion (use cases dependem de interfaces, não de Axios)
 
@@ -217,7 +217,7 @@ electron/
 
 Por padrão, os repositórios apontam para `http://localhost:8080`. Os arquivos relevantes:
 
-- `src/infrastructure/api/AluguemApiRepository.ts`
+- `src/infrastructure/api/AluguelApiRepository.ts`
 - `src/infrastructure/api/ClienteApiRepository.ts`
 - `src/infrastructure/api/TrajeApiRepository.ts`
 - `src/infrastructure/api/EnumApiRepository.ts`
