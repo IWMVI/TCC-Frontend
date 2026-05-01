@@ -448,21 +448,31 @@ export function SelecionadorTraje({
           <p className={styles.mensagem}>Nenhum traje selecionado</p>
         ) : (
           <div className={styles.lista}>
-            {itensSelecionados.map((item, index) => (
-              <div key={item.trajeId} className={styles.itemLista}>
-                <div className={styles.infoItem}>
-                  <p className={styles.nomeTraje}>{item.traje.nome}</p>
-                  <p className={styles.detalhes}>
-                    <span>{item.traje.tipo} · {item.traje.tamanho}</span>
-                    <span>R$ {item.traje.preco?.toFixed(2)}</span>
-                  </p>
+        {itensSelecionados.map((item, index) => (
+          <div key={item.trajeId} className={styles.itemLista}>
+            <div className={styles.cardFoto}>
+              {item.traje.imagem || item.traje.imagemUrl ? (
+                <img src={item.traje.imagem ?? item.traje.imagemUrl}
+                  alt={item.traje.nome} className={styles.cardFotoImg} />
+              ) : (
+                <div className={styles.cardFotoPlaceholder} aria-hidden="true">
+                  <span>👔</span>
                 </div>
-                <button type="button" className={styles.botaoRemover}
-                  onClick={() => onRemoverTraje(index)} title="Remover traje">
-                  <X size={18} />
-                </button>
-              </div>
-            ))}
+              )}
+            </div>
+            <div className={styles.infoItem}>
+              <p className={styles.nomeTraje}>{item.traje.nome}</p>
+              <p className={styles.detalhes}>
+                <span>{item.traje.tipo} · {item.traje.tamanho}</span>
+                <span>R$ {item.traje.preco?.toFixed(2)}</span>
+              </p>
+            </div>
+            <button type="button" className={styles.botaoRemover}
+              onClick={() => onRemoverTraje(index)} title="Remover traje">
+              <X size={18} />
+            </button>
+          </div>
+        ))}
           </div>
         )}
       </div>
