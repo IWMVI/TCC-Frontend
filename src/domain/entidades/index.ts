@@ -13,11 +13,11 @@ export type { Traje, TrajeRequest, TrajeResponse, PeriodoAlugado } from './Traje
 export {StatusAluguel, TipoOcasiao} from './Aluguel';
 export type {
   Aluguel,
-  AluguemItem,
-  AluguemRequest,
-	AluguemUpdateRequest,
-  AluguemItemRequest,
-  AluguemResponse,
+  AluguelItem,
+  AluguelRequest,
+	AluguelUpdateRequest,
+  AluguelItemRequest,
+  AluguelResponse,
 } from './Aluguel';
 export type { DevolucaoRequest, DevolucaoResponse, ItemDevolucaoRequest } from './Devolucao';
 export { CondicaoTraje } from './Devolucao';

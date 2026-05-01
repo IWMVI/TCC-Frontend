@@ -16,7 +16,7 @@ export enum TipoOcasiao {
 	CERIMONIA = 'CERIMONIA',
 }
 
-export interface AluguemItem {
+export interface AluguelItem {
   trajeId: number;
   nomeTraje: string;
   tipo?: string;
@@ -37,34 +37,34 @@ export interface Aluguel {
 	valorTotal: number;
 	observacoes?: string;
 	ocasiao: TipoOcasiao;
-  itens?: AluguemItem[];
+  itens?: AluguelItem[];
 }
 
-export interface AluguemRequest {
+export interface AluguelRequest {
   clienteId: number;
   dataRetirada: string;
   dataDevolucao: string;
 	observacoes?: string;
 	ocasiao: TipoOcasiao;
 	valorDesconto?: number;
-  itens: AluguemItemRequest[];
+  itens: AluguelItemRequest[];
 }
 
-export interface AluguemUpdateRequest {
+export interface AluguelUpdateRequest {
 	dataRetirada: string;
 	dataDevolucao: string;
 	observacoes?: string;
 	ocasiao: TipoOcasiao;
 	valorDesconto?: number;
 	status: StatusAluguel;
-	itens: AluguemItemRequest[];
+	itens: AluguelItemRequest[];
 }
 
-export interface AluguemItemRequest {
+export interface AluguelItemRequest {
   trajeId: number;
 }
 
-export interface AluguemResponse {
+export interface AluguelResponse {
   id: number;
   clienteId: number;
 	nomeCliente: string;
@@ -76,6 +76,6 @@ export interface AluguemResponse {
 	valorTotal: number;
 	observacoes?: string;
 	ocasiao: TipoOcasiao;
-  itens: AluguemItem[];
+  itens: AluguelItem[];
 	cliente?: ClienteResponse;
 }
