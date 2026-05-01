@@ -15,32 +15,35 @@ import {RealizarAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar';
 import {ListarAluguel} from '@/interfaces-graficas/paginas/alugueis/listar';
 import {EditarAluguel} from '@/interfaces-graficas/paginas/alugueis/editar';
 import {ProvedorClientes, ProvedorTrajes} from '@/interfaces-graficas/contextos';
+import {ErrorBoundary} from '@/interfaces-graficas/componentes/feedback/ErrorBoundary';
 
 function App() {
   return (
-    <ProvedorClientes>
-      <ProvedorTrajes>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="clientes" element={<Clientes/>}/>
-            <Route path="clientes/listar" element={<ListarClientes/>}/>
-            <Route path="clientes/excluidos" element={<ListarClientesExcluidos/>}/>
-            <Route path="clientes/novo" element={<CriarCliente />} />
-            <Route path="clientes/:id/editar" element={<EditarCliente />} />
-            <Route path="trajes" element={<Trajes />} />
-            <Route path="trajes/listar" element={<ListarTrajes />} />
-            <Route path="trajes/novo" element={<CriarTraje />} />
-            <Route path="trajes/:id/editar" element={<EditarTraje />} />
-            <Route path="alugueis" element={<Alugueis />} />
-            <Route path="alugueis/novo" element={<RealizarAluguel />} />
-            <Route path="alugueis/listar" element={<ListarAluguel />} />
-            <Route path="alugueis/:id/editar" element={<EditarAluguel />} />
-          </Route>
-        </Routes>
-      </ProvedorTrajes>
-    </ProvedorClientes>
+    <ErrorBoundary>
+      <ProvedorClientes>
+        <ProvedorTrajes>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="clientes" element={<Clientes/>}/>
+              <Route path="clientes/listar" element={<ListarClientes/>}/>
+              <Route path="clientes/excluidos" element={<ListarClientesExcluidos/>}/>
+              <Route path="clientes/novo" element={<CriarCliente />} />
+              <Route path="clientes/:id/editar" element={<EditarCliente />} />
+              <Route path="trajes" element={<Trajes />} />
+              <Route path="trajes/listar" element={<ListarTrajes />} />
+              <Route path="trajes/novo" element={<CriarTraje />} />
+              <Route path="trajes/:id/editar" element={<EditarTraje />} />
+              <Route path="alugueis" element={<Alugueis />} />
+              <Route path="alugueis/novo" element={<RealizarAluguel />} />
+              <Route path="alugueis/listar" element={<ListarAluguel />} />
+              <Route path="alugueis/:id/editar" element={<EditarAluguel />} />
+            </Route>
+          </Routes>
+        </ProvedorTrajes>
+      </ProvedorClientes>
+    </ErrorBoundary>
   );
 }
 
