@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { ClienteApiRepository, PaginacaoResultado } from './ClienteApiRepository';
+import { ClienteApiRepository, PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
 import { ClienteRequest, ClienteResponse, SiglaEstado } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 

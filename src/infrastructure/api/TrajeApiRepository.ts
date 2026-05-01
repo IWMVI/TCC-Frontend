@@ -2,7 +2,7 @@ import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { ITrajeRepository } from '@domain/interfaces';
 import { PeriodoAlugado, TrajeRequest, TrajeResponse } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
-import { PaginacaoResultado } from './ClienteApiRepository';
+import { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
 
 const API_BASE_URL = 'http://localhost:8080';
 

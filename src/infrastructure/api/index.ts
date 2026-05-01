@@ -1,6 +1,6 @@
-export { ClienteApiRepository } from './ClienteApiRepository';
-export { TrajeApiRepository } from './TrajeApiRepository';
-export { AluguelApiRepository } from './AluguelApiRepository';
-export { enumApiRepository } from './EnumApiRepository';
-export type { EnumValues } from './EnumApiRepository';
-export type { PaginacaoResultado } from './ClienteApiRepository';
+export { ClienteApiRepository } from '@/infrastructure/api/ClienteApiRepository';
+export { TrajeApiRepository } from '@/infrastructure/api/TrajeApiRepository';
+export { AluguelApiRepository } from '@/infrastructure/api/AluguelApiRepository';
+export { enumApiRepository } from '@/infrastructure/api/EnumApiRepository';
+export type { EnumValues } from '@/infrastructure/api/EnumApiRepository';
+export type { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';

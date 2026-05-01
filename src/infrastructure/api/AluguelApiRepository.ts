@@ -2,7 +2,7 @@ import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { IAluguelRepository, FiltrosAluguel } from '@domain/interfaces';
 import {AluguelRequest, AluguelResponse, AluguelUpdateRequest, DevolucaoRequest, DevolucaoResponse} from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
-import { PaginacaoResultado } from './ClienteApiRepository';
+import { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
 
 const API_BASE_URL = 'http://localhost:8080';
 

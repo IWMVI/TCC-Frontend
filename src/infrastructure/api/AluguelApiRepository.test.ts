@@ -10,7 +10,7 @@ import {
 } from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { AxiosInstance } from 'axios';
-import { AluguelApiRepository } from './AluguelApiRepository';
+import { AluguelApiRepository } from '@/infrastructure/api/AluguelApiRepository';
 
 interface MockAxiosError extends Error {
   isAxiosError?: boolean;
