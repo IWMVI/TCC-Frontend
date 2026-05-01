@@ -1,20 +1,20 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
-import {Layout} from './interfaces-graficas/componentes/layout/Layout';
-import {Dashboard} from './interfaces-graficas/paginas/dashboard/Dashboard';
-import {Clientes} from './interfaces-graficas/paginas/clientes/Clientes';
-import {ListarClientes} from './interfaces-graficas/paginas/clientes/listar/ListarClientes';
-import {ListarClientesExcluidos} from './interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos';
-import {CriarCliente} from './interfaces-graficas/paginas/clientes/criar/CriarCliente';
-import {EditarCliente} from './interfaces-graficas/paginas/clientes/editar/EditarCliente';
-import {Trajes} from './interfaces-graficas/paginas/trajes/Trajes';
-import {ListarTrajes} from './interfaces-graficas/paginas/trajes/listar/ListarTrajes';
-import {CriarTraje} from './interfaces-graficas/paginas/trajes/criar/CriarTraje';
-import {EditarTraje} from './interfaces-graficas/paginas/trajes/editar/EditarTraje';
-import {Alugueis} from './interfaces-graficas/paginas/alugueis/Alugueis';
-import {RealizarAluguel} from './interfaces-graficas/paginas/alugueis/realizar';
-import {ListarAluguel} from './interfaces-graficas/paginas/alugueis/listar';
-import {EditarAluguel} from './interfaces-graficas/paginas/alugueis/editar';
-import {ProvedorClientes, ProvedorTrajes} from './interfaces-graficas/contextos';
+import {Layout} from '@/interfaces-graficas/componentes/layout/Layout';
+import {Dashboard} from '@/interfaces-graficas/paginas/dashboard/Dashboard';
+import {Clientes} from '@/interfaces-graficas/paginas/clientes/Clientes';
+import {ListarClientes} from '@/interfaces-graficas/paginas/clientes/listar/ListarClientes';
+import {ListarClientesExcluidos} from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos';
+import {CriarCliente} from '@/interfaces-graficas/paginas/clientes/criar/CriarCliente';
+import {EditarCliente} from '@/interfaces-graficas/paginas/clientes/editar/EditarCliente';
+import {Trajes} from '@/interfaces-graficas/paginas/trajes/Trajes';
+import {ListarTrajes} from '@/interfaces-graficas/paginas/trajes/listar/ListarTrajes';
+import {CriarTraje} from '@/interfaces-graficas/paginas/trajes/criar/CriarTraje';
+import {EditarTraje} from '@/interfaces-graficas/paginas/trajes/editar/EditarTraje';
+import {Alugueis} from '@/interfaces-graficas/paginas/alugueis/Alugueis';
+import {RealizarAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar';
+import {ListarAluguel} from '@/interfaces-graficas/paginas/alugueis/listar';
+import {EditarAluguel} from '@/interfaces-graficas/paginas/alugueis/editar';
+import {ProvedorClientes, ProvedorTrajes} from '@/interfaces-graficas/contextos';
 
 function App() {
   return (
