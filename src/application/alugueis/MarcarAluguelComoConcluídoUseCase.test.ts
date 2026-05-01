@@ -1,9 +1,9 @@
 import { MarcarAluguelComoConcluídoUseCase } from './MarcarAluguelComoConcluídoUseCase';
-import { AluguemRepository } from './CriarAluguemUseCase';
-import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { AluguelRepository } from './CriarAluguelUseCase';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
 
 describe('MarcarAluguelComoConcluídoUseCase', () => {
-  let mockRepositorio: jest.Mocked<AluguemRepository>;
+  let mockRepositorio: jest.Mocked<AluguelRepository>;
   let useCase: MarcarAluguelComoConcluídoUseCase;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('MarcarAluguelComoConcluídoUseCase', () => {
     useCase = new MarcarAluguelComoConcluídoUseCase(mockRepositorio);
   });
 
-  const responseMock: AluguemResponse = {
+  const responseMock: AluguelResponse = {
     id: 1,
     clienteId: 1,
     nomeCliente: 'Cliente Teste',

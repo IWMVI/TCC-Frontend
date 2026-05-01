@@ -1,7 +1,7 @@
-import { AluguemRepository } from './CriarAluguemUseCase';
+import { AluguelRepository } from './CriarAluguelUseCase';
 
 export class GerarContratoAluguelUseCase {
-  constructor(private aluguelRepository: AluguemRepository) {}
+  constructor(private aluguelRepository: AluguelRepository) {}
 
   async executar(id: number): Promise<Blob> {
     if (!id || id <= 0) {

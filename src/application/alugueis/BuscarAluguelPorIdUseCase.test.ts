@@ -1,9 +1,9 @@
 import { BuscarAluguelPorIdUseCase } from './BuscarAluguelPorIdUseCase';
-import { AluguemRepository } from './CriarAluguemUseCase';
-import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { AluguelRepository } from './CriarAluguelUseCase';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
 
 describe('BuscarAluguelPorIdUseCase', () => {
-  let mockRepositorio: jest.Mocked<AluguemRepository>;
+  let mockRepositorio: jest.Mocked<AluguelRepository>;
   let useCase: BuscarAluguelPorIdUseCase;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('BuscarAluguelPorIdUseCase', () => {
     useCase = new BuscarAluguelPorIdUseCase(mockRepositorio);
   });
 
-  const aluguelMock: AluguemResponse = {
+  const aluguelMock: AluguelResponse = {
     id: 1,
     clienteId: 1,
     nomeCliente: 'Cliente Teste',

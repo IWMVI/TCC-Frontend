@@ -1,9 +1,9 @@
 import { ListarAlugueisUseCase } from './ListarAlugueisUseCase';
-import { IAluguemRepository, FiltrosAluguel } from '../../domain/interfaces';
-import { AluguemResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
+import { IAluguelRepository, FiltrosAluguel } from '../../domain/interfaces';
+import { AluguelResponse, StatusAluguel, TipoOcasiao } from '../../domain/entidades';
 
 describe('ListarAlugueisUseCase', () => {
-  let mockRepositorio: jest.Mocked<IAluguemRepository>;
+  let mockRepositorio: jest.Mocked<IAluguelRepository>;
   let useCase: ListarAlugueisUseCase;
 
   beforeEach(() => {
@@ -22,7 +22,7 @@ describe('ListarAlugueisUseCase', () => {
     useCase = new ListarAlugueisUseCase(mockRepositorio);
   });
 
-  const alugueisMock: AluguemResponse[] = [
+  const alugueisMock: AluguelResponse[] = [
     {
       id: 1,
       clienteId: 1,

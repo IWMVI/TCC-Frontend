@@ -1,9 +1,9 @@
 import { RegistrarDevolucaoUseCase } from './RegistrarDevolucaoUseCase';
-import { IAluguemRepository } from '../../domain/interfaces';
+import { IAluguelRepository } from '../../domain/interfaces';
 import { CondicaoTraje, DevolucaoRequest, DevolucaoResponse } from '../../domain/entidades';
 
 describe('RegistrarDevolucaoUseCase', () => {
-  let mockRepositorio: jest.Mocked<IAluguemRepository>;
+  let mockRepositorio: jest.Mocked<IAluguelRepository>;
   let useCase: RegistrarDevolucaoUseCase;
 
   beforeEach(() => {
