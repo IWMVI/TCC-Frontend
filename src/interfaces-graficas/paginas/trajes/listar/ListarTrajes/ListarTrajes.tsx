@@ -1,16 +1,17 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ImageIcon } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '@interfaces-graficas/componentes';
-import type { Coluna } from '@interfaces-graficas/componentes/data/Tabela';
-import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
-import { ErrorMessage } from '@interfaces-graficas/componentes/feedback/ErrorMessage';
-import { useTrajes } from '@interfaces-graficas/contextos/ContextoTrajes';
-import { AluguelResponse, TrajeResponse } from '@domain/entidades';
-import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
-import { AluguelApiRepository } from '@infrastructure/api';
-import { FormularioDevolucao } from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
 import styles from '@/interfaces-graficas/paginas/trajes/listar/ListarTrajes/ListarTrajes.module.css';
+import {TRAJE_CONSTANTS} from '@application/trajes/TrajeDependencies';
+import {AluguelResponse, TrajeResponse} from '@domain/entidades';
+import {AluguelApiRepository} from '@infrastructure/api';
+import {Botao, Busca, Card, Modal, Paginacao, Tabela} from '@interfaces-graficas/componentes';
+import type {Coluna} from '@interfaces-graficas/componentes/data/Tabela';
+import {ErrorMessage} from '@interfaces-graficas/componentes/feedback/ErrorMessage';
+import {ModalVisualizacaoImagem} from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
+import {useTrajes} from '@interfaces-graficas/contextos/ContextoTrajes';
+import {FormularioDevolucao} from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
+import {ArrowLeft, Edit2, ImageIcon, MoreVertical, Trash2} from 'lucide-react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Dropdown} from 'react-bootstrap';
+import {Link, useNavigate} from 'react-router-dom';
 
 export function ListarTrajes() {
   const navigate = useNavigate();
@@ -190,38 +191,43 @@ export function ListarTrajes() {
           traje.preco?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '-',
       },
       {
-        chave: 'acoes',
-        titulo: 'Ações',
-        render: (traje) => (
-          <div className={styles['listar-trajes__acoes']}>
-            <Link
-              to={TRAJE_CONSTANTS.ROUTES.EDITAR(traje.id)}
-              className={styles['listar-trajes__botao-editar']}
-              title="Editar traje"
+		  chave: 'acoes',
+		  titulo: 'Ações',
+		  width: '80px',
+		  align: 'center' as const,
+		  render: (traje: TrajeResponse) => (
+			  <div className={styles['listar-trajes__acoes']}>
+				  <Dropdown align="end">
+					  <Dropdown.Toggle
+						  variant="light"
+					      size="sm"
+					      id={`acoes-${traje.id}`}
+					      className={styles['acao-toggle']}
+					      aria-label="Ações"
             >
-              Editar
-            </Link>
-            {traje.status === 'ALUGADO' && (
-              <button
-                type="button"
-                className={styles['listar-trajes__botao-devolver']}
-                onClick={() => abrirDevolucao(traje)}
-                disabled={estaBuscandoAluguel}
-                title="Registrar devolução"
-              >
-                Devolver
-              </button>
-            )}
-            <button
-              type="button"
-              className={styles['listar-trajes__botao-excluir']}
-              onClick={() => abrirModalExclusao(traje)}
-              title="Excluir traje"
-            >
-              Excluir
-            </button>
-          </div>
-        ),
+						  <MoreVertical size={16}/>
+					  </Dropdown.Toggle>
+					  <Dropdown.Menu
+						  renderOnMount
+					      popperConfig={{strategy: 'fixed'}}
+					  >
+						  <Dropdown.Item as={Link} to={TRAJE_CONSTANTS.ROUTES.EDITAR(traje.id)}>
+							  <Edit2 size={14} className={styles['icone-editar']}/>
+							  <span className={styles['acao-texto']}>Editar traje</span>
+						  </Dropdown.Item>
+						  {traje.status === 'ALUGADO' && (
+							  <Dropdown.Item onClick={() => abrirDevolucao(traje)}>
+								  <span className={styles['acao-texto']}>Registrar devolução</span>
+							  </Dropdown.Item>
+						  )}
+						  <Dropdown.Item onClick={() => abrirModalExclusao(traje)}>
+							  <Trash2 size={14} className={styles['icone-excluir']}/>
+							  <span className={styles['acao-texto']}>Excluir traje</span>
+						  </Dropdown.Item>
+					  </Dropdown.Menu>
+				  </Dropdown>
+			  </div>
+		  ),
       },
     ],
     [abrirModalImagem, abrirModalExclusao, abrirDevolucao, estaBuscandoAluguel]

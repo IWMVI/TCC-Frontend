@@ -123,59 +123,47 @@
 
 .listar-trajes__acoes {
   display: flex;
-  gap: var(--espacamento-xs, 0.375rem);
-  justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
 }
 
-.listar-trajes__botao-editar,
-.listar-trajes__botao-excluir,
-.listar-trajes__botao-imagem {
-  padding: var(--espacamento-xs, 0.375rem) var(--espacamento-xs, 0.625rem);
-  border-radius: var(--raio-borda, 4px);
-  font-size: var(--tamanho-fonte-xs, 0.75rem);
-  transition: all 0.2s;
-  cursor: pointer;
+.listar-trajes__acoes :global(.btn).acao-toggle {
+    min-width: 0;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-  white-space: nowrap;
-  border: none;
-}
-
-.listar-trajes__botao-editar {
-  background-color: var(--cor-primaria, #007bff);
+    background-color: var(--muted-foreground);
+    border-color: var(--muted-foreground);
   color: var(--primary-foreground);
 }
 
-.listar-trajes__botao-editar:hover {
-  background-color: var(--cor-secundaria, #0056b3);
-}
-
-.listar-trajes__botao-excluir {
-  background-color: transparent;
-  color: var(--cor-erro, #dc3545);
-  border: 1px solid var(--cor-erro, #dc3545);
-}
-
-.listar-trajes__botao-excluir:hover {
-  background-color: var(--cor-erro, #dc3545);
+.listar-trajes__acoes :global(.btn).acao-toggle:hover,
+.listar-trajes__acoes :global(.btn).acao-toggle:focus,
+.listar-trajes__acoes :global(.btn).acao-toggle:active,
+.listar-trajes__acoes :global(.show) > :global(.btn).acao-toggle {
+    background-color: var(--cor-texto-secundario);
+    border-color: var(--cor-texto-secundario);
   color: var(--primary-foreground);
 }
 
-.listar-trajes__botao-devolver {
-  background-color: var(--cor-aviso);
-  color: var(--primary-foreground);
-  border: none;
+.listar-trajes__acoes :global(.btn).acao-toggle::after {
+    display: none;
 }
 
-.listar-trajes__botao-devolver:hover:not(:disabled) {
-  background-color: var(--cor-aviso);
+.icone-editar {
+    color: var(--cor-info);
 }
 
-.listar-trajes__botao-devolver:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.icone-excluir {
+    color: var(--cor-erro);
+}
+
+.acao-texto {
+    margin-left: 0.5rem;
 }
 
 .listar-trajes__botao-imagem {
@@ -238,12 +226,6 @@
   .listar-trajes__tabela-cabecalho th,
   .listar-trajes__tabela-celula {
     padding: var(--espacamento-md, 0.75rem) var(--espacamento-md, 1rem);
-  }
-
-  .listar-trajes__botao-editar,
-  .listar-trajes__botao-excluir {
-    padding: var(--espacamento-xs, 0.4375rem) var(--espacamento-sm, 0.75rem);
-    font-size: var(--tamanho-fonte-sm, 0.8125rem);
   }
 }
 

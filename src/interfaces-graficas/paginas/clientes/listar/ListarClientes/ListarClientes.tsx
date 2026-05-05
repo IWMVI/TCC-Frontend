@@ -1,13 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Botao, Card, Tabela, Modal, Busca, Paginacao } from '@/interfaces-graficas/componentes';
-import { useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
-import { ListarClientesUseCase, DeletarClienteUseCase } from '@application/clientes';
-import { ClienteApiRepository } from '@infrastructure/api';
-import { ClienteResponse } from '@domain/entidades';
-import { mascararCpfCnpj, mascararCelular } from '@/interfaces-graficas/utils/formatacoes';
+import {Botao, Busca, Card, Modal, Paginacao, Tabela} from '@/interfaces-graficas/componentes';
+import {useClientes} from '@/interfaces-graficas/contextos/ContextoClientes';
 import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientes/ListarClientes.module.css';
+import {mascararCelular, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
+import {DeletarClienteUseCase, ListarClientesUseCase} from '@application/clientes';
+import {ClienteResponse} from '@domain/entidades';
+import {ClienteApiRepository} from '@infrastructure/api';
+import {ArrowLeft, Edit2, MoreVertical, Trash2} from 'lucide-react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {Dropdown} from 'react-bootstrap';
+import {Link, useNavigate} from 'react-router-dom';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesUseCase = new ListarClientesUseCase(clienteRepositorio);
@@ -146,24 +147,34 @@ export function ListarClientes() {
     {
       chave: 'acoes' as keyof ClienteResponse,
       titulo: 'Ações',
-      width: '180px',
+		width: '80px',
+		align: 'center' as const,
       render: (cliente: ClienteResponse) => (
         <div className={styles['listar-clientes__acoes']}>
-          <Link
-            to={`/clientes/${cliente.id}/editar`}
-            className={styles['listar-clientes__botao-editar']}
-            title="Editar cliente"
-          >
-            Editar
-          </Link>
-          <button
-            type="button"
-            className={styles['listar-clientes__botao-excluir']}
-            onClick={() => abrirModalExclusao(cliente)}
-            title="Excluir cliente"
-          >
-            Excluir
-          </button>
+			<Dropdown align="end">
+				<Dropdown.Toggle
+					variant="light"
+			        size="sm"
+			        id={`acoes-${cliente.id}`}
+			        className={styles['acao-toggle']}
+			        aria-label="Ações"
+				>
+					<MoreVertical size={16}/>
+				</Dropdown.Toggle>
+				<Dropdown.Menu
+					renderOnMount
+			        popperConfig={{strategy: 'fixed'}}
+				>
+					<Dropdown.Item as={Link} to={`/clientes/${cliente.id}/editar`}>
+						<Edit2 size={14} className={styles['icone-editar']}/>
+						<span className={styles['acao-texto']}>Editar cliente</span>
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => abrirModalExclusao(cliente)}>
+						<Trash2 size={14} className={styles['icone-excluir']}/>
+						<span className={styles['acao-texto']}>Excluir cliente</span>
+					</Dropdown.Item>
+				</Dropdown.Menu>
+			</Dropdown>
         </div>
       ),
     },
