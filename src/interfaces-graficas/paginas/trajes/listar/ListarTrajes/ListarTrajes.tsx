@@ -4,13 +4,12 @@ import {AluguelResponse, TrajeResponse} from '@domain/entidades';
 import {AluguelApiRepository} from '@infrastructure/api';
 import {Botao, Busca, Card, Modal, Paginacao, Tabela} from '@interfaces-graficas/componentes';
 import type {Coluna} from '@interfaces-graficas/componentes/data/Tabela';
-import {ErrorMessage} from '@interfaces-graficas/componentes/feedback/ErrorMessage';
 import {ModalVisualizacaoImagem} from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
 import {useTrajes} from '@interfaces-graficas/contextos/ContextoTrajes';
 import {FormularioDevolucao} from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
 import {ArrowLeft, Edit2, ImageIcon, MoreVertical, Trash2} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Dropdown} from 'react-bootstrap';
+import {Alert, Dropdown} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
 
 export function ListarTrajes() {
@@ -24,6 +23,14 @@ export function ListarTrajes() {
   const [trajeSelecionado, setTrajeSelecionado] = useState<TrajeResponse | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [inicializou, setInicializou] = useState(false);
+  const [alertaErro, setAlertaErro] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (alertaErro) {
+      const timer = setTimeout(() => setAlertaErro(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertaErro]);
 
   // Devolução
   const aluguelRepositorio = useMemo(() => new AluguelApiRepository(), []);
@@ -99,12 +106,17 @@ export function ListarTrajes() {
       await removerTraje(trajeParaExcluir.id);
       fecharModalExclusao();
       carregarDados(termoBusca || undefined, estado.paginaAtual);
-    } catch {
-      dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir traje' });
+    } catch (err) {
+      fecharModalExclusao();
+      if (trajeParaExcluir.status === 'ALUGADO') {
+        setAlertaErro('Não é possível excluir o traje pois ele está alugado no momento. Realize a devolução antes de excluí-lo.');
+      } else {
+        setAlertaErro('Não foi possível excluir o traje. Tente novamente mais tarde.');
+      }
     } finally {
       setEstaExcluindo(false);
     }
-  }, [trajeParaExcluir, removerTraje, fecharModalExclusao, carregarDados, termoBusca, estado.paginaAtual, dispatch]);
+  }, [trajeParaExcluir, removerTraje, fecharModalExclusao, carregarDados, termoBusca, estado.paginaAtual]);
 
   const handlePageChange = useCallback(
     (pagina: number) => {
@@ -130,7 +142,7 @@ export function ListarTrajes() {
       setAluguelParaDevolver(aluguel);
       setModalDevolucaoAberto(true);
     } catch {
-      dispatch({ tipo: 'SET_ERRO', payload: `Nenhum aluguel ativo encontrado para o traje "${traje.nome}"` });
+      setAlertaErro(`Nenhum aluguel ativo encontrado para o traje "${traje.nome}"`);
     } finally {
       setEstaBuscandoAluguel(false);
     }
@@ -142,10 +154,10 @@ export function ListarTrajes() {
         const novaUrl = await atualizarImagem(trajeId, file);
         setTrajeSelecionado((prev) => (prev ? { ...prev, imagem: novaUrl, imagemUrl: novaUrl } : null));
       } catch {
-        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao atualizar imagem' });
+        setAlertaErro('Erro ao atualizar imagem');
       }
     },
-    [atualizarImagem, dispatch]
+      [atualizarImagem],
   );
 
   const handleRemoverImagem = useCallback(
@@ -154,10 +166,10 @@ export function ListarTrajes() {
         await removerImagem(trajeId);
         setTrajeSelecionado((prev) => (prev ? { ...prev, imagem: '', imagemUrl: '' } : null));
       } catch {
-        dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao remover imagem' });
+        setAlertaErro('Erro ao remover imagem');
       }
     },
-    [removerImagem, dispatch]
+      [removerImagem],
   );
 
   const colunas = useMemo<Coluna<TrajeResponse>[]>(
@@ -237,10 +249,6 @@ export function ListarTrajes() {
     navigate(-1);
   }, [navigate]);
 
-  const limparErro = useCallback(() => {
-    dispatch({ tipo: 'SET_ERRO', payload: null });
-  }, [dispatch]);
-
   return (
     <div className={styles['listar-trajes']}>
       <header className={styles['listar-trajes__header']}>
@@ -275,9 +283,17 @@ export function ListarTrajes() {
             onSearch={(valor) => carregarDadosComDebounce(valor || undefined, 0)}
           />
         </div>
-
-        {estado.erro && (
-          <ErrorMessage mensagem={estado.erro} onDismiss={limparErro} />
+        
+        {alertaErro && (
+            <Alert
+                variant="danger"
+                onClose={() => setAlertaErro(null)}
+                dismissible
+                className={styles['alerta-fixo']}
+            >
+              <Alert.Heading>Erro</Alert.Heading>
+              <p>{alertaErro}</p>
+            </Alert>
         )}
 
         <div className={styles['listar-trajes__tabela-wrapper']}>

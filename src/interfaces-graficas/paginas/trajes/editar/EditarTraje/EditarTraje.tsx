@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FormularioTraje } from '@/interfaces-graficas/paginas/trajes/componentes';
-import { LoadingState } from '@/interfaces-graficas/componentes/feedback/LoadingState';
-import { atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
-import { TrajeRequest } from '@domain/entidades';
+import {LoadingState} from '@/interfaces-graficas/componentes/feedback/LoadingState';
+import {FormularioTraje} from '@/interfaces-graficas/paginas/trajes/componentes';
+import {atualizarTrajeUseCase, buscarTrajePorIdUseCase, TRAJE_CONSTANTS, trajeRepository} from '@application/trajes';
+import {TrajeRequest} from '@domain/entidades';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 
 export function EditarTraje() {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +42,13 @@ export function EditarTraje() {
 
     carregarTraje();
   }, [id]);
+	
+	useEffect(() => {
+		if (erro) {
+			const timer = setTimeout(() => setErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [erro]);
 
   async function handleSubmit(dados: TrajeRequest): Promise<number> {
     if (!id) return 0;
@@ -73,8 +80,8 @@ export function EditarTraje() {
       
       navigate(TRAJE_CONSTANTS.ROUTES.LISTAR);
       return Number.parseInt(id, 10);
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao atualizar traje');
+	} catch {
+		setErro('Não foi possível atualizar o traje. Verifique os dados e tente novamente.');
       return 0;
     } finally {
       setEstaEnviando(false);

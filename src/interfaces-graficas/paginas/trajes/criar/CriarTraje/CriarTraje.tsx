@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FormularioTraje } from '@/interfaces-graficas/paginas/trajes/componentes';
-import { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';
-import { criarTrajeUseCase, TRAJE_CONSTANTS, trajeRepository } from '@application/trajes';
-import { TrajeRequest, TrajeResponse } from '@domain/entidades';
+import {FormularioTraje} from '@/interfaces-graficas/paginas/trajes/componentes';
+import {criarTrajeUseCase, TRAJE_CONSTANTS, trajeRepository} from '@application/trajes';
+import {TrajeRequest, TrajeResponse} from '@domain/entidades';
+import {useEffect, useState} from 'react';
+import {Alert} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
 
 interface CriarTrajeProps {
   modoModal?: boolean;
@@ -19,12 +19,17 @@ export function CriarTraje({
   const navigate = useNavigate();
   const [estaEnviando, setEstaEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [modalTitulo, setModalTitulo] = useState('');
-  const [modalMensagem, setModalMensagem] = useState('');
+	const [alertaSucesso, setAlertaSucesso] = useState(false);
+	
+	useEffect(() => {
+		if (erro) {
+			const timer = setTimeout(() => setErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [erro]);
 
   function voltarParaInicial() {
-    setModalAberto(false);
+	  setAlertaSucesso(false);
     if (modoModal && onCancelar) {
       onCancelar();
       return;
@@ -32,8 +37,8 @@ export function CriarTraje({
 
     navigate(TRAJE_CONSTANTS.ROUTES.LISTA);
   }
-
-  async function handleSubmit(dados: TrajeRequest): Promise<number> {
+	
+	async function handleSubmit(dados: TrajeRequest): Promise<number | undefined> {
     setErro(null);
     setEstaEnviando(true);
     try {
@@ -63,20 +68,13 @@ export function CriarTraje({
         onCadastroSucesso?.(criado);
         return criado.id;
       }
-
-      setModalTitulo('Sucesso');
-      setModalMensagem('Traje criado com sucesso.');
-      setModalAberto(true);
+		
+		setAlertaSucesso(true);
+		setTimeout(() => voltarParaInicial(), 2500);
       return criado.id;
-    } catch (err) {
-      const mensagem = err instanceof Error ? err.message : 'Erro ao criar traje';
-      setErro(mensagem);
-      if (!modoModal) {
-        setModalTitulo('Falha');
-        setModalMensagem(`Não foi possível criar traje: ${mensagem}`);
-        setModalAberto(true);
-      }
-      throw err;
+	} catch {
+		setErro('Não foi possível criar o traje. Verifique os dados e tente novamente.');
+		setAlertaSucesso(false);
     } finally {
       setEstaEnviando(false);
     }
@@ -84,27 +82,38 @@ export function CriarTraje({
 
   return (
     <>
+		{alertaSucesso && (
+			<Alert
+				variant="success"
+			    onClose={voltarParaInicial}
+			    dismissible
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Traje criado!</Alert.Heading>
+				<p>Redirecionando para a lista de trajes...</p>
+			</Alert>
+		)}
+		
+		{erro && !alertaSucesso && (
+			<Alert
+				variant="danger"
+			    onClose={() => setErro(null)}
+			    dismissible
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Falha ao criar traje</Alert.Heading>
+				<p>{erro}</p>
+			</Alert>
+		)}
+
       <FormularioTraje
         titulo="Cadastrar Novo Traje"
         estaEnviando={estaEnviando}
-        erro={erro}
+        erro={null}
         onSubmit={handleSubmit}
         modoModal={modoModal}
         onCancel={onCancelar}
       />
-
-      {!modoModal && (
-        <Modal
-          titulo={modalTitulo}
-          mensagem={modalMensagem}
-          estaAberto={modalAberto}
-          aoConfirmar={voltarParaInicial}
-          aoCancelar={voltarParaInicial}
-          textoBotaoConfirmar="Ir para trajes"
-          textoBotaoCancelar="Fechar"
-          tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
-        />
-      )}
     </>
   );
 }

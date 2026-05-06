@@ -8,6 +8,15 @@
   color: var(--foreground);
 }
 
+.alerta-fixo {
+    position: fixed !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    z-index: 9999 !important;
+    min-width: 300px !important;
+    box-shadow: var(--sombra-lg) !important;
+}
+
 .listar-aluguel__header {
   display: flex;
   justify-content: space-between;

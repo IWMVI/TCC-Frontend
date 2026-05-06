@@ -243,6 +243,73 @@
 
   .alert {
     color: var(--foreground);
+      background-color: var(--card);
+      border-color: var(--border);
+  }
+
+    .alert-success {
+        background-color: var(--cor-sucesso-bg);
+        border-color: var(--cor-sucesso-borda);
+        color: var(--cor-sucesso-texto);
+    }
+
+    .alert-success .alert-link {
+        color: var(--cor-sucesso-texto);
+    }
+
+    .alert-danger {
+        background-color: var(--cor-erro-bg);
+        border-color: var(--cor-erro-borda);
+        color: var(--cor-erro-texto);
+    }
+
+    .alert-danger .alert-link {
+        color: var(--cor-erro-texto);
+    }
+
+    .alert-warning {
+        background-color: var(--cor-aviso-bg);
+        border-color: var(--cor-aviso-borda);
+        color: var(--cor-aviso-texto);
+    }
+
+    .alert-warning .alert-link {
+        color: var(--cor-aviso-texto);
+    }
+
+    .alert-info {
+        background-color: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: var(--cor-info);
+    }
+
+    .alert-info .alert-link {
+        color: var(--cor-info);
+    }
+
+    .alert .btn-close {
+        filter: none;
+        opacity: 0.7;
+    }
+
+    .alert-success .btn-close {
+        filter: invert(1) brightness(0.3);
+    }
+
+    .alert-danger .btn-close {
+        filter: invert(1) brightness(0.3);
+    }
+
+    .alert-warning .btn-close {
+        filter: invert(1) brightness(0.3);
+    }
+
+    .alert .alert-heading {
+        color: inherit;
+    }
+
+    .toast-notificacao {
+        box-shadow: var(--sombra-lg) !important;
   }
 
   .modal-content {

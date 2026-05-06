@@ -4,6 +4,18 @@
   max-width: 100%;
 }
 
+.alerta-fixo {
+  position: fixed !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  z-index: 9999 !important;
+  min-width: 300px !important;
+  box-shadow: var(--sombra-lg) !important;
+  background-color: var(--cor-erro-bg, #f8d7da) !important;
+  border-color: var(--cor-erro-borda, #f5c6cb) !important;
+  color: var(--cor-erro-texto, #721c24) !important;
+}
+
 /* Header com navegação */
 .listar-clientes__header {
   margin-bottom: 1rem;

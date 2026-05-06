@@ -7,7 +7,7 @@ import {ClienteResponse} from '@domain/entidades';
 import {ClienteApiRepository} from '@infrastructure/api';
 import {ArrowLeft, Edit2, MoreVertical, Trash2} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Dropdown} from 'react-bootstrap';
+import {Alert, Dropdown} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
 
 const clienteRepositorio = new ClienteApiRepository();
@@ -25,6 +25,14 @@ export function ListarClientes() {
   const [estaExcluindo, setEstaExcluindo] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const jaCarregouRef = useRef(false);
+	const [alertaErro, setAlertaErro] = useState<string | null>(null);
+	
+	useEffect(() => {
+		if (alertaErro) {
+			const timer = setTimeout(() => setAlertaErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [alertaErro]);
 
   const carregarClientes = useCallback(
     async (busca?: string, pagina?: number) => {
@@ -37,7 +45,7 @@ export function ListarClientes() {
       const signal = abortControllerRef.current.signal;
 
       dispatch({ tipo: 'SET_CARREGANDO', payload: true });
-      dispatch({ tipo: 'SET_ERRO', payload: null });
+		setAlertaErro(null);
       try {
         const resultado = await listarClientesUseCase.executar(
           busca,
@@ -59,7 +67,7 @@ export function ListarClientes() {
         }
       } catch (erro) {
         if (erro instanceof Error && erro.name !== 'AbortError') {
-          dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao carregar clientes' });
+			setAlertaErro('Erro ao carregar clientes');
         }
       } finally {
         if (!signal.aborted) {
@@ -116,7 +124,8 @@ export function ListarClientes() {
       // Recarrega a lista após exclusão
       carregarClientes(termoBusca || undefined, estado.paginaAtual);
     } catch {
-      dispatch({ tipo: 'SET_ERRO', payload: 'Erro ao excluir cliente' });
+		fecharModal();
+		setAlertaErro('Não foi possível excluir o cliente. Tente novamente mais tarde.');
     } finally {
       setEstaExcluindo(false);
     }
@@ -219,8 +228,18 @@ export function ListarClientes() {
                 onSearch={(valor) => carregarClientes(valor || undefined, 0)}
               />
             </div>
-
-            {estado.erro && <div className={styles['listar-clientes__erro']}>{estado.erro}</div>}
+			  
+			  {alertaErro && (
+				  <Alert
+					  variant="danger"
+			          onClose={() => setAlertaErro(null)}
+			          dismissible
+			          className={styles['alerta-fixo']}
+				  >
+					  <Alert.Heading>Erro</Alert.Heading>
+					  <p>{alertaErro}</p>
+				  </Alert>
+			  )}
 
             <div className={styles['listar-clientes__tabela-wrapper']}>
               <Tabela colunas={colunas} dados={estado.clientes} estaCarregando={estado.estaCarregando} />

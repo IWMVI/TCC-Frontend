@@ -1,13 +1,17 @@
-import {useState, useEffect, useCallback} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
-import {ArrowLeft} from 'lucide-react';
-import {Modal, Botao, Card} from '@/interfaces-graficas/componentes';
+import {Botao, Card} from '@/interfaces-graficas/componentes';
+import styles from '@/interfaces-graficas/paginas/alugueis/editar/EditarAluguel.module.css';
+import {DetalhesAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
+import {SelecionadorTraje} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
+import {obterTipoOcasiaoPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
+import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/status';
 import {
-	BuscarAluguelPorIdUseCase,
-	AtualizarAluguelUseCase,
-} from '@application/alugueis';
+	converterMoedaBrParaNumero,
+	formatarMoedaBrPartindoDeDigitos,
+	formatarNumeroParaMoedaBr,
+	mascararCpfCnpj,
+} from '@/interfaces-graficas/utils/formatacoes';
+import {AtualizarAluguelUseCase, BuscarAluguelPorIdUseCase} from '@application/alugueis';
 import {BuscarTrajePorIdUseCase} from '@application/trajes';
-import {AluguelApiRepository, TrajeApiRepository} from '@infrastructure/api';
 import {
 	AluguelItemRequest,
 	AluguelResponse,
@@ -16,17 +20,11 @@ import {
 	TipoOcasiao,
 	Traje,
 } from '@domain/entidades';
-import {
-	converterMoedaBrParaNumero,
-	formatarMoedaBrPartindoDeDigitos,
-	formatarNumeroParaMoedaBr,
-	mascararCpfCnpj,
-} from '@/interfaces-graficas/utils/formatacoes';
-import {SelecionadorTraje} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
-import {DetalhesAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
-import {obterTipoOcasiaoPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
-import {obterAliasStatusAluguel, obterStatusAluguelPorValor} from '@/interfaces-graficas/paginas/alugueis/utils/status';
-import styles from '@/interfaces-graficas/paginas/alugueis/editar/EditarAluguel.module.css';
+import {AluguelApiRepository, TrajeApiRepository} from '@infrastructure/api';
+import {ArrowLeft} from 'lucide-react';
+import {useCallback, useEffect, useState} from 'react';
+import {Alert} from 'react-bootstrap';
+import {useNavigate, useParams} from 'react-router-dom';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const trajeRepositorio = new TrajeApiRepository();
@@ -55,10 +53,26 @@ export function EditarAluguel() {
 	const [ocasiao, setOcasiao] = useState<TipoOcasiao | ''>('');
 	const [status, setStatus] = useState<StatusAluguel | ''>('');
 	const [valorDesconto, setValorDesconto] = useState('0,00');
-
-	const [modalAberto, setModalAberto] = useState(false);
-	const [modalTitulo, setModalTitulo] = useState('');
-	const [modalMensagem, setModalMensagem] = useState('');
+	
+	const [alertaSucesso, setAlertaSucesso] = useState<string | null>(null);
+	const [alertaErro, setAlertaErro] = useState<string | null>(null);
+	
+	useEffect(() => {
+		if (alertaSucesso) {
+			const timer = setTimeout(() => {
+				setAlertaSucesso(null);
+				navigate('/alugueis/listar', {replace: true});
+			}, 2500);
+			return () => clearTimeout(timer);
+		}
+	}, [alertaSucesso, navigate]);
+	
+	useEffect(() => {
+		if (alertaErro) {
+			const timer = setTimeout(() => setAlertaErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [alertaErro]);
 
 	const calcularSubtotal = useCallback(() => {
 		return itensSelecionados.reduce((total, item) => total + (item.traje.preco || 0), 0);
@@ -92,9 +106,7 @@ export function EditarAluguel() {
 				);
 				setItensSelecionados(trajesDetalhados);
 			} catch {
-				setModalTitulo('Erro');
-				setModalMensagem('Erro ao carregar aluguel');
-				setModalAberto(true);
+				setAlertaErro('Não foi possível carregar o aluguel');
 			} finally {
 				setEstaCarregando(false);
 			}
@@ -104,15 +116,6 @@ export function EditarAluguel() {
 			carregarAluguel();
 		}
 	}, [aluguelId]);
-
-	function irParaLista() {
-		navigate('/alugueis/listar', {replace: true});
-	}
-
-	function voltarParaLista() {
-		setModalAberto(false);
-		irParaLista();
-	}
 
 	function adicionarTraje(traje: Traje) {
 		if (!traje.id) {
@@ -148,44 +151,32 @@ export function EditarAluguel() {
 		}
 
 		if (itensSelecionados.length === 0) {
-			setModalTitulo('Erro');
-			setModalMensagem('Adicione pelo menos um traje');
-			setModalAberto(true);
+			setAlertaErro('Adicione pelo menos um traje');
 			return;
 		}
 
 		if (!dataRetirada || !dataDevolucao) {
-			setModalTitulo('Erro');
-			setModalMensagem('Preencha data de retirada e devolução');
-			setModalAberto(true);
+			setAlertaErro('Preencha data de retirada e devolução');
 			return;
 		}
 
 		if (!ocasiao) {
-			setModalTitulo('Erro');
-			setModalMensagem('Selecione a ocasião');
-			setModalAberto(true);
+			setAlertaErro('Selecione a ocasião');
 			return;
 		}
 
 		if (!status) {
-			setModalTitulo('Erro');
-			setModalMensagem('Selecione o status');
-			setModalAberto(true);
+			setAlertaErro('Selecione o status');
 			return;
 		}
 
 		if (dataDevolucao <= dataRetirada) {
-			setModalTitulo('Erro');
-			setModalMensagem('Data de devolução deve ser após a data de retirada');
-			setModalAberto(true);
+			setAlertaErro('Data de devolução deve ser após a data de retirada');
 			return;
 		}
 
 		if (descontoNumerico > calcularSubtotal()) {
-			setModalTitulo('Erro');
-			setModalMensagem('O desconto não pode ser maior que o valor total dos itens');
-			setModalAberto(true);
+			setAlertaErro('O desconto não pode ser maior que o valor total dos itens');
 			return;
 		}
 
@@ -207,14 +198,9 @@ export function EditarAluguel() {
 			};
 
 			await atualizarAluguelUseCase.executar(aluguelId, dados);
-			setModalTitulo('Sucesso');
-			setModalMensagem('Aluguel atualizado com sucesso.');
-			setModalAberto(true);
-		} catch (erro) {
-			const mensagem = erro instanceof Error ? erro.message : 'Erro ao atualizar aluguel';
-			setModalTitulo('Falha');
-			setModalMensagem(`Não foi possível atualizar aluguel: ${mensagem}`);
-			setModalAberto(true);
+			setAlertaSucesso('Aluguel atualizado com sucesso');
+		} catch {
+			setAlertaErro('Não foi possível atualizar o aluguel. Verifique os dados e tente novamente');
 		} finally {
 			setEstaEnviando(false);
 		}
@@ -242,7 +228,7 @@ export function EditarAluguel() {
 				<button
 					type="button"
 					className={styles.botaoVoltar}
-					onClick={irParaLista}
+					onClick={() => navigate('/alugueis/listar', {replace: true})}
 					title="Voltar"
 				>
 					<ArrowLeft size={20} />
@@ -325,22 +311,36 @@ export function EditarAluguel() {
 					<Botao tipo="primario" onClick={handleAtualizar} disabled={estaEnviando}>
 						{estaEnviando ? 'Salvando...' : 'Salvar Alterações'}
 					</Botao>
-					<Botao tipo="perigo" onClick={irParaLista} disabled={estaEnviando}>
+					<Botao tipo="perigo" onClick={() => navigate('/alugueis/listar', {replace: true})}
+					       disabled={estaEnviando}>
 						Cancelar
 					</Botao>
 				</div>
 			</main>
-
-			<Modal
-				titulo={modalTitulo}
-				mensagem={modalMensagem}
-				estaAberto={modalAberto}
-				aoConfirmar={modalTitulo === 'Sucesso' ? voltarParaLista : () => setModalAberto(false)}
-				aoCancelar={() => setModalAberto(false)}
-				textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para lista' : 'Ok'}
-				textoBotaoCancelar="Fechar"
-				tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
-			/>
+			
+			{alertaSucesso && (
+				<Alert
+					variant="success"
+					onClose={() => setAlertaSucesso(null)}
+					dismissible
+					style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+				>
+					<Alert.Heading>Sucesso</Alert.Heading>
+					<p>{alertaSucesso}</p>
+				</Alert>
+			)}
+			
+			{alertaErro && (
+				<Alert
+					variant="danger"
+					onClose={() => setAlertaErro(null)}
+					dismissible
+					style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+				>
+					<Alert.Heading>Erro</Alert.Heading>
+					<p>{alertaErro}</p>
+				</Alert>
+			)}
 		</div>
 	);
 }

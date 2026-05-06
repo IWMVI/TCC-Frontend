@@ -1,25 +1,20 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Modal, Botao, Card } from '@/interfaces-graficas/componentes';
-import { CriarAluguelUseCase } from '@application/alugueis';
-import { AluguelApiRepository } from '@infrastructure/api';
-import {
-	AluguelRequest,
-	AluguelItemRequest,
-	ClienteResponse,
-	TipoOcasiao,
-	Traje,
-} from '@domain/entidades';
-import { SelecionadorCliente } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorCliente';
-import { SelecionadorTraje } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
-import { DetalhesAluguel } from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
+import {Botao, Card} from '@/interfaces-graficas/componentes';
+import {DetalhesAluguel} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/DetalhesAluguel';
+import {SelecionadorCliente} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorCliente';
+import {SelecionadorTraje} from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje';
+import styles from '@/interfaces-graficas/paginas/alugueis/realizar/RealizarAluguel.module.css';
 import {
 	converterMoedaBrParaNumero,
 	formatarMoedaBrPartindoDeDigitos,
 	formatarNumeroParaMoedaBr,
 } from '@/interfaces-graficas/utils/formatacoes';
-import styles from '@/interfaces-graficas/paginas/alugueis/realizar/RealizarAluguel.module.css';
+import {CriarAluguelUseCase} from '@application/alugueis';
+import {AluguelItemRequest, AluguelRequest, ClienteResponse, TipoOcasiao, Traje} from '@domain/entidades';
+import {AluguelApiRepository} from '@infrastructure/api';
+import {ArrowLeft} from 'lucide-react';
+import {useCallback, useEffect, useState} from 'react';
+import {Alert} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const criarAluguelUseCase = new CriarAluguelUseCase(aluguelRepositorio);
@@ -40,9 +35,15 @@ export function RealizarAluguel() {
 	const [valorDesconto, setValorDesconto] = useState('0,00');
 
   const [estaEnviando, setEstaEnviando] = useState(false);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [modalTitulo, setModalTitulo] = useState('');
-  const [modalMensagem, setModalMensagem] = useState('');
+	const [alertaSucesso, setAlertaSucesso] = useState(false);
+	const [alertaErro, setAlertaErro] = useState<string | null>(null);
+	
+	useEffect(() => {
+		if (alertaErro && !alertaSucesso) {
+			const timer = setTimeout(() => setAlertaErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [alertaErro, alertaSucesso]);
 
   const calcularSubtotal = useCallback(() => {
 	  return itensSelecionados.reduce((total, item) => total + (item.traje.preco || 0), 0);
@@ -56,7 +57,7 @@ export function RealizarAluguel() {
   }, [calcularSubtotal, descontoNumerico]);
 
   function voltarParaInicial() {
-    setModalAberto(false);
+	  setAlertaSucesso(false);
     navigate('/alugueis');
   }
 	
@@ -95,45 +96,35 @@ export function RealizarAluguel() {
   }
 
   async function handleRealizarAluguel() {
+	  setAlertaErro(null);
+
     if (!clienteSelecionado) {
-      setModalTitulo('Erro');
-      setModalMensagem('Selecione um cliente');
-      setModalAberto(true);
+		setAlertaErro('Selecione um cliente');
       return;
     }
 
     if (itensSelecionados.length === 0) {
-      setModalTitulo('Erro');
-      setModalMensagem('Adicione pelo menos um traje');
-      setModalAberto(true);
+		setAlertaErro('Adicione pelo menos um traje');
       return;
     }
 	  
 	  if (!dataRetirada || !dataDevolucao) {
-      setModalTitulo('Erro');
-		  setModalMensagem('Preencha data de retirada e devolucao');
-      setModalAberto(true);
+		  setAlertaErro('Preencha data de retirada e devolucao');
       return;
     }
 	  
 	  if (!ocasiao) {
-      setModalTitulo('Erro');
-		  setModalMensagem('Selecione a ocasiao');
-      setModalAberto(true);
+		  setAlertaErro('Selecione a ocasiao');
       return;
     }
 
     if (dataDevolucao <= dataRetirada) {
-      setModalTitulo('Erro');
-		setModalMensagem('Data de devolucao deve ser apos a data de retirada');
-		setModalAberto(true);
+		setAlertaErro('Data de devolucao deve ser apos a data de retirada');
 		return;
 	}
 	  
 	  if (descontoNumerico > calcularSubtotal()) {
-		  setModalTitulo('Erro');
-		  setModalMensagem('O desconto nao pode ser maior que o valor total dos itens');
-      setModalAberto(true);
+		  setAlertaErro('O desconto nao pode ser maior que o valor total dos itens');
       return;
     }
 
@@ -155,14 +146,10 @@ export function RealizarAluguel() {
       };
 
       await criarAluguelUseCase.executar(dados);
-      setModalTitulo('Sucesso');
-      setModalMensagem('Aluguel realizado com sucesso.');
-      setModalAberto(true);
-    } catch (err) {
-      const mensagem = err instanceof Error ? err.message : 'Erro ao realizar aluguel';
-      setModalTitulo('Falha');
-		setModalMensagem(`Nao foi possivel realizar aluguel: ${mensagem}`);
-      setModalAberto(true);
+		setAlertaSucesso(true);
+		setTimeout(() => voltarParaInicial(), 2500);
+	} catch {
+		setAlertaErro('Não foi possível realizar o aluguel. Verifique os dados e tente novamente.');
     } finally {
       setEstaEnviando(false);
     }
@@ -170,6 +157,30 @@ export function RealizarAluguel() {
 
   return (
     <div className={styles.realizarAluguel}>
+		{alertaSucesso && (
+			<Alert
+				variant="success"
+			    onClose={voltarParaInicial}
+			    dismissible
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Aluguel realizado!</Alert.Heading>
+				<p>Redirecionando para a lista de aluguéis...</p>
+			</Alert>
+		)}
+		
+		{alertaErro && !alertaSucesso && (
+			<Alert
+				variant="warning"
+			    onClose={() => setAlertaErro(null)}
+			    dismissible
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Atenção</Alert.Heading>
+				<p>{alertaErro}</p>
+			</Alert>
+		)}
+
       <header className={styles.header}>
         <button
           type="button"
@@ -234,17 +245,6 @@ export function RealizarAluguel() {
           </Botao>
         </div>
       </main>
-
-      <Modal
-        titulo={modalTitulo}
-        mensagem={modalMensagem}
-        estaAberto={modalAberto}
-        aoConfirmar={modalTitulo === 'Sucesso' ? voltarParaInicial : () => setModalAberto(false)}
-        aoCancelar={() => setModalAberto(false)}
-        textoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'Ir para alugueis' : 'Ok'}
-        textoBotaoCancelar="Fechar"
-        tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
-      />
     </div>
   );
 }

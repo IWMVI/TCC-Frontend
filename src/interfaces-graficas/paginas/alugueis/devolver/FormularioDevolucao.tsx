@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { AluguelApiRepository } from '@infrastructure/api';
-import { RegistrarDevolucaoUseCase } from '@application/alugueis';
-import { CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest } from '@domain/entidades';
-import { AluguelItem } from '@domain/entidades/Aluguel';
-import { formatarMoedaBrPartindoDeDigitos, converterMoedaBrParaNumero } from '@/interfaces-graficas/utils/formatacoes';
-import { Calendario } from '@/interfaces-graficas/componentes';
+import {Calendario} from '@/interfaces-graficas/componentes';
 import styles from '@/interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao.module.css';
+import {converterMoedaBrParaNumero, formatarMoedaBrPartindoDeDigitos} from '@/interfaces-graficas/utils/formatacoes';
+import {RegistrarDevolucaoUseCase} from '@application/alugueis';
+import {CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest} from '@domain/entidades';
+import {AluguelItem} from '@domain/entidades/Aluguel';
+import {AluguelApiRepository} from '@infrastructure/api';
+import {useState} from 'react';
 
 interface FormularioDevolucaoProps {
   aluguelId: number;
@@ -95,10 +95,8 @@ export function FormularioDevolucao({ aluguelId, itens, onSucesso, onCancelar }:
     try {
       await registrarDevolucaoUseCase.executar(aluguelId, dados);
       onSucesso();
-    } catch (erro) {
-      const mensagem =
-        erro instanceof Error ? erro.message : 'Erro ao registrar devolução. Tente novamente.';
-      setErroGeral(mensagem);
+	} catch {
+		setErroGeral('Não foi possível registrar a devolução. Tente novamente ou entre em contato com o suporte.');
     } finally {
       setEstaEnviando(false);
     }

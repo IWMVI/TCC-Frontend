@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FormularioCliente } from '@/interfaces-graficas/paginas/clientes/componentes';
-import { Modal } from '@/interfaces-graficas/componentes/feedback/Modal/Modal';
-import { CriarClienteUseCase } from '@application/clientes';
-import { ClienteApiRepository } from '@infrastructure/api';
-import { ClienteRequest, ClienteResponse } from '@domain/entidades';
+import {FormularioCliente} from '@/interfaces-graficas/paginas/clientes/componentes';
+import {CriarClienteUseCase} from '@application/clientes';
+import {ClienteRequest, ClienteResponse} from '@domain/entidades';
+import {ClienteApiRepository} from '@infrastructure/api';
+import {useEffect, useState} from 'react';
+import {Alert} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
 
 const clienteRepositorio = new ClienteApiRepository();
 const criarClienteUseCase = new CriarClienteUseCase(clienteRepositorio);
@@ -23,12 +23,17 @@ export function CriarCliente({
   const navigate = useNavigate();
   const [estaEnviando, setEstaEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [modalTitulo, setModalTitulo] = useState('');
-  const [modalMensagem, setModalMensagem] = useState('');
+	const [alertaSucesso, setAlertaSucesso] = useState(false);
+	
+	useEffect(() => {
+		if (erro) {
+			const timer = setTimeout(() => setErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [erro]);
 
   function voltarParaInicial() {
-    setModalAberto(false);
+	  setAlertaSucesso(false);
     if (modoModal && onCancelar) {
       onCancelar();
       return;
@@ -36,8 +41,8 @@ export function CriarCliente({
 
     navigate('/dashboard');
   }
-
-  async function handleSubmit(dados: ClienteRequest): Promise<number> {
+	
+	async function handleSubmit(dados: ClienteRequest): Promise<number | undefined> {
     setErro(null);
     setEstaEnviando(true);
     try {
@@ -46,20 +51,13 @@ export function CriarCliente({
         onCadastroSucesso?.(criado);
         return criado.id;
       }
-
-      setModalTitulo('Sucesso');
-      setModalMensagem('Cliente criado com sucesso.');
-      setModalAberto(true);
+		
+		setAlertaSucesso(true);
+		setTimeout(() => voltarParaInicial(), 2500);
       return criado.id;
-    } catch (err) {
-      const mensagem = err instanceof Error ? err.message : 'Erro ao criar cliente';
-      setErro(mensagem);
-      if (!modoModal) {
-        setModalTitulo('Falha');
-        setModalMensagem(`Não foi possível criar cliente: ${mensagem}`);
-        setModalAberto(true);
-      }
-      throw err;
+	} catch {
+		setErro('Não foi possível criar o cliente. Verifique os dados e tente novamente.');
+		setAlertaSucesso(false);
     } finally {
       setEstaEnviando(false);
     }
@@ -67,27 +65,40 @@ export function CriarCliente({
 
   return (
     <>
+		{alertaSucesso && (
+			<Alert
+				variant="success"
+			    onClose={voltarParaInicial}
+			    dismissible
+			    className="alerta-auto"
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Cliente criado!</Alert.Heading>
+				<p>Redirecionando para a página inicial...</p>
+			</Alert>
+		)}
+		
+		{erro && !alertaSucesso && (
+			<Alert
+				variant="danger"
+			    onClose={() => setErro(null)}
+			    dismissible
+			    className="alerta-auto"
+			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
+			>
+				<Alert.Heading>Falha ao criar cliente</Alert.Heading>
+				<p>{erro}</p>
+			</Alert>
+		)}
+
       <FormularioCliente
         titulo="Cadastrar Novo Cliente"
         estaEnviando={estaEnviando}
-        erro={erro}
+        erro={null}
         onSubmit={handleSubmit}
         modoModal={modoModal}
         onCancel={onCancelar}
       />
-
-      {!modoModal && (
-        <Modal
-          titulo={modalTitulo}
-          mensagem={modalMensagem}
-          estaAberto={modalAberto}
-          aoConfirmar={voltarParaInicial}
-          aoCancelar={voltarParaInicial}
-          textoBotaoConfirmar="Ir para início"
-          textoBotaoCancelar="Fechar"
-          tipoBotaoConfirmar={modalTitulo === 'Sucesso' ? 'primario' : 'perigo'}
-        />
-      )}
     </>
   );
 }

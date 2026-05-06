@@ -1,16 +1,15 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { Card, Tabela, Modal, Paginacao } from '@/interfaces-graficas/componentes';
-import { useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
-import {
-  ListarClientesExcluidosUseCase,
-  RecuperarClienteUseCase,
-} from '@application/clientes';
-import { ClienteApiRepository } from '@infrastructure/api';
-import { ClienteResponse } from '@domain/entidades';
-import { mascararCpfCnpj, mascararCelular } from '@/interfaces-graficas/utils/formatacoes';
-import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos.module.css';
+import {Card, Modal, Paginacao, Tabela} from '@/interfaces-graficas/componentes';
+import {useClientes} from '@/interfaces-graficas/contextos/ContextoClientes';
+import styles
+  from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos.module.css';
+import {mascararCelular, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
+import {ListarClientesExcluidosUseCase, RecuperarClienteUseCase} from '@application/clientes';
+import {ClienteResponse} from '@domain/entidades';
+import {ClienteApiRepository} from '@infrastructure/api';
+import {ArrowLeft, RotateCcw} from 'lucide-react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {Alert} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesExcluidosUseCase = new ListarClientesExcluidosUseCase(clienteRepositorio);
@@ -35,6 +34,13 @@ export function ListarClientesExcluidos() {
   const tamanhoPagina = TAMANHO_PAGINA_PADRAO;
 
   const jaCarregouRef = useRef(false);
+	
+	useEffect(() => {
+		if (erro) {
+			const timer = setTimeout(() => setErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [erro]);
 
   const carregarExcluidos = useCallback(async (pagina?: number) => {
     setCarregando(true);
@@ -85,7 +91,8 @@ export function ListarClientesExcluidos() {
       // Notifica via contexto
       dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: clienteRecuperado });
     } catch {
-      setErro('Erro ao recuperar cliente');
+		fecharModal();
+		setErro('Não foi possível recuperar o cliente. Tente novamente mais tarde.');
     } finally {
       setEstaRecuperando(false);
     }
@@ -154,7 +161,17 @@ export function ListarClientesExcluidos() {
 
       <Card titulo="Lista de Clientes Excluídos">
         <div className={styles.card__conteudo}>
-          {erro && <div className={styles.card__erro}>{erro}</div>}
+			{erro && (
+				<Alert
+					variant="danger"
+			        onClose={() => setErro(null)}
+			        dismissible
+			        className={styles['alerta-fixo']}
+				>
+					<Alert.Heading>Erro</Alert.Heading>
+					<p>{erro}</p>
+				</Alert>
+			)}
 
           {clientes.length === 0 && !carregando ? (
             <div className={styles.card__vazio}>Nenhum cliente excluído encontrado</div>

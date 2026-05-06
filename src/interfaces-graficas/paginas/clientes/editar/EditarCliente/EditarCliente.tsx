@@ -1,11 +1,11 @@
+import {FormularioCliente} from '@/interfaces-graficas/paginas/clientes/componentes';
+import styles from '@/interfaces-graficas/paginas/clientes/editar/EditarCliente/EditarCliente.module.css';
+import {mascararCelular, mascararCep, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
+import {AtualizarClienteUseCase, BuscarClientePorIdUseCase} from '@application/clientes';
+import {ClienteRequest, Endereco, MedidaFemininaResponse, MedidaMasculinaResponse} from '@domain/entidades';
+import {ClienteApiRepository} from '@infrastructure/api';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {FormularioCliente} from '@/interfaces-graficas/paginas/clientes/componentes';
-import {AtualizarClienteUseCase, BuscarClientePorIdUseCase} from '@application/clientes';
-import {ClienteApiRepository} from '@infrastructure/api';
-import {ClienteRequest, Endereco, MedidaFemininaResponse, MedidaMasculinaResponse} from '@domain/entidades';
-import {mascararCelular, mascararCep, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
-import styles from '@/interfaces-graficas/paginas/clientes/editar/EditarCliente/EditarCliente.module.css';
 
 const clienteRepositorio = new ClienteApiRepository();
 const buscarClienteUseCase = new BuscarClientePorIdUseCase(clienteRepositorio);
@@ -77,6 +77,13 @@ export function EditarCliente() {
     const [initialData, setInitialData] = useState<
         Partial<ClienteRequest> & { medidas?: Record<string, number>; medidaId?: number }
     >();
+	
+	useEffect(() => {
+		if (erro) {
+			const timer = setTimeout(() => setErro(null), 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [erro]);
 
     useEffect(() => {
         async function carregarCliente() {
@@ -114,8 +121,8 @@ export function EditarCliente() {
         try {
             await atualizarClienteUseCase.executar(Number.parseInt(id, 10), dados);
             navigate('/clientes/listar');
-        } catch (err) {
-            setErro(err instanceof Error ? err.message : 'Erro ao atualizar cliente');
+		} catch {
+			setErro('Não foi possível atualizar o cliente. Verifique os dados e tente novamente.');
         } finally {
             setEstaEnviando(false);
         }
