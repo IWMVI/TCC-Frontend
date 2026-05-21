@@ -36,6 +36,7 @@ export function ProvedorTema({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook compartilhado com o provider
 export function useTema() {
   const contexto = useContext(ContextoTema);
   if (contexto === undefined) {

@@ -14,7 +14,7 @@ import {Link, useNavigate} from 'react-router-dom';
 
 export function ListarTrajes() {
   const navigate = useNavigate();
-  const { estado, carregarTrajes, removerTraje, atualizarImagem, removerImagem, dispatch } = useTrajes();
+  const { estado, carregarTrajes, removerTraje, atualizarImagem, removerImagem } = useTrajes();
   const [termoBusca, setTermoBusca] = useState('');
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [trajeParaExcluir, setTrajeParaExcluir] = useState<TrajeResponse | null>(null);
@@ -36,7 +36,7 @@ export function ListarTrajes() {
   const aluguelRepositorio = useMemo(() => new AluguelApiRepository(), []);
   const [modalDevolucaoAberto, setModalDevolucaoAberto] = useState(false);
   const [aluguelParaDevolver, setAluguelParaDevolver] = useState<AluguelResponse | null>(null);
-  const [estaBuscandoAluguel, setEstaBuscandoAluguel] = useState(false);
+  const [, setEstaBuscandoAluguel] = useState(false);
 
   const carregarDados = useCallback(
     (busca?: string, pagina?: number) => {
@@ -106,7 +106,7 @@ export function ListarTrajes() {
       await removerTraje(trajeParaExcluir.id);
       fecharModalExclusao();
       carregarDados(termoBusca || undefined, estado.paginaAtual);
-    } catch (err) {
+    } catch {
       fecharModalExclusao();
       if (trajeParaExcluir.status === 'ALUGADO') {
         setAlertaErro('Não é possível excluir o traje pois ele está alugado no momento. Realize a devolução antes de excluí-lo.');
@@ -146,7 +146,7 @@ export function ListarTrajes() {
     } finally {
       setEstaBuscandoAluguel(false);
     }
-  }, [aluguelRepositorio, dispatch]);
+  }, [aluguelRepositorio]);
 
   const handleAtualizarImagem = useCallback(
     async (trajeId: number, file: File) => {
@@ -242,7 +242,7 @@ export function ListarTrajes() {
 		  ),
       },
     ],
-    [abrirModalImagem, abrirModalExclusao, abrirDevolucao, estaBuscandoAluguel]
+    [abrirModalImagem, abrirModalExclusao, abrirDevolucao]
   );
 
   const handleVoltar = useCallback(() => {

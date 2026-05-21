@@ -52,6 +52,7 @@ export default [
       'dist-electron/**',
       'release/**',
       'electron/**',
+      'scripts/**',
       'vite.config.ts',
     ],
   },
