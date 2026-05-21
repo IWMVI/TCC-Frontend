@@ -1,0 +1,1 @@
+export { ModalFormulario } from './ModalFormulario';
