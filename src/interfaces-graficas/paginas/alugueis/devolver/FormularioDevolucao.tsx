@@ -1,6 +1,14 @@
-import {Calendario} from '@/interfaces-graficas/componentes';
+import { Calendario } from '@/interfaces-graficas/componentes';
+import { ResumoFinanceiroAluguel } from '@/interfaces-graficas/paginas/alugueis/componentes/ResumoFinanceiroAluguel';
 import styles from '@/interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao.module.css';
-import {converterMoedaBrParaNumero, formatarMoedaBrPartindoDeDigitos} from '@/interfaces-graficas/utils/formatacoes';
+import {
+  calcularResumoFinanceiroDeItens,
+  somarValorItens,
+} from '@/interfaces-graficas/paginas/alugueis/utils/resumoFinanceiro';
+import {
+  converterMoedaBrParaNumero,
+  formatarMoedaBrPartindoDeDigitos,
+} from '@/interfaces-graficas/utils/formatacoes';
 import {RegistrarDevolucaoUseCase} from '@application/alugueis';
 import {CondicaoTraje, DevolucaoRequest, ItemDevolucaoRequest} from '@domain/entidades';
 import {AluguelItem} from '@domain/entidades/Aluguel';
@@ -10,6 +18,8 @@ import {useState} from 'react';
 interface FormularioDevolucaoProps {
   aluguelId: number;
   itens: AluguelItem[];
+  valorTotalAtual: number;
+  valorDesconto: number;
   onSucesso: () => void;
   onCancelar: () => void;
 }
@@ -27,7 +37,14 @@ const OPCOES_CONDICAO: { valor: CondicaoTraje; rotulo: string }[] = [
   { valor: CondicaoTraje.HIGIENIZACAO,  rotulo: 'Higienização' },
 ];
 
-export function FormularioDevolucao({ aluguelId, itens, onSucesso, onCancelar }: FormularioDevolucaoProps) {
+export function FormularioDevolucao({
+  aluguelId,
+  itens,
+  valorTotalAtual,
+  valorDesconto,
+  onSucesso,
+  onCancelar,
+}: FormularioDevolucaoProps) {
   const [dataDevolucao, setDataDevolucao] = useState('');
   const [valorMulta, setValorMulta] = useState('');
   const [observacoes, setObservacoes] = useState('');
@@ -43,6 +60,14 @@ export function FormularioDevolucao({ aluguelId, itens, onSucesso, onCancelar }:
   const [erroGeral, setErroGeral] = useState('');
 
   const [estaEnviando, setEstaEnviando] = useState(false);
+
+  const multaNumerica = valorMulta !== '' ? converterMoedaBrParaNumero(valorMulta) : 0;
+  const subtotalItens = somarValorItens(itens);
+  const resumoPreview = calcularResumoFinanceiroDeItens(
+    subtotalItens > 0 ? subtotalItens : valorTotalAtual,
+    valorDesconto,
+    multaNumerica,
+  );
 
   function atualizarCondicao(trajeId: number, condicao: CondicaoTraje) {
     setCondicoes((prev) => ({ ...prev, [trajeId]: condicao }));
@@ -173,6 +198,11 @@ export function FormularioDevolucao({ aluguelId, itens, onSucesso, onCancelar }:
               )}
             </div>
           )}
+
+          <ResumoFinanceiroAluguel
+            resumo={resumoPreview}
+            titulo="Resumo Financeiro"
+          />
 
           <div className={styles['campo-grupo']}>
             <label htmlFor="valorMulta" className={styles['campo-label']}>

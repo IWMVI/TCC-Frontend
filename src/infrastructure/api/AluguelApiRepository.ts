@@ -59,7 +59,7 @@ export class AluguelApiRepository implements IAluguelRepository {
   async buscarPorId(id: number): Promise<AluguelResponse> {
     try {
       const resposta = await this.aluguelApi.get<AluguelResponse>(`/alugueis/${id}`);
-      return resposta.data;
+      return this.normalizarResposta(resposta.data);
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
         throw new RecursoNaoEncontrado('Aluguel', id);
@@ -209,6 +209,20 @@ export class AluguelApiRepository implements IAluguelRepository {
       }
       throw this.criarErro(error_, 'Erro ao gerar contrato');
     }
+  }
+
+  private normalizarResposta(aluguel: AluguelResponse): AluguelResponse {
+    return {
+      ...aluguel,
+      valorTotal: Number(aluguel.valorTotal),
+      valorDesconto: Number(aluguel.valorDesconto ?? 0),
+      valorMulta: Number(aluguel.valorMulta ?? 0),
+      itens:
+        aluguel.itens?.map((item) => ({
+          ...item,
+          valorItem: item.valorItem != null ? Number(item.valorItem) : undefined,
+        })) ?? [],
+    };
   }
 
   private criarErro(error: unknown, mensagemPadrao: string): Error {

@@ -2,6 +2,7 @@ import { ClienteResponse } from '@/domain/entidades/Cliente';
 
 export enum StatusAluguel {
   ATIVO = 'Ativo',
+  ATRASO = 'Em Atraso',
   CONCLUIDO = 'Concluído',
   CANCELADO = 'Cancelado',
 }
@@ -73,6 +74,7 @@ export interface AluguelResponse {
   dataDevolucao: string;
   status: StatusAluguel;
   valorDesconto: number;
+  valorMulta: number;
   valorTotal: number;
   observacoes?: string;
   ocasiao: TipoOcasiao;

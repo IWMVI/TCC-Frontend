@@ -1,10 +1,15 @@
 import { StatusAluguel } from '@domain/entidades';
 
 const STATUS_ALUGUEL_ALIAS: Record<StatusAluguel, string> = {
-	[StatusAluguel.ATIVO]: 'Ativo',
-	[StatusAluguel.CONCLUIDO]: 'Concluído',
-	[StatusAluguel.CANCELADO]: 'Cancelado',
+  [StatusAluguel.ATIVO]: 'Ativo',
+  [StatusAluguel.ATRASO]: 'Em Atraso',
+  [StatusAluguel.CONCLUIDO]: 'Concluído',
+  [StatusAluguel.CANCELADO]: 'Cancelado',
 };
+
+export function statusPermiteDevolucao(status: StatusAluguel): boolean {
+  return status === StatusAluguel.ATIVO || status === StatusAluguel.ATRASO;
+}
 
 export function obterAliasStatusAluguel(status: StatusAluguel): string {
   return STATUS_ALUGUEL_ALIAS[status] ?? status;

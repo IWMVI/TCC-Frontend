@@ -323,7 +323,7 @@ export function EditarAluguel() {
             ocasiao={ocasiao}
             valorDesconto={valorDesconto}
             subtotal={calcularSubtotal()}
-            total={calcularTotal()}
+            valorMulta={aluguel?.valorMulta ?? 0}
             periodosOcupados={periodosOcupados}
             carregandoPeriodos={carregandoPeriodos}
             onDataRetiradaChange={handleDataRetiradaChange}

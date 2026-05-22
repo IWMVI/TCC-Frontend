@@ -15,6 +15,9 @@ import {
   GerarContratoAluguelUseCase,
   ListarAlugueisUseCase,
 } from '@application/alugueis';
+import { ResumoFinanceiroAluguel } from '@/interfaces-graficas/paginas/alugueis/componentes/ResumoFinanceiroAluguel';
+import { calcularResumoFinanceiroDeAluguel } from '@/interfaces-graficas/paginas/alugueis/utils/resumoFinanceiro';
+import { statusPermiteDevolucao } from '@/interfaces-graficas/paginas/alugueis/utils/status';
 import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 import { FiltrosAluguel } from '@domain/interfaces';
 import { AluguelApiRepository } from '@infrastructure/api';
@@ -112,6 +115,11 @@ export function ListarAluguel() {
       }
     }
   }, []);
+
+  function buscarComFiltros(filtrosParam: FiltrosAluguel) {
+    setPainelFiltrosAberto(false);
+    carregarAluguel(filtrosParam, 0);
+  }
 
   // Task 13.2: initialize with ATIVO status on mount
   useEffect(() => {
@@ -223,6 +231,7 @@ export function ListarAluguel() {
       render: (aluguel: AluguelResponse) => {
         const classeMap: Record<StatusAluguel, string> = {
           [StatusAluguel.ATIVO]: styles['status-ativo'],
+          [StatusAluguel.ATRASO]: styles['status-atraso'],
           [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
           [StatusAluguel.CANCELADO]: styles['status-cancelado'],
         };
@@ -262,7 +271,7 @@ export function ListarAluguel() {
                 <FileText size={14} className={styles['icone-detalhes']} />
                 <span className={styles['acao-texto']}>Gerar contrato</span>
               </Dropdown.Item>
-              {aluguel.status === StatusAluguel.ATIVO && (
+              {statusPermiteDevolucao(aluguel.status) && (
                 <Dropdown.Item onClick={() => abrirModalDevolucao(aluguel)}>
                   <RotateCcw size={14} className={styles['icone-devolver']} />
                   <span className={styles['acao-texto']}>Registrar devolução</span>
@@ -353,6 +362,7 @@ export function ListarAluguel() {
                   >
                     <option value="">Todos</option>
                     <option value={StatusAluguel.ATIVO}>Ativo</option>
+                    <option value={StatusAluguel.ATRASO}>Em Atraso</option>
                     <option value={StatusAluguel.CONCLUIDO}>Concluído</option>
                     <option value={StatusAluguel.CANCELADO}>Cancelado</option>
                   </select>
@@ -429,7 +439,7 @@ export function ListarAluguel() {
               </div>
 
               <div className={styles['painel-filtros__acoes']}>
-                <Botao tipo="primario" onClick={() => carregarAluguel(filtros, 0)}>
+                <Botao tipo="primario" onClick={() => buscarComFiltros(filtros)}>
                   Buscar
                 </Botao>
                 <Botao
@@ -437,7 +447,7 @@ export function ListarAluguel() {
                   onClick={() => {
                     const filtrosLimpos: FiltrosAluguel = { status: StatusAluguel.ATIVO };
                     setFiltros(filtrosLimpos);
-                    carregarAluguel(filtrosLimpos, 0);
+                    buscarComFiltros(filtrosLimpos);
                   }}
                 >
                   Limpar Filtros
@@ -610,30 +620,10 @@ export function ListarAluguel() {
 
               {/* Coluna direita — resumo financeiro */}
               <div className={styles['modal-detalhes-col--resumo']}>
-                <section className={styles['modal-detalhes-secao']}>
-                  <h3 className={styles['modal-detalhes-secao__titulo']}>Resumo Financeiro</h3>
-                  <div className={styles['modal-resumo']}>
-                    <div className={styles['modal-resumo-linha']}>
-                      <span>Subtotal</span>
-                      <span>
-                        R${' '}
-                        {(
-                          aluguelDetalhes.valorTotal + (aluguelDetalhes.valorDesconto ?? 0)
-                        ).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className={styles['modal-resumo-linha']}>
-                      <span>Desconto</span>
-                      <span className={styles['modal-resumo-desconto']}>
-                        - R$ {(aluguelDetalhes.valorDesconto ?? 0).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className={styles['modal-resumo-total']}>
-                      <span>Total</span>
-                      <span>R$ {aluguelDetalhes.valorTotal.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </section>
+                <ResumoFinanceiroAluguel
+                  variante="modal"
+                  resumo={calcularResumoFinanceiroDeAluguel(aluguelDetalhes)}
+                />
               </div>
             </div>
           </div>
@@ -645,6 +635,8 @@ export function ListarAluguel() {
         <FormularioDevolucao
           aluguelId={aluguelParaDevolver.id}
           itens={aluguelParaDevolver.itens ?? []}
+          valorTotalAtual={aluguelParaDevolver.valorTotal}
+          valorDesconto={aluguelParaDevolver.valorDesconto ?? 0}
           onSucesso={handleDevolucaoSucesso}
           onCancelar={handleDevolucaoCancelar}
         />

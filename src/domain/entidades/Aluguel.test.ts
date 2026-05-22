@@ -3,12 +3,13 @@ import { StatusAluguel, TipoOcasiao } from '@/domain/entidades/Aluguel';
 describe('StatusAluguel', () => {
   it('deve possuir valores legíveis para interface do usuário', () => {
     expect(StatusAluguel.ATIVO).toBe('Ativo');
+    expect(StatusAluguel.ATRASO).toBe('Em Atraso');
     expect(StatusAluguel.CONCLUIDO).toBe('Concluído');
     expect(StatusAluguel.CANCELADO).toBe('Cancelado');
   });
 
-  it('deve conter exatamente 3 status', () => {
-    expect(Object.keys(StatusAluguel)).toHaveLength(3);
+  it('deve conter exatamente 4 status', () => {
+    expect(Object.keys(StatusAluguel)).toHaveLength(4);
   });
 });
 

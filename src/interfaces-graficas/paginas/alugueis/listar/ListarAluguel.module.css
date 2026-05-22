@@ -182,6 +182,7 @@
 }
 
 .status-ativo,
+.status-atraso,
 .status-concluido,
 .status-cancelado {
   display: inline-flex;
@@ -199,6 +200,12 @@
   background-color: var(--cor-sucesso-bg);
   color: var(--cor-sucesso-texto);
   border: 1px solid var(--cor-sucesso-borda);
+}
+
+.status-atraso {
+  background-color: var(--cor-erro-bg);
+  color: var(--cor-erro-texto);
+  border: 1px solid var(--cor-erro-borda);
 }
 
 .status-concluido {

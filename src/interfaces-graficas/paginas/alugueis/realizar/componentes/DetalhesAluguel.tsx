@@ -1,7 +1,9 @@
 import { PeriodoAlugado, TipoOcasiao } from '@domain/entidades';
 import { Calendario } from '@/interfaces-graficas/componentes';
-import { converterMoedaBrParaNumero } from '@/interfaces-graficas/utils/formatacoes';
+import { ResumoFinanceiroAluguel } from '@/interfaces-graficas/paginas/alugueis/componentes/ResumoFinanceiroAluguel';
 import { obterAliasTipoOcasiao } from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
+import { calcularResumoFinanceiroDeItens } from '@/interfaces-graficas/paginas/alugueis/utils/resumoFinanceiro';
+import { converterMoedaBrParaNumero } from '@/interfaces-graficas/utils/formatacoes';
 import {
   dataDevolucaoComConflitoReserva,
   dataRetiradaIndisponivel,
@@ -16,7 +18,7 @@ interface Props {
   ocasiao: TipoOcasiao | '';
   valorDesconto: string;
   subtotal: number;
-  total: number;
+  valorMulta?: number;
   periodosOcupados?: PeriodoAlugado[];
   carregandoPeriodos?: boolean;
   onDataRetiradaChange: (data: string) => void;
@@ -33,7 +35,7 @@ export function DetalhesAluguel({
   ocasiao,
   valorDesconto,
   subtotal,
-  total,
+  valorMulta = 0,
   periodosOcupados = [],
   carregandoPeriodos = false,
   onDataRetiradaChange,
@@ -43,6 +45,7 @@ export function DetalhesAluguel({
   onValorDescontoChange,
 }: Readonly<Props>) {
   const descontoNumerico = converterMoedaBrParaNumero(valorDesconto);
+  const resumo = calcularResumoFinanceiroDeItens(subtotal, descontoNumerico, valorMulta);
   const minDataDevolucao = dataRetirada ? diaSeguinte(dataRetirada) : undefined;
   const possuiTrajesComReservas = periodosOcupados.length > 0;
 
@@ -151,22 +154,7 @@ export function DetalhesAluguel({
           </div>
         </div>
 
-        <div className={styles.resumo}>
-          <div className={styles.linhaResumo}>
-            <span className={styles.rotulo}>Subtotal:</span>
-            <span className={styles.valor}>R$ {subtotal.toFixed(2)}</span>
-          </div>
-
-          <div className={styles.linhaResumo}>
-            <span className={styles.rotulo}>Desconto:</span>
-            <span className={styles.valor}>- R$ {descontoNumerico.toFixed(2)}</span>
-          </div>
-
-          <div className={styles.linhaNegrito}>
-            <span className={styles.rotulo}>Total:</span>
-            <span className={styles.valorTotal}>R$ {total.toFixed(2)}</span>
-          </div>
-        </div>
+        <ResumoFinanceiroAluguel resumo={resumo} titulo="" />
       </div>
     </div>
   );

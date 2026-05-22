@@ -265,7 +265,6 @@ export function RealizarAluguel() {
             ocasiao={ocasiao}
             valorDesconto={valorDesconto}
             subtotal={calcularSubtotal()}
-            total={calcularTotal()}
             periodosOcupados={periodosOcupados}
             carregandoPeriodos={carregandoPeriodos}
             onDataRetiradaChange={handleDataRetiradaChange}
