@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { ITrajeRepository } from '@domain/interfaces';
 import { PeriodoAlugado, TrajeRequest, TrajeResponse } from '@domain/entidades';
+import { normalizarDataIso } from '@domain/utils/dataIso';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
 
@@ -158,7 +159,10 @@ export class TrajeApiRepository implements ITrajeRepository {
       const resposta = await this.trajeApi.get<PeriodoAlugado[]>(
         `/trajes/${trajeId}/periodos-alugados`,
       );
-      return resposta.data;
+      return resposta.data.map((periodo) => ({
+        dataRetirada: normalizarDataIso(periodo.dataRetirada),
+        dataDevolucao: normalizarDataIso(periodo.dataDevolucao),
+      }));
     } catch (error_) {
       if (isAxiosError(error_) && error_.response?.status === 404) {
         throw new RecursoNaoEncontrado('Traje', trajeId);

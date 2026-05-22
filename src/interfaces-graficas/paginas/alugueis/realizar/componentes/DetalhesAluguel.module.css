@@ -22,6 +22,15 @@
   gap: 1rem;
 }
 
+.avisoReservas {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--cor-erro-texto);
+  background: var(--cor-erro-bg);
+  border-radius: 6px;
+}
+
 /* Linha com os 4 campos lado a lado */
 .linhacampos {
   display: grid;

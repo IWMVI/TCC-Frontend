@@ -23,10 +23,12 @@ interface Props {
   onRemoverTraje: (index: number) => void;
 }
 
+import { dataDentroDePeriodoReservado, normalizarPeriodosAlugados } from '@/interfaces-graficas/paginas/alugueis/utils/validacaoDatasAluguel';
+
 // ─── helpers de calendário ────────────────────────────────────────────────────
 
 const DIAS_SEMANA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 function isoParaDate(iso: string): Date {
   const [y, m, d] = iso.split('-').map(Number);
@@ -34,22 +36,28 @@ function isoParaDate(iso: string): Date {
 }
 
 function dataDentroDeAlgumPeriodo(date: Date, periodos: PeriodoAlugado[]): boolean {
-  return periodos.some((p) => {
-    const inicio = isoParaDate(p.dataRetirada);
-    const fim    = isoParaDate(p.dataDevolucao);
-    return date >= inicio && date <= fim;
-  });
+  const dataIso = toIsoDateLocal(date);
+  return dataDentroDePeriodoReservado(dataIso, periodos);
+}
+
+function toIsoDateLocal(date: Date): string {
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${mes}-${dia}`;
 }
 
 function gerarSemanas(ano: number, mes: number): (Date | null)[][] {
   const primeiroDia = new Date(ano, mes, 1);
-  const ultimoDia   = new Date(ano, mes + 1, 0);
+  const ultimoDia = new Date(ano, mes + 1, 0);
   const semanas: (Date | null)[][] = [];
   let semanaAtual: (Date | null)[] = Array(primeiroDia.getDay()).fill(null);
 
   for (let d = 1; d <= ultimoDia.getDate(); d++) {
     semanaAtual.push(new Date(ano, mes, d));
-    if (semanaAtual.length === 7) { semanas.push(semanaAtual); semanaAtual = []; }
+    if (semanaAtual.length === 7) {
+      semanas.push(semanaAtual);
+      semanaAtual = [];
+    }
   }
   if (semanaAtual.length > 0) {
     while (semanaAtual.length < 7) semanaAtual.push(null);
@@ -92,25 +100,33 @@ function MiniCalendario({ periodos, carregando }: MiniCalendarioProps) {
         const semanas = gerarSemanas(ano, mes);
         return (
           <div key={`${ano}-${mes}`} className={styles.calMes}>
-            <div className={styles.calMesTitulo}>{MESES[mes]} {ano}</div>
+            <div className={styles.calMesTitulo}>
+              {MESES[mes]} {ano}
+            </div>
             <div className={styles.calGrid}>
               {DIAS_SEMANA.map((d, i) => (
-                <span key={i} className={styles.calDiaSemana}>{d}</span>
+                <span key={i} className={styles.calDiaSemana}>
+                  {d}
+                </span>
               ))}
               {semanas.flat().map((date, i) => {
                 if (!date) return <span key={i} className={styles.calVazio} />;
                 const passado = date < hoje;
                 const ocupado = dataDentroDeAlgumPeriodo(date, periodos);
-                const ehHoje  = date.toDateString() === hoje.toDateString();
+                const ehHoje = date.toDateString() === hoje.toDateString();
 
                 let cls = styles.calDia;
-                if (passado)      cls += ` ${styles.calDiaPassado}`;
+                if (passado) cls += ` ${styles.calDiaPassado}`;
                 else if (ocupado) cls += ` ${styles.calDiaOcupado}`;
-                else              cls += ` ${styles.calDiaLivre}`;
-                if (ehHoje)       cls += ` ${styles.calDiaHoje}`;
+                else cls += ` ${styles.calDiaLivre}`;
+                if (ehHoje) cls += ` ${styles.calDiaHoje}`;
 
                 return (
-                  <span key={i} className={cls} title={ocupado ? 'Ocupado' : passado ? '' : 'Disponível'}>
+                  <span
+                    key={i}
+                    className={cls}
+                    title={ocupado ? 'Ocupado' : passado ? '' : 'Disponível'}
+                  >
                     {date.getDate()}
                   </span>
                 );
@@ -133,18 +149,22 @@ interface BotaoDisponibilidadeProps {
 function BotaoDisponibilidade({ periodos, carregando }: BotaoDisponibilidadeProps) {
   const [aberto, setAberto] = useState(false);
   const [posicao, setPosicao] = useState<{ top: number; left: number; abrirParaCima: boolean }>({
-    top: 0, left: 0, abrirParaCima: false,
+    top: 0,
+    left: 0,
+    abrirParaCima: false,
   });
-  const btnRef  = useRef<HTMLButtonElement>(null);
-  const popRef  = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   // Fecha ao clicar fora
   useEffect(() => {
     if (!aberto) return;
     function handleClick(e: MouseEvent) {
       if (
-        popRef.current && !popRef.current.contains(e.target as Node) &&
-        btnRef.current  && !btnRef.current.contains(e.target as Node)
+        popRef.current &&
+        !popRef.current.contains(e.target as Node) &&
+        btnRef.current &&
+        !btnRef.current.contains(e.target as Node)
       ) {
         setAberto(false);
       }
@@ -157,15 +177,13 @@ function BotaoDisponibilidade({ periodos, carregando }: BotaoDisponibilidadeProp
     if (!btnRef.current) return;
     const rect = btnRef.current.getBoundingClientRect();
     const popoverAltura = 280;
-    const espacoAbaixo  = window.innerHeight - rect.bottom;
+    const espacoAbaixo = window.innerHeight - rect.bottom;
     const abrirParaCima = espacoAbaixo < popoverAltura + 16;
 
     setPosicao({
       // Se abre para cima: ancora no topo do botão e subtrai a altura do popover
       // Se abre para baixo: ancora no bottom do botão
-      top:  abrirParaCima
-              ? rect.top - popoverAltura - 6
-              : rect.bottom + 6,
+      top: abrirParaCima ? rect.top - popoverAltura - 6 : rect.bottom + 6,
       left: Math.min(rect.left, window.innerWidth - 340),
       abrirParaCima,
     });
@@ -180,9 +198,11 @@ function BotaoDisponibilidade({ periodos, carregando }: BotaoDisponibilidadeProp
         ref={btnRef}
         type="button"
         className={`${styles.btnDisponibilidade} ${
-          carregando ? styles.btnDisponibilidadeCarregando :
-          temReserva ? styles.btnDisponibilidadeOcupado   :
-                       styles.btnDisponibilidadeLivre
+          carregando
+            ? styles.btnDisponibilidadeCarregando
+            : temReserva
+              ? styles.btnDisponibilidadeOcupado
+              : styles.btnDisponibilidadeLivre
         }`}
         onClick={togglePopover}
         aria-expanded={aberto}
@@ -191,33 +211,41 @@ function BotaoDisponibilidade({ periodos, carregando }: BotaoDisponibilidadeProp
         {carregando ? (
           <span className={styles.calSpinner} />
         ) : temReserva ? (
-          <><AlertCircle size={12} /> {periodos.length} reserva{periodos.length > 1 ? 's' : ''}</>
+          <>
+            <AlertCircle size={12} /> {periodos.length} reserva{periodos.length > 1 ? 's' : ''}
+          </>
         ) : (
-          <><CheckCircle2 size={12} /> Livre</>
+          <>
+            <CheckCircle2 size={12} /> Livre
+          </>
         )}
         <Calendar size={11} className={styles.btnDisponibilidadeIconeCal} />
       </button>
 
-      {aberto && createPortal(
-        <div
-          ref={popRef}
-          className={`${styles.popover} ${posicao.abrirParaCima ? styles.popoverCima : styles.popoverBaixo}`}
-          style={{ top: posicao.abrirParaCima ? posicao.top - 8 : posicao.top, left: posicao.left }}
-          role="dialog"
-          aria-label="Calendário de disponibilidade"
-        >
-          <div className={styles.popoverTitulo}>
-            {temReserva ? '🔴 Datas reservadas' : '🟢 Sem reservas ativas'}
-          </div>
-          <MiniCalendario periodos={periodos} carregando={carregando} />
-          <div className={styles.calLegenda}>
-            <span className={styles.calLegendaLivre}>Disponível</span>
-            <span className={styles.calLegendaOcupado}>Ocupado</span>
-            <span className={styles.calLegendaPassado}>Passado</span>
-          </div>
-        </div>,
-        document.body,
-      )}
+      {aberto &&
+        createPortal(
+          <div
+            ref={popRef}
+            className={`${styles.popover} ${posicao.abrirParaCima ? styles.popoverCima : styles.popoverBaixo}`}
+            style={{
+              top: posicao.abrirParaCima ? posicao.top - 8 : posicao.top,
+              left: posicao.left,
+            }}
+            role="dialog"
+            aria-label="Calendário de disponibilidade"
+          >
+            <div className={styles.popoverTitulo}>
+              {temReserva ? '🔴 Datas reservadas' : '🟢 Sem reservas ativas'}
+            </div>
+            <MiniCalendario periodos={periodos} carregando={carregando} />
+            <div className={styles.calLegenda}>
+              <span className={styles.calLegendaLivre}>Disponível</span>
+              <span className={styles.calLegendaOcupado}>Ocupado</span>
+              <span className={styles.calLegendaPassado}>Passado</span>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
@@ -229,16 +257,16 @@ export function SelecionadorTraje({
   onAdicionarTraje,
   onRemoverTraje,
 }: Readonly<Props>) {
-  const [termoBusca, setTermoBusca]           = useState('');
-  const [trajes, setTrajes]                   = useState<Traje[]>([]);
-  const [estaCarregando, setEstaCarregando]   = useState(false);
+  const [termoBusca, setTermoBusca] = useState('');
+  const [trajes, setTrajes] = useState<Traje[]>([]);
+  const [estaCarregando, setEstaCarregando] = useState(false);
   const [trajeSelecionado, setTrajeSelecionado] = useState<Traje | null>(null);
   const [periodosAlugados, setPeriodosAlugados] = useState<PeriodoAlugado[]>([]);
   const [estaBuscandoPeriodos, setEstaBuscandoPeriodos] = useState(false);
-  const [buscaSemResultados, setBuscaSemResultados]     = useState(false);
-  const [modalCadastroAberto, setModalCadastroAberto]   = useState(false);
+  const [buscaSemResultados, setBuscaSemResultados] = useState(false);
+  const [modalCadastroAberto, setModalCadastroAberto] = useState(false);
 
-  const [periodosMap, setPeriodosMap]                   = useState<Record<number, PeriodoAlugado[]>>({});
+  const [periodosMap, setPeriodosMap] = useState<Record<number, PeriodoAlugado[]>>({});
   const [periodosMapCarregando, setPeriodosMapCarregando] = useState<Record<number, boolean>>({});
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -260,19 +288,23 @@ export function SelecionadorTraje({
 
       if (lista.length > 0) {
         const carregandoInicial: Record<number, boolean> = {};
-        lista.forEach((t) => { if (t.id) carregandoInicial[t.id] = true; });
+        lista.forEach((t) => {
+          if (t.id) carregandoInicial[t.id] = true;
+        });
         setPeriodosMapCarregando(carregandoInicial);
 
         await Promise.allSettled(
           lista.map(async (t) => {
             if (!t.id) return;
             try {
-              const periodos = await trajeRepositorio.buscarPeriodosAlugados(t.id);
+              const periodos = normalizarPeriodosAlugados(
+                await trajeRepositorio.buscarPeriodosAlugados(t.id),
+              );
               setPeriodosMap((prev) => ({ ...prev, [t.id!]: periodos }));
             } finally {
               setPeriodosMapCarregando((prev) => ({ ...prev, [t.id!]: false }));
             }
-          }),
+          })
         );
       }
     } catch {
@@ -283,12 +315,21 @@ export function SelecionadorTraje({
     }
   }, []);
 
-  useEffect(() => () => { abortControllerRef.current?.abort(); }, []);
+  useEffect(
+    () => () => {
+      abortControllerRef.current?.abort();
+    },
+    []
+  );
 
   useEffect(() => {
     const id = setTimeout(() => {
       if (termoBusca) carregarTrajes(termoBusca);
-      else { setTrajes([]); setBuscaSemResultados(false); setPeriodosMap({}); }
+      else {
+        setTrajes([]);
+        setBuscaSemResultados(false);
+        setPeriodosMap({});
+      }
     }, 300);
     return () => clearTimeout(id);
   }, [termoBusca, carregarTrajes]);
@@ -302,7 +343,9 @@ export function SelecionadorTraje({
     if (!traje.id) return;
     setEstaBuscandoPeriodos(true);
     try {
-      const periodos = await trajeRepositorio.buscarPeriodosAlugados(traje.id);
+      const periodos = normalizarPeriodosAlugados(
+        await trajeRepositorio.buscarPeriodosAlugados(traje.id),
+      );
       setPeriodosAlugados(periodos);
     } catch {
       setPeriodosAlugados([]);
@@ -338,7 +381,6 @@ export function SelecionadorTraje({
 
   return (
     <div className={styles.selecionadorTraje}>
-
       {/* ── Busca ── */}
       <div className={styles.busca}>
         <label htmlFor="busca-traje">Pesquisar Traje</label>
@@ -361,21 +403,32 @@ export function SelecionadorTraje({
           <div className={styles.trajeTemporarioTopo}>
             <div className={styles.cardFoto}>
               {trajeSelecionado.imagem || trajeSelecionado.imagemUrl ? (
-                <img src={trajeSelecionado.imagem ?? trajeSelecionado.imagemUrl}
-                  alt={trajeSelecionado.nome} className={styles.cardFotoImg} />
+                <img
+                  src={trajeSelecionado.imagem ?? trajeSelecionado.imagemUrl}
+                  alt={trajeSelecionado.nome}
+                  className={styles.cardFotoImg}
+                />
               ) : (
-                <div className={styles.cardFotoPlaceholder} aria-hidden="true"><span>👔</span></div>
+                <div className={styles.cardFotoPlaceholder} aria-hidden="true">
+                  <span>👔</span>
+                </div>
               )}
             </div>
             <div className={styles.infoTraje}>
               <h4>{trajeSelecionado.nome}</h4>
-              <p>Tipo: {trajeSelecionado.tipo} · Tamanho: {trajeSelecionado.tamanho}</p>
+              <p>
+                Tipo: {trajeSelecionado.tipo} · Tamanho: {trajeSelecionado.tamanho}
+              </p>
             </div>
             <BotaoDisponibilidade periodos={periodosAlugados} carregando={estaBuscandoPeriodos} />
           </div>
           <div className={styles.acoes}>
-            <Botao tipo="primario" onClick={handleAdicionarTraje}>Adicionar</Botao>
-            <Botao tipo="secundario" onClick={handleCancelarSelecao}>Cancelar</Botao>
+            <Botao tipo="primario" onClick={handleAdicionarTraje}>
+              Adicionar
+            </Botao>
+            <Botao tipo="secundario" onClick={handleCancelarSelecao}>
+              Cancelar
+            </Botao>
           </div>
         </div>
       )}
@@ -390,8 +443,11 @@ export function SelecionadorTraje({
             <div className={styles.semResultados}>
               <p className={styles.mensagem}>Nenhum traje encontrado</p>
               {buscaSemResultados && (
-                <button type="button" className={styles.botaoCadastrar}
-                  onClick={() => setModalCadastroAberto(true)}>
+                <button
+                  type="button"
+                  className={styles.botaoCadastrar}
+                  onClick={() => setModalCadastroAberto(true)}
+                >
                   Cadastrar traje
                 </button>
               )}
@@ -400,7 +456,7 @@ export function SelecionadorTraje({
             <ul className={styles.cardLista}>
               {trajes.map((traje) => {
                 const id = traje.id!;
-                const periodos          = periodosMap[id] ?? [];
+                const periodos = periodosMap[id] ?? [];
                 const carregandoPeriodo = periodosMapCarregando[id] ?? false;
 
                 return (
@@ -408,8 +464,11 @@ export function SelecionadorTraje({
                     <div className={styles.cardTopo}>
                       <div className={styles.cardFoto}>
                         {traje.imagem || traje.imagemUrl ? (
-                          <img src={traje.imagem ?? traje.imagemUrl}
-                            alt={traje.nome} className={styles.cardFotoImg} />
+                          <img
+                            src={traje.imagem ?? traje.imagemUrl}
+                            alt={traje.nome}
+                            className={styles.cardFotoImg}
+                          />
                         ) : (
                           <div className={styles.cardFotoPlaceholder} aria-hidden="true">
                             <span>👔</span>
@@ -427,8 +486,11 @@ export function SelecionadorTraje({
                       </div>
                       <div className={styles.cardAcoes}>
                         <BotaoDisponibilidade periodos={periodos} carregando={carregandoPeriodo} />
-                        <button type="button" className={styles.botaoSelecionar}
-                          onClick={() => handleSelecionarTraje(traje)}>
+                        <button
+                          type="button"
+                          className={styles.botaoSelecionar}
+                          onClick={() => handleSelecionarTraje(traje)}
+                        >
                           Selecionar
                         </button>
                       </div>
@@ -448,39 +510,54 @@ export function SelecionadorTraje({
           <p className={styles.mensagem}>Nenhum traje selecionado</p>
         ) : (
           <div className={styles.lista}>
-        {itensSelecionados.map((item, index) => (
-          <div key={item.trajeId} className={styles.itemLista}>
-            <div className={styles.cardFoto}>
-              {item.traje.imagem || item.traje.imagemUrl ? (
-                <img src={item.traje.imagem ?? item.traje.imagemUrl}
-                  alt={item.traje.nome} className={styles.cardFotoImg} />
-              ) : (
-                <div className={styles.cardFotoPlaceholder} aria-hidden="true">
-                  <span>👔</span>
+            {itensSelecionados.map((item, index) => (
+              <div key={item.trajeId} className={styles.itemLista}>
+                <div className={styles.cardFoto}>
+                  {item.traje.imagem || item.traje.imagemUrl ? (
+                    <img
+                      src={item.traje.imagem ?? item.traje.imagemUrl}
+                      alt={item.traje.nome}
+                      className={styles.cardFotoImg}
+                    />
+                  ) : (
+                    <div className={styles.cardFotoPlaceholder} aria-hidden="true">
+                      <span>👔</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className={styles.infoItem}>
-              <p className={styles.nomeTraje}>{item.traje.nome}</p>
-              <p className={styles.detalhes}>
-                <span>{item.traje.tipo} · {item.traje.tamanho}</span>
-                <span>R$ {item.traje.preco?.toFixed(2)}</span>
-              </p>
-            </div>
-            <button type="button" className={styles.botaoRemover}
-              onClick={() => onRemoverTraje(index)} title="Remover traje">
-              <X size={18} />
-            </button>
-          </div>
-        ))}
+                <div className={styles.infoItem}>
+                  <p className={styles.nomeTraje}>{item.traje.nome}</p>
+                  <p className={styles.detalhes}>
+                    <span>
+                      {item.traje.tipo} · {item.traje.tamanho}
+                    </span>
+                    <span>R$ {item.traje.preco?.toFixed(2)}</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.botaoRemover}
+                  onClick={() => onRemoverTraje(index)}
+                  title="Remover traje"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      <ModalFormulario titulo="Cadastrar Traje" estaAberto={modalCadastroAberto}
-        aoFechar={() => setModalCadastroAberto(false)}>
-        <CriarTraje modoModal onCadastroSucesso={handleCadastroSucesso}
-          onCancelar={() => setModalCadastroAberto(false)} />
+      <ModalFormulario
+        titulo="Cadastrar Traje"
+        estaAberto={modalCadastroAberto}
+        aoFechar={() => setModalCadastroAberto(false)}
+      >
+        <CriarTraje
+          modoModal
+          onCadastroSucesso={handleCadastroSucesso}
+          onCancelar={() => setModalCadastroAberto(false)}
+        />
       </ModalFormulario>
     </div>
   );
