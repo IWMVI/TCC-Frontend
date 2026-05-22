@@ -181,8 +181,12 @@ export function RealizarAluguel() {
       await criarAluguelUseCase.executar(dados);
       setAlertaSucesso(true);
       setTimeout(() => voltarParaInicial(), 2500);
-    } catch {
-      setAlertaErro('Não foi possível realizar o aluguel. Verifique os dados e tente novamente.');
+    } catch (erro) {
+      const mensagem =
+        erro instanceof Error && erro.message
+          ? erro.message
+          : 'Não foi possível realizar o aluguel. Verifique os dados e tente novamente.';
+      setAlertaErro(mensagem);
     } finally {
       setEstaEnviando(false);
     }
