@@ -9,12 +9,12 @@
 }
 
 .alerta-fixo {
-    position: fixed !important;
-    top: 1rem !important;
-    right: 1rem !important;
-    z-index: 9999 !important;
-    min-width: 300px !important;
-    box-shadow: var(--sombra-lg) !important;
+  position: fixed !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  z-index: 9999 !important;
+  min-width: 300px !important;
+  box-shadow: var(--sombra-lg) !important;
 }
 
 .listar-aluguel__header {
@@ -63,7 +63,7 @@
 }
 
 .listar-aluguel__titulo {
-  flex:1;
+  flex: 1;
 
   h1 {
     margin: 0;
@@ -76,7 +76,7 @@
     color: var(--muted-foreground);
     font-size: 0.95rem;
   }
-  }
+}
 
 .listar-aluguel__acoes-header {
   display: flex;
@@ -103,7 +103,7 @@
 }
 
 .listar-aluguel__input-busca {
-  flex:1;
+  flex: 1;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -121,7 +121,7 @@
   @media (max-width: 768px) {
     width: 100%;
   }
-  }
+}
 
 .listar-aluguel__mensagem {
   padding: 2rem;
@@ -165,11 +165,21 @@
   display: none;
 }
 
-.icone-detalhes { color: var(--cor-info); }
-.icone-editar   { color: var(--cor-info); }
-.icone-devolver { color: var(--cor-aviso); }
-.icone-excluir  { color: var(--cor-erro); }
-.acao-texto     { margin-left: 0.5rem; }
+.icone-detalhes {
+  color: var(--cor-info);
+}
+.icone-editar {
+  color: var(--cor-info);
+}
+.icone-devolver {
+  color: var(--cor-aviso);
+}
+.icone-excluir {
+  color: var(--cor-erro);
+}
+.acao-texto {
+  margin-left: 0.5rem;
+}
 
 .status-ativo,
 .status-concluido,
@@ -633,5 +643,3 @@
     flex-direction: column;
   }
 }
-
-
