@@ -86,6 +86,8 @@
   position: fixed;
   z-index: 9999;
   min-width: 280px;
+  max-height: calc(100vh - 1.5rem);
+  overflow-y: auto;
   background: var(--popover);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -95,8 +97,7 @@
 }
 
 .calendario__popover--cima {
-  top: auto;
-  bottom: calc(100% + 0.5rem);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .calendario__header {
@@ -168,6 +169,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.25rem;
+  min-height: calc(6 * 32px + 5 * 0.25rem);
 }
 
 .calendario__day {
@@ -186,6 +188,26 @@
 .calendario__day:disabled {
   color: var(--muted-foreground);
   cursor: not-allowed;
+}
+
+.calendario__day--ocupado {
+  background: var(--cor-erro-bg);
+  color: var(--cor-erro-texto);
+  font-weight: 600;
+}
+
+.calendario__day--ocupado:disabled {
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.calendario__day--ocupado.calendario__day--outside {
+  background: var(--cor-erro-bg);
+  color: var(--cor-erro-texto);
+}
+
+.calendario__day--ocupado.calendario__day--sunday {
+  color: var(--cor-erro-texto);
 }
 
 .calendario__day--outside {

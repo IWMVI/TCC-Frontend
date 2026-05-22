@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from '@/interfaces-graficas/componentes/form/Calendario/Calendario.module.css';
@@ -15,105 +15,177 @@ interface CalendarioProps {
 	required?: boolean;
 	permitirPassado?: boolean;
 	clearable?: boolean;
+	verificarDataDesabilitada?: (dataIso: string) => boolean;
+	verificarDataReservada?: (dataIso: string) => boolean;
 }
 
 type DiaCalendario = {
-	data: Date;
-	foraDoMesAtual: boolean;
+  data: Date;
+  foraDoMesAtual: boolean;
 };
 
 type PainelCalendario = 'dia' | 'mes' | 'ano';
 
 const MESES = [
-	'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-	'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ];
 
 const TAMANHO_PAGINA_ANOS = 12;
 
 function normalizeDate(date: Date): Date {
-	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 function parseIsoDate(dateString: string): Date | null {
-	if (!dateString) return null;
-	const [ano, mes, dia] = dateString.split('-').map(Number);
-	if (!ano || !mes || !dia) return null;
-	return new Date(ano, mes - 1, dia);
+  if (!dateString) return null;
+  const [ano, mes, dia] = dateString.split('-').map(Number);
+  if (!ano || !mes || !dia) return null;
+  return new Date(ano, mes - 1, dia);
 }
 
 function toIsoDate(date: Date): string {
-	const ano = date.getFullYear();
-	const mes = String(date.getMonth() + 1).padStart(2, '0');
-	const dia = String(date.getDate()).padStart(2, '0');
-	return `${ano}-${mes}-${dia}`;
+  const ano = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
 }
 
 function isSameDate(a: Date, b: Date): boolean {
-	return a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
-function startOfMonth(year: number, month: number): Date { return new Date(year, month, 1); }
-function endOfMonth(year: number, month: number): Date { return new Date(year, month + 1, 0); }
-function startOfYear(year: number): Date { return new Date(year, 0, 1); }
-function endOfYear(year: number): Date { return new Date(year, 11, 31); }
+function startOfMonth(year: number, month: number): Date {
+  return new Date(year, month, 1);
+}
+function endOfMonth(year: number, month: number): Date {
+  return new Date(year, month + 1, 0);
+}
+function startOfYear(year: number): Date {
+  return new Date(year, 0, 1);
+}
+function endOfYear(year: number): Date {
+  return new Date(year, 11, 31);
+}
 
 function buildMonthGrid(baseDate: Date): DiaCalendario[] {
-	const ano = baseDate.getFullYear();
-	const mes = baseDate.getMonth();
-	const primeiroDiaMes = startOfMonth(ano, mes);
-	const ultimoDiaMes = endOfMonth(ano, mes);
-	const diaSemanaInicio = primeiroDiaMes.getDay();
-	const totalDiasMes = ultimoDiaMes.getDate();
-	const dias: DiaCalendario[] = [];
+  const ano = baseDate.getFullYear();
+  const mes = baseDate.getMonth();
+  const primeiroDiaMes = startOfMonth(ano, mes);
+  const ultimoDiaMes = endOfMonth(ano, mes);
+  const diaSemanaInicio = primeiroDiaMes.getDay();
+  const totalDiasMes = ultimoDiaMes.getDate();
+  const dias: DiaCalendario[] = [];
 
-	for (let i = diaSemanaInicio - 1; i >= 0; i -= 1) {
-		dias.push({ data: new Date(ano, mes, -i), foraDoMesAtual: true });
-	}
-	for (let dia = 1; dia <= totalDiasMes; dia += 1) {
-		dias.push({ data: new Date(ano, mes, dia), foraDoMesAtual: false });
-	}
-	while (dias.length % 7 !== 0) {
-		const proximo = new Date(dias[dias.length - 1].data);
-		proximo.setDate(proximo.getDate() + 1);
-		dias.push({ data: proximo, foraDoMesAtual: true });
-	}
-	return dias;
+  for (let i = diaSemanaInicio - 1; i >= 0; i -= 1) {
+    dias.push({ data: new Date(ano, mes, -i), foraDoMesAtual: true });
+  }
+  for (let dia = 1; dia <= totalDiasMes; dia += 1) {
+    dias.push({ data: new Date(ano, mes, dia), foraDoMesAtual: false });
+  }
+  while (dias.length % 7 !== 0) {
+    const proximo = new Date(dias[dias.length - 1].data);
+    proximo.setDate(proximo.getDate() + 1);
+    dias.push({ data: proximo, foraDoMesAtual: true });
+  }
+  return dias;
 }
 
-function isDateBlocked(date: Date, minDate: Date, maxDate: Date | null): boolean {
-	const alvo = normalizeDate(date);
-	if (alvo < minDate) return true;
-	if (maxDate && alvo > maxDate) return true;
-	return false;
+function isDateBlocked(
+  date: Date,
+  minDate: Date,
+  maxDate: Date | null,
+  verificarDataDesabilitada?: (dataIso: string) => boolean,
+): boolean {
+  const alvo = normalizeDate(date);
+  if (alvo < minDate) return true;
+  if (maxDate && alvo > maxDate) return true;
+  if (verificarDataDesabilitada?.(toIsoDate(date))) return true;
+  return false;
 }
 
 function isMonthBlocked(year: number, month: number, minDate: Date, maxDate: Date | null): boolean {
-	return endOfMonth(year, month) < minDate || (maxDate ? startOfMonth(year, month) > maxDate : false);
+  return (
+    endOfMonth(year, month) < minDate || (maxDate ? startOfMonth(year, month) > maxDate : false)
+  );
 }
 
 function isYearBlocked(year: number, minDate: Date, maxDate: Date | null): boolean {
-	return endOfYear(year) < minDate || (maxDate ? startOfYear(year) > maxDate : false);
+  return endOfYear(year) < minDate || (maxDate ? startOfYear(year) > maxDate : false);
 }
 
 // ─── Posição calculada para o portal ─────────────────────────────────────────
 
 interface PopoverPos {
-	top: number;
-	left: number;
-	width: number;
+  top: number;
+  left: number;
+  width: number;
 }
 
-function calcularPosicao(trigger: HTMLElement): PopoverPos & { paraCima: boolean } {
-	const rect = trigger.getBoundingClientRect();
-	return {
-		top: rect.bottom + 4,
-		left: Math.max(0, Math.min(rect.left, window.innerWidth - 300)),
-		width: Math.max(rect.width, 280),
-		paraCima: false,
-	};
+const MARGEM_POPOVER = 12;
+const LARGURA_MINIMA_POPOVER = 280;
+const LINHAS_MES_MAXIMAS = 6;
+
+function estimarAlturaPopover(painel: PainelCalendario, linhasMes: number = LINHAS_MES_MAXIMAS): number {
+  const alturaHeader = 44;
+  if (painel === 'mes' || painel === 'ano') {
+    return alturaHeader + 210 + 24;
+  }
+  const alturaGrade = linhasMes * 36 + 32;
+  return alturaHeader + alturaGrade + 24;
+}
+
+function alturaReferenciaPopover(painel: PainelCalendario): number {
+  return estimarAlturaPopover(painel, LINHAS_MES_MAXIMAS);
+}
+
+function resolverAbrirParaCima(
+  trigger: HTMLElement,
+  alturaPopover: number,
+): boolean {
+  const rect = trigger.getBoundingClientRect();
+  const espacoAbaixo = window.innerHeight - rect.bottom - MARGEM_POPOVER;
+  const espacoAcima = rect.top - MARGEM_POPOVER;
+  const cabeAbaixo = espacoAbaixo >= alturaPopover;
+  const cabeAcima = espacoAcima >= alturaPopover;
+  return !cabeAbaixo && (cabeAcima || espacoAcima > espacoAbaixo);
+}
+
+function calcularPosicao(
+  trigger: HTMLElement,
+  alturaPopover: number,
+  abrirParaCima: boolean,
+): PopoverPos & { paraCima: boolean } {
+  const rect = trigger.getBoundingClientRect();
+  const largura = Math.max(rect.width, LARGURA_MINIMA_POPOVER);
+  const left = Math.max(
+    MARGEM_POPOVER,
+    Math.min(rect.left, window.innerWidth - largura - MARGEM_POPOVER),
+  );
+
+  let top = abrirParaCima
+    ? rect.top - alturaPopover - MARGEM_POPOVER
+    : rect.bottom + MARGEM_POPOVER;
+
+  const limiteSuperior = MARGEM_POPOVER;
+  const limiteInferior = window.innerHeight - alturaPopover - MARGEM_POPOVER;
+  top = Math.max(limiteSuperior, Math.min(top, limiteInferior));
+
+  return { top, left, width: largura, paraCima: abrirParaCima };
 }
 
 // ─── Componente ──────────────────────────────────────────────────────────────
@@ -126,165 +198,250 @@ export function Calendario({
 	required = false,
 	permitirPassado = false,
 	clearable = true,
+	verificarDataDesabilitada,
+	verificarDataReservada,
 }: Readonly<CalendarioProps>) {
-	const hoje = useMemo(() => normalizeDate(new Date()), []);
-	const selecionada = useMemo(() => parseIsoDate(value), [value]);
-	const minDateProp = min ? parseIsoDate(min) : null;
-	const maxDate = max ? parseIsoDate(max) : null;
-	const minDate = permitirPassado
-		? (minDateProp ? normalizeDate(minDateProp) : new Date(0))
-		: (minDateProp && minDateProp > hoje ? normalizeDate(minDateProp) : hoje);
+  const verificarReserva =
+    verificarDataReservada ?? verificarDataDesabilitada;
+  const hoje = useMemo(() => normalizeDate(new Date()), []);
+  const selecionada = useMemo(() => parseIsoDate(value), [value]);
+  const minDateProp = min ? parseIsoDate(min) : null;
+  const maxDate = max ? parseIsoDate(max) : null;
+  const minDate = permitirPassado
+    ? minDateProp
+      ? normalizeDate(minDateProp)
+      : new Date(0)
+    : minDateProp && minDateProp > hoje
+      ? normalizeDate(minDateProp)
+      : hoje;
 
-	const [aberto, setAberto] = useState(false);
-	const [painel, setPainel] = useState<PainelCalendario>('dia');
-	const [mesAtual, setMesAtual] = useState<Date>(() => selecionada ?? hoje);
-	const [inicioPaginaAnos, setInicioPaginaAnos] = useState(() => (selecionada ?? hoje).getFullYear() - 5);
-	const [pos, setPos] = useState<(PopoverPos & { paraCima: boolean }) | null>(null);
+  const [aberto, setAberto] = useState(false);
+  const [painel, setPainel] = useState<PainelCalendario>('dia');
+  const [mesAtual, setMesAtual] = useState<Date>(() => selecionada ?? hoje);
+  const [inicioPaginaAnos, setInicioPaginaAnos] = useState(
+    () => (selecionada ?? hoje).getFullYear() - 5
+  );
+  const [pos, setPos] = useState<(PopoverPos & { paraCima: boolean }) | null>(null);
 
-	const triggerRef = useRef<HTMLButtonElement>(null);
-	const popoverRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const abrirParaCimaRef = useRef<boolean | null>(null);
 
-	useEffect(() => {
-		const dataBase = selecionada ?? hoje;
-		setMesAtual(new Date(dataBase.getFullYear(), dataBase.getMonth(), 1));
-		setInicioPaginaAnos(dataBase.getFullYear() - 5);
-	}, [selecionada, hoje]);
+  const diasDoMes = useMemo(() => buildMonthGrid(mesAtual), [mesAtual]);
 
-	// Fecha ao clicar fora ou pressionar Escape
-	useEffect(() => {
-		if (!aberto) return undefined;
+  const atualizarPosicao = useCallback(() => {
+    if (!triggerRef.current) {
+      return;
+    }
+    const altura = alturaReferenciaPopover(painel);
+    const abrirParaCima =
+      abrirParaCimaRef.current ?? resolverAbrirParaCima(triggerRef.current, altura);
+    setPos(calcularPosicao(triggerRef.current, altura, abrirParaCima));
+  }, [painel]);
 
-		function handleClick(e: MouseEvent) {
-			if (
-				popoverRef.current && !popoverRef.current.contains(e.target as Node) &&
-				triggerRef.current && !triggerRef.current.contains(e.target as Node)
-			) {
-				setAberto(false);
-				setPainel('dia');
-			}
-		}
-		function handleEscape(e: KeyboardEvent) {
-			if (e.key === 'Escape') { setAberto(false); setPainel('dia'); }
-		}
+  useEffect(() => {
+    const dataBase = selecionada ?? hoje;
+    setMesAtual(new Date(dataBase.getFullYear(), dataBase.getMonth(), 1));
+    setInicioPaginaAnos(dataBase.getFullYear() - 5);
+  }, [selecionada, hoje]);
 
-		document.addEventListener('mousedown', handleClick);
-		document.addEventListener('keydown', handleEscape);
-		return () => {
-			document.removeEventListener('mousedown', handleClick);
-			document.removeEventListener('keydown', handleEscape);
-		};
-	}, [aberto]);
+  // Fecha ao clicar fora ou pressionar Escape
+  useEffect(() => {
+    if (!aberto) return undefined;
 
-	// Recalcula posição ao rolar ou redimensionar
-	useEffect(() => {
-		if (!aberto || !triggerRef.current) return undefined;
-		function atualizar() {
-			if (triggerRef.current) setPos(calcularPosicao(triggerRef.current));
-		}
-		window.addEventListener('scroll', atualizar, true);
-		window.addEventListener('resize', atualizar);
-		return () => {
-			window.removeEventListener('scroll', atualizar, true);
-			window.removeEventListener('resize', atualizar);
-		};
-	}, [aberto]);
+    function handleClick(e: MouseEvent) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(e.target as Node)
+      ) {
+        setAberto(false);
+        setPainel('dia');
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setAberto(false);
+        setPainel('dia');
+      }
+    }
 
-	const diasDoMes = useMemo(() => buildMonthGrid(mesAtual), [mesAtual]);
-	const anosDaPagina = useMemo(() =>
-		Array.from({ length: TAMANHO_PAGINA_ANOS }, (_, i) => inicioPaginaAnos + i),
-		[inicioPaginaAnos]);
-	const labelMes = useMemo(() =>
-		new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(mesAtual),
-		[mesAtual]);
-	const labelAno = mesAtual.getFullYear();
-	const valorExibicao = useMemo(() =>
-		selecionada ? new Intl.DateTimeFormat('pt-BR').format(selecionada) : '',
-		[selecionada]);
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [aberto]);
 
-	const podeIrMesAnterior = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() - 1, minDate, maxDate);
-	const podeIrMesSeguinte = !isMonthBlocked(mesAtual.getFullYear(), mesAtual.getMonth() + 1, minDate, maxDate);
-	const podeIrAnoAnterior = !isYearBlocked(mesAtual.getFullYear() - 1, minDate, maxDate);
-	const podeIrAnoSeguinte = !isYearBlocked(mesAtual.getFullYear() + 1, minDate, maxDate);
-	const podeIrPaginaAnosAnterior = anosDaPagina.some((a) => !isYearBlocked(a - TAMANHO_PAGINA_ANOS, minDate, maxDate));
-	const podeIrPaginaAnosSeguinte = anosDaPagina.some((a) => !isYearBlocked(a + TAMANHO_PAGINA_ANOS, minDate, maxDate));
+  useEffect(() => {
+    if (!aberto) {
+      abrirParaCimaRef.current = null;
+    }
+  }, [aberto]);
+
+  useLayoutEffect(() => {
+    if (!aberto) {
+      return;
+    }
+    atualizarPosicao();
+  }, [aberto, painel, atualizarPosicao]);
+
+  useEffect(() => {
+    if (!aberto) return undefined;
+    window.addEventListener('scroll', atualizarPosicao, true);
+    window.addEventListener('resize', atualizarPosicao);
+    return () => {
+      window.removeEventListener('scroll', atualizarPosicao, true);
+      window.removeEventListener('resize', atualizarPosicao);
+    };
+  }, [aberto, atualizarPosicao]);
+  const anosDaPagina = useMemo(
+    () => Array.from({ length: TAMANHO_PAGINA_ANOS }, (_, i) => inicioPaginaAnos + i),
+    [inicioPaginaAnos]
+  );
+  const labelMes = useMemo(
+    () => new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(mesAtual),
+    [mesAtual]
+  );
+  const labelAno = mesAtual.getFullYear();
+  const valorExibicao = useMemo(
+    () => (selecionada ? new Intl.DateTimeFormat('pt-BR').format(selecionada) : ''),
+    [selecionada]
+  );
+
+  const podeIrMesAnterior = !isMonthBlocked(
+    mesAtual.getFullYear(),
+    mesAtual.getMonth() - 1,
+    minDate,
+    maxDate
+  );
+  const podeIrMesSeguinte = !isMonthBlocked(
+    mesAtual.getFullYear(),
+    mesAtual.getMonth() + 1,
+    minDate,
+    maxDate
+  );
+  const podeIrAnoAnterior = !isYearBlocked(mesAtual.getFullYear() - 1, minDate, maxDate);
+  const podeIrAnoSeguinte = !isYearBlocked(mesAtual.getFullYear() + 1, minDate, maxDate);
+  const podeIrPaginaAnosAnterior = anosDaPagina.some(
+    (a) => !isYearBlocked(a - TAMANHO_PAGINA_ANOS, minDate, maxDate)
+  );
+  const podeIrPaginaAnosSeguinte = anosDaPagina.some(
+    (a) => !isYearBlocked(a + TAMANHO_PAGINA_ANOS, minDate, maxDate)
+  );
 
 	function selecionarData(data: Date) {
-		if (isDateBlocked(data, minDate, maxDate)) return;
+		if (isDateBlocked(data, minDate, maxDate, verificarDataDesabilitada)) return;
 		onChange(toIsoDate(data));
 		setAberto(false);
 		setPainel('dia');
 	}
 
-	function handleAnterior() {
-		if (painel === 'dia') {
-			if (!podeIrMesAnterior) return;
-			setMesAtual(new Date(mesAtual.getFullYear(), mesAtual.getMonth() - 1, 1));
-		} else if (painel === 'mes') {
-			if (!podeIrAnoAnterior) return;
-			setMesAtual(new Date(mesAtual.getFullYear() - 1, mesAtual.getMonth(), 1));
-		} else {
-			if (!podeIrPaginaAnosAnterior) return;
-			setInicioPaginaAnos((v) => v - TAMANHO_PAGINA_ANOS);
-		}
-	}
+  function handleAnterior() {
+    if (painel === 'dia') {
+      if (!podeIrMesAnterior) return;
+      setMesAtual(new Date(mesAtual.getFullYear(), mesAtual.getMonth() - 1, 1));
+    } else if (painel === 'mes') {
+      if (!podeIrAnoAnterior) return;
+      setMesAtual(new Date(mesAtual.getFullYear() - 1, mesAtual.getMonth(), 1));
+    } else {
+      if (!podeIrPaginaAnosAnterior) return;
+      setInicioPaginaAnos((v) => v - TAMANHO_PAGINA_ANOS);
+    }
+  }
 
-	function handleSeguinte() {
-		if (painel === 'dia') {
-			if (!podeIrMesSeguinte) return;
-			setMesAtual(new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1));
-		} else if (painel === 'mes') {
-			if (!podeIrAnoSeguinte) return;
-			setMesAtual(new Date(mesAtual.getFullYear() + 1, mesAtual.getMonth(), 1));
-		} else {
-			if (!podeIrPaginaAnosSeguinte) return;
-			setInicioPaginaAnos((v) => v + TAMANHO_PAGINA_ANOS);
-		}
-	}
+  function handleSeguinte() {
+    if (painel === 'dia') {
+      if (!podeIrMesSeguinte) return;
+      setMesAtual(new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1));
+    } else if (painel === 'mes') {
+      if (!podeIrAnoSeguinte) return;
+      setMesAtual(new Date(mesAtual.getFullYear() + 1, mesAtual.getMonth(), 1));
+    } else {
+      if (!podeIrPaginaAnosSeguinte) return;
+      setInicioPaginaAnos((v) => v + TAMANHO_PAGINA_ANOS);
+    }
+  }
 
-	function abrirCalendario() {
-		if (disabled) return;
-		if (!aberto && triggerRef.current) {
-			setPos(calcularPosicao(triggerRef.current));
-		}
-		setAberto((v) => !v);
-		setPainel('dia');
-		setInicioPaginaAnos(mesAtual.getFullYear() - 5);
-	}
+  function abrirCalendario() {
+    if (disabled) return;
+    const vaiAbrir = !aberto;
+    if (vaiAbrir && triggerRef.current) {
+      const altura = alturaReferenciaPopover('dia');
+      const abrirParaCima = resolverAbrirParaCima(triggerRef.current, altura);
+      abrirParaCimaRef.current = abrirParaCima;
+      setPos(calcularPosicao(triggerRef.current, altura, abrirParaCima));
+    } else if (!vaiAbrir) {
+      abrirParaCimaRef.current = null;
+    }
+    setAberto(vaiAbrir);
+    if (vaiAbrir) {
+      setPainel('dia');
+      setInicioPaginaAnos(mesAtual.getFullYear() - 5);
+    }
+  }
 
-	const popoverContent = aberto && pos ? createPortal(
-		<div
-			ref={popoverRef}
-			className={styles.calendario__popover}
-			style={{ top: pos.top, left: pos.left, width: pos.width }}
-			role="dialog"
-			aria-label={`Selecionar data para ${label}`}
-		>
-			<div className={styles.calendario__header}>
-				<button type="button" className={styles.calendario__nav} onClick={handleAnterior}
-					disabled={
-						(painel === 'dia' && !podeIrMesAnterior) ||
-						(painel === 'mes' && !podeIrAnoAnterior) ||
-						(painel === 'ano' && !podeIrPaginaAnosAnterior)
-					} aria-label="Anterior">
-					<ChevronLeft size={16} />
-				</button>
-				<div className={styles.calendario__titleGroup}>
-					<button type="button" className={styles.calendario__titleButton} onClick={() => setPainel('mes')}>
-						{labelMes}
-					</button>
-					<button type="button" className={styles.calendario__titleButton} onClick={() => setPainel('ano')}>
-						{labelAno}
-					</button>
-				</div>
-				<button type="button" className={styles.calendario__nav} onClick={handleSeguinte}
-					disabled={
-						(painel === 'dia' && !podeIrMesSeguinte) ||
-						(painel === 'mes' && !podeIrAnoSeguinte) ||
-						(painel === 'ano' && !podeIrPaginaAnosSeguinte)
-					} aria-label="Próximo">
-					<ChevronRight size={16} />
-				</button>
-			</div>
+  const popoverContent =
+    aberto && pos
+      ? createPortal(
+          <div
+            ref={popoverRef}
+            className={[
+              styles.calendario__popover,
+              pos.paraCima ? styles['calendario__popover--cima'] : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            style={{ top: pos.top, left: pos.left, width: pos.width }}
+            role="dialog"
+            aria-label={`Selecionar data para ${label}`}
+          >
+            <div className={styles.calendario__header}>
+              <button
+                type="button"
+                className={styles.calendario__nav}
+                onClick={handleAnterior}
+                disabled={
+                  (painel === 'dia' && !podeIrMesAnterior) ||
+                  (painel === 'mes' && !podeIrAnoAnterior) ||
+                  (painel === 'ano' && !podeIrPaginaAnosAnterior)
+                }
+                aria-label="Anterior"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <div className={styles.calendario__titleGroup}>
+                <button
+                  type="button"
+                  className={styles.calendario__titleButton}
+                  onClick={() => setPainel('mes')}
+                >
+                  {labelMes}
+                </button>
+                <button
+                  type="button"
+                  className={styles.calendario__titleButton}
+                  onClick={() => setPainel('ano')}
+                >
+                  {labelAno}
+                </button>
+              </div>
+              <button
+                type="button"
+                className={styles.calendario__nav}
+                onClick={handleSeguinte}
+                disabled={
+                  (painel === 'dia' && !podeIrMesSeguinte) ||
+                  (painel === 'mes' && !podeIrAnoSeguinte) ||
+                  (painel === 'ano' && !podeIrPaginaAnosSeguinte)
+                }
+                aria-label="Próximo"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
 
 			{painel === 'dia' && (
 				<>
@@ -297,14 +454,20 @@ export function Calendario({
 						{diasDoMes.map(({ data, foraDoMesAtual }) => {
 							const selected = selecionada ? isSameDate(data, selecionada) : false;
 							const isToday = isSameDate(data, hoje);
-							const blocked = isDateBlocked(data, minDate, maxDate);
+							const dataIso = toIsoDate(data);
+							const reservado = verificarReserva?.(dataIso) ?? false;
+							const blocked = isDateBlocked(data, minDate, maxDate, verificarDataDesabilitada);
 							return (
-								<button key={toIsoDate(data)} type="button"
+								<button key={dataIso} type="button"
 									className={[
 										styles.calendario__day,
 										foraDoMesAtual ? styles['calendario__day--outside'] : '',
 										selected ? styles['calendario__day--selected'] : '',
-										isToday ? styles['calendario__day--today'] : '', data.getDay() === 0 ? styles['calendario__day--sunday'] : '',].filter(Boolean).join(' ')}
+										isToday ? styles['calendario__day--today'] : '',
+										reservado ? styles['calendario__day--ocupado'] : '',
+										data.getDay() === 0 ? styles['calendario__day--sunday'] : '',
+									].filter(Boolean).join(' ')}
+									title={reservado ? 'Data reservada' : undefined}
 									onClick={() => selecionarData(data)}
 									disabled={blocked}>
 									{data.getDate()}
@@ -315,82 +478,120 @@ export function Calendario({
 				</>
 			)}
 
-			{painel === 'mes' && (
-				<div className={styles.calendario__grid}>
-					{MESES.map((mesNome, mesIndice) => {
-						const blocked = isMonthBlocked(mesAtual.getFullYear(), mesIndice, minDate, maxDate);
-						const active = mesAtual.getMonth() === mesIndice;
-						return (
-							<button key={mesNome} type="button"
-								className={[styles.calendario__cell, active ? styles['calendario__cell--active'] : ''].filter(Boolean).join(' ')}
-								disabled={blocked}
-								onClick={() => { setMesAtual(new Date(mesAtual.getFullYear(), mesIndice, 1)); setPainel('dia'); }}>
-								{mesNome}
-							</button>
-						);
-					})}
-				</div>
-			)}
+            {painel === 'mes' && (
+              <div className={styles.calendario__grid}>
+                {MESES.map((mesNome, mesIndice) => {
+                  const blocked = isMonthBlocked(
+                    mesAtual.getFullYear(),
+                    mesIndice,
+                    minDate,
+                    maxDate
+                  );
+                  const active = mesAtual.getMonth() === mesIndice;
+                  return (
+                    <button
+                      key={mesNome}
+                      type="button"
+                      className={[
+                        styles.calendario__cell,
+                        active ? styles['calendario__cell--active'] : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      disabled={blocked}
+                      onClick={() => {
+                        setMesAtual(new Date(mesAtual.getFullYear(), mesIndice, 1));
+                        setPainel('dia');
+                      }}
+                    >
+                      {mesNome}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
-			{painel === 'ano' && (
-				<div className={styles.calendario__grid}>
-					{anosDaPagina.map((ano) => {
-						const blocked = isYearBlocked(ano, minDate, maxDate);
-						const active = mesAtual.getFullYear() === ano;
-						return (
-							<button key={ano} type="button"
-								className={[styles.calendario__cell, active ? styles['calendario__cell--active'] : ''].filter(Boolean).join(' ')}
-								disabled={blocked}
-								onClick={() => { setMesAtual(new Date(ano, mesAtual.getMonth(), 1)); setPainel('dia'); }}>
-								{ano}
-							</button>
-						);
-					})}
-				</div>
-			)}
-		</div>,
-		document.body,
-	) : null;
+            {painel === 'ano' && (
+              <div className={styles.calendario__grid}>
+                {anosDaPagina.map((ano) => {
+                  const blocked = isYearBlocked(ano, minDate, maxDate);
+                  const active = mesAtual.getFullYear() === ano;
+                  return (
+                    <button
+                      key={ano}
+                      type="button"
+                      className={[
+                        styles.calendario__cell,
+                        active ? styles['calendario__cell--active'] : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      disabled={blocked}
+                      onClick={() => {
+                        setMesAtual(new Date(ano, mesAtual.getMonth(), 1));
+                        setPainel('dia');
+                      }}
+                    >
+                      {ano}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>,
+          document.body
+        )
+      : null;
 
-	return (
-		<div className={styles.calendario}>
-			<label htmlFor={id} className={styles.calendario__label}>
-				{label}
-				{required ? <span className={styles.calendario__required}>*</span> : null}
-			</label>
+  return (
+    <div className={styles.calendario}>
+      <label htmlFor={id} className={styles.calendario__label}>
+        {label}
+        {required ? <span className={styles.calendario__required}>*</span> : null}
+      </label>
 
-			<div className={styles.calendario__inputWrapper}>
-				<button
-					ref={triggerRef}
-					id={id}
-					type="button"
-					className={styles.calendario__trigger}
-					onClick={abrirCalendario}
-					disabled={disabled}
-					aria-haspopup="dialog"
-					aria-expanded={aberto}
-				>
-					<span className={`${styles.calendario__value} ${!valorExibicao ? styles['calendario__value--placeholder'] : ''}`}>
-						{valorExibicao || placeholder}
-					</span>
-					{clearable && valorExibicao && !disabled ? (
-						<span
-							role="button"
-							aria-label="Limpar data"
-							className={styles.calendario__clear}
-							onClick={(e) => { e.stopPropagation(); onChange(''); }}
-							onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onChange(''); } }}
-							tabIndex={0}
-						>
-							✕
-						</span>
-					) : (
-						<Calendar size={18} className={styles.calendario__icon} />
-					)}
-				</button>
-			</div>
+      <div className={styles.calendario__inputWrapper}>
+        <button
+          ref={triggerRef}
+          id={id}
+          type="button"
+          className={styles.calendario__trigger}
+          onClick={abrirCalendario}
+          disabled={disabled}
+          aria-haspopup="dialog"
+          aria-expanded={aberto}
+        >
+          <span
+            className={`${styles.calendario__value} ${!valorExibicao ? styles['calendario__value--placeholder'] : ''}`}
+          >
+            {valorExibicao || placeholder}
+          </span>
+          {clearable && valorExibicao && !disabled ? (
+            <span
+              role="button"
+              aria-label="Limpar data"
+              className={styles.calendario__clear}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange('');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation();
+                  onChange('');
+                }
+              }}
+              tabIndex={0}
+            >
+              ✕
+            </span>
+          ) : (
+            <Calendar size={18} className={styles.calendario__icon} />
+          )}
+        </button>
+      </div>
 
-			{popoverContent}
-		</div>
-	);
+      {popoverContent}
+    </div>
+  );
 }
