@@ -336,6 +336,8 @@ export function ListarTrajes() {
         <FormularioDevolucao
           aluguelId={aluguelParaDevolver.id}
           itens={aluguelParaDevolver.itens ?? []}
+          valorTotalAtual={aluguelParaDevolver.valorTotal}
+          valorDesconto={aluguelParaDevolver.valorDesconto ?? 0}
           onSucesso={() => {
             setModalDevolucaoAberto(false);
             setAluguelParaDevolver(null);

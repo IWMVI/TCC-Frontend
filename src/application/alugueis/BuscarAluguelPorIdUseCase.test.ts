@@ -28,6 +28,7 @@ describe('BuscarAluguelPorIdUseCase', () => {
     dataDevolucao: '2026-05-10',
     status: StatusAluguel.ATIVO,
     valorDesconto: 0,
+    valorMulta: 0,
     valorTotal: 500,
     ocasiao: TipoOcasiao.CASAMENTO,
     itens: [],

@@ -506,6 +506,7 @@ export function ListarAluguel() {
                 {(() => {
                   const classeMap: Record<StatusAluguel, string> = {
                     [StatusAluguel.ATIVO]: styles['status-ativo'],
+                    [StatusAluguel.ATRASO]: styles['status-atraso'],
                     [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
                     [StatusAluguel.CANCELADO]: styles['status-cancelado'],
                   };

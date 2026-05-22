@@ -35,6 +35,7 @@ describe('CriarAluguelUseCase', () => {
     dataDevolucao: '2026-05-15',
     status: StatusAluguel.ATIVO,
     valorDesconto: 0,
+    valorMulta: 0,
     valorTotal: 500,
     ocasiao: TipoOcasiao.CASAMENTO,
     itens: [{ trajeId: 10, nomeTraje: 'Traje Social' }],

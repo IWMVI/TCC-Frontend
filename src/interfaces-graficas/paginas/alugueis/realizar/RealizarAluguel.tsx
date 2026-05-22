@@ -63,11 +63,6 @@ export function RealizarAluguel() {
     trajeRepository: trajeRepositorio,
   });
 
-  const calcularTotal = useCallback(() => {
-    const subtotal = calcularSubtotal();
-    return Math.max(0, subtotal - descontoNumerico);
-  }, [calcularSubtotal, descontoNumerico]);
-
   function voltarParaInicial() {
     setAlertaSucesso(false);
     navigate('/alugueis');

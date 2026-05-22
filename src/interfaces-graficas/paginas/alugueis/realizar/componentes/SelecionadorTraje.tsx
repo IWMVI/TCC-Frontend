@@ -30,11 +30,6 @@ import { dataDentroDePeriodoReservado, normalizarPeriodosAlugados } from '@/inte
 const DIAS_SEMANA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-function isoParaDate(iso: string): Date {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
 function dataDentroDeAlgumPeriodo(date: Date, periodos: PeriodoAlugado[]): boolean {
   const dataIso = toIsoDateLocal(date);
   return dataDentroDePeriodoReservado(dataIso, periodos);

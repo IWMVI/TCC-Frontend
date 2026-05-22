@@ -98,11 +98,6 @@ export function EditarAluguel() {
     dataDevolucaoIgnorar: dataDevolucaoOriginal,
   });
 
-  const calcularTotal = useCallback(() => {
-    const subtotal = calcularSubtotal();
-    return Math.max(0, subtotal - descontoNumerico);
-  }, [calcularSubtotal, descontoNumerico]);
-
   useEffect(() => {
     async function carregarAluguel() {
       try {
