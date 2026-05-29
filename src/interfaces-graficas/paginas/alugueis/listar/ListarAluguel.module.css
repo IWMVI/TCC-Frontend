@@ -97,6 +97,16 @@
   gap: 1.5rem;
 }
 
+.listar-aluguel__tabela-wrapper {
+  overflow-x: auto;
+}
+
+.listar-aluguel__paginacao {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+}
+
 .listar-aluguel__busca {
   display: flex;
   gap: 1rem;
@@ -181,45 +191,6 @@
   margin-left: 0.5rem;
 }
 
-.status-ativo,
-.status-atraso,
-.status-concluido,
-.status-cancelado {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 6.5rem;
-  padding: 0.25rem 0;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.status-ativo {
-  background-color: var(--cor-sucesso-bg);
-  color: var(--cor-sucesso-texto);
-  border: 1px solid var(--cor-sucesso-borda);
-}
-
-.status-atraso {
-  background-color: var(--cor-erro-bg);
-  color: var(--cor-erro-texto);
-  border: 1px solid var(--cor-erro-borda);
-}
-
-.status-concluido {
-  background-color: var(--muted);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-}
-
-.status-cancelado {
-  background-color: var(--cor-erro-bg);
-  color: var(--cor-erro-texto);
-  border: 1px solid var(--cor-erro-borda);
-}
-
 .modal-detalhes {
   display: flex;
   flex-direction: column;
@@ -296,12 +267,12 @@
 /* Container do modal de detalhes */
 .modal-detalhes-container {
   background: var(--card);
-  border-radius: 8px;
+  border-radius: var(--raio-borda);
   box-shadow: var(--sombra-lg);
   width: 100%;
   max-width: 780px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   color: var(--card-foreground);
@@ -314,7 +285,12 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  border-top-left-radius: var(--raio-borda);
+  border-top-right-radius: var(--raio-borda);
+  border-bottom: 1px solid color-mix(in srgb, var(--header-text) 12%, transparent);
+  flex-shrink: 0;
 }
 
 .modal-detalhes-header__info {
@@ -326,7 +302,7 @@
 .modal-detalhes-header__id {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--muted-foreground);
+  color: color-mix(in srgb, var(--header-text) 72%, transparent);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -335,7 +311,7 @@
   margin: 0;
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--foreground);
+  color: var(--header-text);
 }
 
 .modal-detalhes-header__acoes {
@@ -348,10 +324,10 @@
 .modal-detalhes-header__fechar {
   width: 28px;
   height: 28px;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--header-text) 24%, transparent);
   border-radius: 6px;
-  background: var(--card);
-  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--header-text) 8%, transparent);
+  color: var(--header-text);
   font-size: 0.8rem;
   cursor: pointer;
   display: flex;
@@ -371,6 +347,9 @@
   display: grid;
   grid-template-columns: 1fr 220px;
   gap: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
@@ -583,70 +562,4 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--cor-sucesso);
-}
-
-/* Filter panel */
-.painel-filtros {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background-color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--foreground);
-}
-
-.painel-filtros__controles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.filtro-campo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--foreground);
-  }
-}
-
-.filtro-input,
-.filtro-select {
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  background-color: var(--input-background);
-  color: var(--foreground);
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: var(--cor-info);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-}
-
-.painel-filtros__acoes {
-  display: flex;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border);
-
-  @media (max-width: 576px) {
-    flex-direction: column;
-  }
 }
