@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+import { httpClient } from '@/infrastructure/api/httpClient';
 
 export interface EnumValues {
   tecido: string[];
@@ -17,16 +15,9 @@ export interface EnumValues {
 }
 
 class EnumApiRepository {
-  private readonly api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
   async buscarValoresEnum(): Promise<EnumValues> {
     try {
-      const resposta = await this.api.get<EnumValues>('/enums');
+      const resposta = await httpClient.get<EnumValues>('/enums');
       return resposta.data;
     } catch (error) {
       console.error('Erro ao buscar enums:', error);

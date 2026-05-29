@@ -1,22 +1,15 @@
-import axios, { AxiosInstance, isAxiosError } from 'axios';
+import { AxiosInstance, isAxiosError } from 'axios';
 import { IAluguelRepository, FiltrosAluguel } from '@domain/interfaces';
 import {AluguelRequest, AluguelResponse, AluguelUpdateRequest, DevolucaoRequest, DevolucaoResponse} from '@domain/entidades';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
-
-const API_BASE_URL = 'http://localhost:8080';
+import { httpClient } from '@/infrastructure/api/httpClient';
 
 export class AluguelApiRepository implements IAluguelRepository {
   private readonly aluguelApi: AxiosInstance;
 
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.aluguelApi = axios.create({
-      baseURL: baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 10000,
-    });
+  constructor(aluguelApi: AxiosInstance = httpClient) {
+    this.aluguelApi = aluguelApi;
   }
 
   async listar(

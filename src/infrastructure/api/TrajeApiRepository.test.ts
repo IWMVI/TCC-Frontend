@@ -17,11 +17,10 @@ interface MockAxiosError extends Error {
 }
 
 describe('TrajeApiRepository', () => {
-  const baseUrl = 'http://localhost:8080';
   let repositorio: TrajeApiRepository;
 
   beforeEach(() => {
-    repositorio = new TrajeApiRepository(baseUrl);
+    repositorio = new TrajeApiRepository({} as AxiosInstance);
     jest.clearAllMocks();
   });
 

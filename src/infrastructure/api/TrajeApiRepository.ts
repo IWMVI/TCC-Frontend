@@ -1,23 +1,16 @@
-import axios, { AxiosInstance, isAxiosError } from 'axios';
+import { AxiosInstance, isAxiosError } from 'axios';
 import { ITrajeRepository } from '@domain/interfaces';
 import { PeriodoAlugado, TrajeRequest, TrajeResponse } from '@domain/entidades';
 import { normalizarDataIso } from '@domain/utils/dataIso';
 import { FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado } from '@domain/erros';
 import { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
-
-const API_BASE_URL = 'http://localhost:8080';
+import { httpClient } from '@/infrastructure/api/httpClient';
 
 export class TrajeApiRepository implements ITrajeRepository {
   private readonly trajeApi: AxiosInstance;
 
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.trajeApi = axios.create({
-      baseURL: baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 10000,
-    });
+  constructor(trajeApi: AxiosInstance = httpClient) {
+    this.trajeApi = trajeApi;
   }
 
   async listar(

@@ -1,5 +1,6 @@
-import axios, {AxiosInstance, isAxiosError} from 'axios';
+import { AxiosInstance, isAxiosError } from 'axios';
 import {IClienteRepository} from '@domain/interfaces';
+import { httpClient } from '@/infrastructure/api/httpClient';
 import {
     ClienteRequest,
     ClienteResponse,
@@ -9,8 +10,6 @@ import {
     MedidaMasculinaResponse,
 } from '@domain/entidades';
 import {FalhaConexao, FalhaRequisicao, RecursoNaoEncontrado} from '@domain/erros';
-
-const API_BASE_URL = 'http://localhost:8080';
 
 export type PaginacaoResultado<T> = {
   content: T[];
@@ -26,14 +25,8 @@ export type PaginacaoResultado<T> = {
 export class ClienteApiRepository implements IClienteRepository {
     private readonly clienteApi: AxiosInstance;
 
-    constructor(baseUrl: string = API_BASE_URL) {
-        this.clienteApi = axios.create({
-            baseURL: baseUrl,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            timeout: 10000,
-        });
+    constructor(clienteApi: AxiosInstance = httpClient) {
+        this.clienteApi = clienteApi;
     }
 
     async listar(

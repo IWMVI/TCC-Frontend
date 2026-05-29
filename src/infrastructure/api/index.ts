@@ -4,3 +4,8 @@ export { AluguelApiRepository } from '@/infrastructure/api/AluguelApiRepository'
 export { enumApiRepository } from '@/infrastructure/api/EnumApiRepository';
 export type { EnumValues } from '@/infrastructure/api/EnumApiRepository';
 export type { PaginacaoResultado } from '@/infrastructure/api/ClienteApiRepository';
+export { httpClient, TOKEN_STORAGE_KEY, FUNCIONARIO_STORAGE_KEY } from '@/infrastructure/api/httpClient';
+export { AuthApiRepository } from '@/infrastructure/api/AuthApiRepository';
+export { FuncionarioApiRepository } from '@/infrastructure/api/FuncionarioApiRepository';
+export { DashboardApiRepository } from '@/infrastructure/api/DashboardApiRepository';
+export { FinancasApiRepository } from '@/infrastructure/api/FinancasApiRepository';

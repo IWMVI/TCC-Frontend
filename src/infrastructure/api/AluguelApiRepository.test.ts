@@ -25,11 +25,10 @@ interface MockAxiosError extends Error {
 }
 
 describe('AluguelApiRepository', () => {
-  const baseUrl = 'http://localhost:8080';
   let repositorio: AluguelApiRepository;
 
   beforeEach(() => {
-    repositorio = new AluguelApiRepository(baseUrl);
+    repositorio = new AluguelApiRepository({} as AxiosInstance);
     jest.clearAllMocks();
   });
 
