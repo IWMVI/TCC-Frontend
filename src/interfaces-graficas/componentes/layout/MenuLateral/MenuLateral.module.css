@@ -1,0 +1,337 @@
+.menu {
+  --menu-largura-expandida: 240px;
+  --menu-largura-colapsada: 68px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--menu-largura-expandida);
+  height: 100%;
+  flex-shrink: 0;
+  align-self: stretch;
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-right: 1px solid var(--border);
+  transition: width 0.25s ease;
+  z-index: 20;
+}
+
+.menu--colapsado {
+  width: var(--menu-largura-colapsada);
+}
+
+.menu__nav {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.menu__item {
+  --menu-item-cor: var(--muted-foreground);
+
+  position: relative;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.menu__item:last-child {
+  border-bottom: none;
+}
+
+.menu__item[data-destaque='dashboard'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-info) 45%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='alugueis'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-aviso) 40%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='clientes'] {
+  --menu-item-cor: color-mix(in srgb, #0d9488 38%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='financas'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-sucesso) 42%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='funcionarios'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-secundaria) 50%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='trajes'] {
+  --menu-item-cor: color-mix(in srgb, #6d28d9 38%, var(--muted-foreground));
+}
+
+.menu__item[data-destaque='controle'] {
+  --menu-item-cor: var(--muted-foreground);
+}
+
+.menu__link,
+.menu__secao {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  gap: 0.65rem;
+  padding: 0 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--sidebar-foreground);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.menu__secao {
+  justify-content: space-between;
+}
+
+.menu__secao_conteudo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.menu__icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: color 0.15s ease;
+}
+
+.menu__link:hover,
+.menu__secao:hover,
+.menu__secao--mini,
+.menu__link--mini {
+  background-color: color-mix(in srgb, var(--muted) 55%, var(--sidebar));
+}
+
+.menu__link:hover .menu__icone,
+.menu__secao:hover .menu__icone,
+.menu__secao--mini .menu__icone,
+.menu__link--mini .menu__icone {
+  color: var(--menu-item-cor);
+}
+
+.menu__link--ativo,
+.menu__secao--ativa {
+  background-color: color-mix(in srgb, var(--menu-item-cor) 7%, var(--sidebar));
+  box-shadow: inset 2px 0 0 var(--menu-item-cor);
+  font-weight: 600;
+}
+
+.menu__link--ativo .menu__icone,
+.menu__secao--ativa .menu__icone {
+  color: var(--menu-item-cor);
+}
+
+.menu__chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: transform 0.2s, color 0.15s ease;
+}
+
+.menu__secao--ativa .menu__chevron,
+.menu__secao:hover .menu__chevron {
+  color: var(--menu-item-cor);
+}
+
+.menu__chevron--aberto {
+  transform: rotate(180deg);
+}
+
+.menu__submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  background-color: color-mix(in srgb, var(--muted) 28%, var(--sidebar));
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-borda) transparent;
+}
+
+.menu__submenu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.menu__submenu::-webkit-scrollbar-thumb {
+  background-color: var(--cor-borda);
+  border-radius: 4px;
+}
+
+.menu__subitem_item {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.menu__subitem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  padding: 0 1rem 0 2.35rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.menu__subitem:hover {
+  background-color: color-mix(in srgb, var(--muted) 45%, transparent);
+  color: var(--sidebar-foreground);
+}
+
+.menu__subitem--ativo {
+  color: var(--sidebar-foreground);
+  font-weight: 600;
+  background-color: color-mix(in srgb, var(--menu-item-cor) 6%, var(--card));
+  border-left-color: var(--menu-item-cor);
+}
+
+.menu__rotulo {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu--colapsado .menu__rotulo,
+.menu--colapsado .menu__chevron {
+  display: none;
+}
+
+.menu--colapsado .menu__link,
+.menu--colapsado .menu__secao {
+  justify-content: center;
+  padding: 0;
+}
+
+.menu--colapsado .menu__secao_conteudo {
+  justify-content: center;
+  gap: 0;
+}
+
+.menu__mini {
+  --menu-item-cor: var(--muted-foreground);
+
+  position: fixed;
+  z-index: 1200;
+  min-width: 220px;
+  margin-left: 4px;
+  padding: 0;
+  background-color: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-lg);
+  overflow: hidden;
+}
+
+.menu__mini[data-destaque='dashboard'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-info) 45%, var(--muted-foreground));
+}
+
+.menu__mini[data-destaque='alugueis'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-aviso) 40%, var(--muted-foreground));
+}
+
+.menu__mini[data-destaque='clientes'] {
+  --menu-item-cor: color-mix(in srgb, #0d9488 38%, var(--muted-foreground));
+}
+
+.menu__mini[data-destaque='financas'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-sucesso) 42%, var(--muted-foreground));
+}
+
+.menu__mini[data-destaque='funcionarios'] {
+  --menu-item-cor: color-mix(in srgb, var(--cor-secundaria) 50%, var(--muted-foreground));
+}
+
+.menu__mini[data-destaque='trajes'] {
+  --menu-item-cor: color-mix(in srgb, #6d28d9 38%, var(--muted-foreground));
+}
+
+.menu__mini_titulo {
+  margin: 0;
+  padding: 0.55rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--header-text);
+  background-color: var(--header-bg);
+  border-top-left-radius: calc(var(--raio-borda) - 1px);
+  border-top-right-radius: calc(var(--raio-borda) - 1px);
+  border-bottom: 1px solid color-mix(in srgb, var(--header-text) 12%, transparent);
+}
+
+.menu__mini_lista {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.menu__mini_item {
+  display: block;
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.menu__mini_item:hover {
+  background-color: color-mix(in srgb, var(--muted) 40%, var(--card));
+}
+
+.menu__mini_item--ativo {
+  background-color: color-mix(in srgb, var(--menu-item-cor) 8%, var(--card));
+  color: var(--foreground);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--menu-item-cor);
+}
+
+@media (max-width: 768px) {
+  .menu {
+    --menu-largura-expandida: 200px;
+    --menu-largura-colapsada: 60px;
+  }
+}
