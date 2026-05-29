@@ -30,7 +30,6 @@ import {
   dataDevolucaoIndisponivel,
   periodosConflitam,
 } from '@/interfaces-graficas/paginas/alugueis/utils/validacaoDatasAluguel';
-import { ArrowLeft } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -264,15 +263,6 @@ export function EditarAluguel() {
   return (
     <div className={styles.editarAluguel}>
       <header className={styles.header}>
-        <button
-          type="button"
-          className={styles.botaoVoltar}
-          onClick={() => navigate('/alugueis/listar', { replace: true })}
-          title="Voltar"
-        >
-          <ArrowLeft size={20} />
-          <span>Voltar</span>
-        </button>
         <div className={styles.titulo}>
           <h1>Editar Aluguel</h1>
           <p>Atualize os detalhes do aluguel ID {aluguel.id}</p>

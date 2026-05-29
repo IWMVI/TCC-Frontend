@@ -10,6 +10,7 @@ import {
   mascararTelefone,
 } from '@/interfaces-graficas/utils/formatacoes';
 import { formatarMedida } from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/formatacoes';
+import { useConfirmarCancelarCadastro } from '@/interfaces-graficas/hooks/useConfirmarCancelarCadastro';
 import styles from '@/interfaces-graficas/paginas/clientes/componentes/FormularioCliente/FormularioCliente.module.css';
 
 const medidaApi = new ClienteApiRepository();
@@ -97,6 +98,9 @@ export function FormularioCliente({
   onCancel,
 }: Readonly<FormularioClienteProps>) {
   const navigate = useNavigate();
+  const { solicitarCancelamento, modalConfirmacao } = useConfirmarCancelarCadastro(() => {
+    navigate('/dashboard');
+  });
 
   const [sexo, setSexo] = useState<Sexo>(
     initialData?.sexo === 'MASCULINO'
@@ -403,7 +407,7 @@ export function FormularioCliente({
       return;
     }
 
-    navigate('/clientes');
+    solicitarCancelamento();
   }
 
   const mostrarCancelar = !modoModal || Boolean(onCancel);
@@ -456,6 +460,7 @@ export function FormularioCliente({
   }
 
   return (
+    <>
     <div className={styles.fc}>
       <h1 className={styles.fc__titulo}>{titulo}</h1>
 
@@ -644,5 +649,7 @@ export function FormularioCliente({
         </div>
       </form>
     </div>
+    {modalConfirmacao}
+    </>
   );
 }
