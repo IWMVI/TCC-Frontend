@@ -9,7 +9,7 @@ import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
 import { ClienteResponse } from '@domain/entidades';
 import { ClienteApiRepository } from '@infrastructure/api';
 import { RotateCcw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-bootstrap';
 
 const clienteRepositorio = new ClienteApiRepository();
@@ -27,8 +27,6 @@ export function ListarClientesExcluidos() {
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [totalRegistros, setTotalRegistros] = useState(0);
-
-  const jaCarregouRef = useRef(false);
 
   useEffect(() => {
     if (erro) {
@@ -59,10 +57,7 @@ export function ListarClientesExcluidos() {
   }, []);
 
   useEffect(() => {
-    if (!jaCarregouRef.current) {
-      jaCarregouRef.current = true;
-      void carregarExcluidos();
-    }
+    void carregarExcluidos();
   }, [carregarExcluidos]);
 
   function abrirModalRecuperacao(cliente: ClienteResponse) {

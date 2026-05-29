@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, Dropdown } from 'react-bootstrap';
 import { Edit2, Filter, MoreVertical } from 'lucide-react';
@@ -35,8 +35,6 @@ export function ListarFuncionarios() {
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [totalRegistros, setTotalRegistros] = useState(0);
-  const jaCarregouRef = useRef(false);
-
   const carregar = useCallback(async (busca?: string, pagina = 0) => {
     setCarregando(true);
     setErro(null);
@@ -54,10 +52,7 @@ export function ListarFuncionarios() {
   }, []);
 
   useEffect(() => {
-    if (!jaCarregouRef.current) {
-      jaCarregouRef.current = true;
-      void carregar();
-    }
+    void carregar();
   }, [carregar]);
 
   function buscarComFiltros() {
