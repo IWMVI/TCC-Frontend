@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
 import { ClienteResponse } from '@domain/entidades';
 
 interface EstadoClientes {
@@ -32,7 +33,7 @@ const estadoInicial: EstadoClientes = {
   paginaAtual: 0,
   totalPaginas: 0,
   totalRegistros: 0,
-  tamanhoPagina: 10,
+  tamanhoPagina: TAMANHO_PAGINA_PADRAO,
 };
 
 function clientesReducer(estado: EstadoClientes, acao: AcaoClientes): EstadoClientes {

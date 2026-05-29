@@ -110,9 +110,9 @@ export function ProvedorTrajes({ children }: { children: ReactNode }) {
         dispatch({
           tipo: 'SET_PAGINACAO',
           payload: {
-            totalPaginas: resultado.totalPages,
+            totalPaginas: Math.max(resultado.totalPages, 1),
             totalRegistros: resultado.totalElements,
-            tamanhoPagina: resultado.size,
+            tamanhoPagina: TRAJE_CONSTANTS.TAMANHO_PAGINA_PADRAO,
             paginaAtual: resultado.number,
           },
         });

@@ -1,24 +1,22 @@
-import {Card, Modal, Paginacao, Tabela} from '@/interfaces-graficas/componentes';
-import {useClientes} from '@/interfaces-graficas/contextos/ContextoClientes';
-import styles
-  from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos.module.css';
-import {mascararCelular, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
-import {ListarClientesExcluidosUseCase, RecuperarClienteUseCase} from '@application/clientes';
-import {ClienteResponse} from '@domain/entidades';
-import {ClienteApiRepository} from '@infrastructure/api';
-import {ArrowLeft, RotateCcw} from 'lucide-react';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
+import { Card, Modal, Paginacao, Tabela } from '@/interfaces-graficas/componentes';
+import { useClientes } from '@/interfaces-graficas/contextos/ContextoClientes';
+import paginaListagemStyles from '@/interfaces-graficas/estilos/PaginaListagem.module.css';
+import acoesStyles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientes/ListarClientes.module.css';
+import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientesExcluidos/ListarClientesExcluidos.module.css';
+import { mascararCelular, mascararCpfCnpj } from '@/interfaces-graficas/utils/formatacoes';
+import { ListarClientesExcluidosUseCase, RecuperarClienteUseCase } from '@application/clientes';
+import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
+import { ClienteResponse } from '@domain/entidades';
+import { ClienteApiRepository } from '@infrastructure/api';
+import { RotateCcw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert } from 'react-bootstrap';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesExcluidosUseCase = new ListarClientesExcluidosUseCase(clienteRepositorio);
 const recuperarClienteUseCase = new RecuperarClienteUseCase(clienteRepositorio);
 
-const TAMANHO_PAGINA_PADRAO = 10;
-
 export function ListarClientesExcluidos() {
-  const navigate = useNavigate();
   const { dispatch } = useClientes();
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [carregando, setCarregando] = useState(false);
@@ -26,30 +24,30 @@ export function ListarClientesExcluidos() {
   const [modalAberto, setModalAberto] = useState(false);
   const [clienteParaRecuperar, setClienteParaRecuperar] = useState<ClienteResponse | null>(null);
   const [estaRecuperando, setEstaRecuperando] = useState(false);
-
-  // Paginação
   const [paginaAtual, setPaginaAtual] = useState(0);
-  const [totalPaginas, setTotalPaginas] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(1);
   const [totalRegistros, setTotalRegistros] = useState(0);
-  const tamanhoPagina = TAMANHO_PAGINA_PADRAO;
 
   const jaCarregouRef = useRef(false);
-	
-	useEffect(() => {
-		if (erro) {
-			const timer = setTimeout(() => setErro(null), 5000);
-			return () => clearTimeout(timer);
-		}
-	}, [erro]);
+
+  useEffect(() => {
+    if (erro) {
+      const timer = setTimeout(() => setErro(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [erro]);
 
   const carregarExcluidos = useCallback(async (pagina?: number) => {
     setCarregando(true);
     setErro(null);
     try {
-      const resultado = await listarClientesExcluidosUseCase.executar(pagina ?? 0, tamanhoPagina);
+      const resultado = await listarClientesExcluidosUseCase.executar(
+        pagina ?? 0,
+        TAMANHO_PAGINA_PADRAO,
+      );
 
       setClientes(resultado.content);
-      setTotalPaginas(resultado.totalPages);
+      setTotalPaginas(Math.max(resultado.totalPages, 1));
       setTotalRegistros(resultado.totalElements);
       setPaginaAtual(resultado.number);
     } catch (error_) {
@@ -58,13 +56,12 @@ export function ListarClientesExcluidos() {
     } finally {
       setCarregando(false);
     }
-  }, [tamanhoPagina]);
+  }, []);
 
-  // Carregar dados iniciais
   useEffect(() => {
     if (!jaCarregouRef.current) {
       jaCarregouRef.current = true;
-      carregarExcluidos();
+      void carregarExcluidos();
     }
   }, [carregarExcluidos]);
 
@@ -84,26 +81,20 @@ export function ListarClientesExcluidos() {
     setEstaRecuperando(true);
     try {
       const clienteRecuperado = await recuperarClienteUseCase.executar(clienteParaRecuperar.id);
-      // Remove da lista local
       setClientes((prev) => prev.filter((c) => c.id !== clienteRecuperado.id));
+      setTotalRegistros((prev) => Math.max(prev - 1, 0));
       fecharModal();
-
-      // Notifica via contexto
       dispatch({ tipo: 'ADICIONAR_CLIENTE', payload: clienteRecuperado });
     } catch {
-		fecharModal();
-		setErro('Não foi possível recuperar o cliente. Tente novamente mais tarde.');
+      fecharModal();
+      setErro('Não foi possível recuperar o cliente. Tente novamente mais tarde.');
     } finally {
       setEstaRecuperando(false);
     }
   }
 
   function handlePageChange(pagina: number) {
-    carregarExcluidos(pagina);
-  }
-
-  function handleVoltar() {
-    navigate('/clientes');
+    void carregarExcluidos(pagina);
   }
 
   const colunas = [
@@ -140,62 +131,49 @@ export function ListarClientesExcluidos() {
   ];
 
   return (
-    <div className={styles['listar-excluidos']}>
-      <header className={styles['listar-excluidos__header']}>
-        <div className={styles['listar-excluidos__navegacao']}>
-          <button
-            type="button"
-            className={styles['listar-excluidos__botao-voltar']}
-            onClick={handleVoltar}
-            title="Voltar para página de clientes"
-          >
-            <ArrowLeft size={20} />
-            <span>Voltar</span>
-          </button>
-          <div className={styles['listar-excluidos__titulo']}>
-            <h1>Clientes Excluídos</h1>
-            <p>Recupere clientes removidos do sistema</p>
-          </div>
+    <div className={paginaListagemStyles['pagina-listagem']} data-pagina-listagem>
+      <header className={paginaListagemStyles['pagina-listagem__header']}>
+        <div className={paginaListagemStyles['pagina-listagem__titulo']}>
+          <h1>Clientes Excluídos</h1>
+          <p>Recupere clientes removidos do sistema</p>
         </div>
       </header>
 
-      <Card titulo="Lista de Clientes Excluídos">
-        <div className={styles.card__conteudo}>
-			{erro && (
-				<Alert
-					variant="danger"
-			        onClose={() => setErro(null)}
-			        dismissible
-			        className={styles['alerta-fixo']}
-				>
-					<Alert.Heading>Erro</Alert.Heading>
-					<p>{erro}</p>
-				</Alert>
-			)}
-
-          {clientes.length === 0 && !carregando ? (
-            <div className={styles.card__vazio}>Nenhum cliente excluído encontrado</div>
-          ) : (
-            <>
-              <div className={styles.card__corpo}>
-                <Tabela colunas={colunas} dados={clientes} />
-              </div>
-
-              {totalPaginas > 1 && (
-                <Paginacao
-                  paginaAtual={paginaAtual}
-                  totalPaginas={totalPaginas}
-                  totalRegistros={totalRegistros}
-                  tamanhoPagina={tamanhoPagina}
-                  onPageChange={handlePageChange}
-                />
-              )}
-            </>
+      <Card preencheAltura>
+        <div className={paginaListagemStyles['pagina-listagem__area-card']}>
+          {erro && (
+            <Alert
+              variant="danger"
+              onClose={() => setErro(null)}
+              dismissible
+              className={acoesStyles['alerta-fixo']}
+            >
+              <Alert.Heading>Erro</Alert.Heading>
+              <p>{erro}</p>
+            </Alert>
           )}
+
+          <div className={paginaListagemStyles['pagina-listagem__tabela']}>
+            <Tabela
+              colunas={colunas}
+              dados={clientes}
+              estaCarregando={carregando}
+              linhasPorPagina={TAMANHO_PAGINA_PADRAO}
+            />
+          </div>
+
+          <div className={paginaListagemStyles['pagina-listagem__paginacao']}>
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalPaginas={totalPaginas}
+              totalRegistros={totalRegistros}
+              tamanhoPagina={TAMANHO_PAGINA_PADRAO}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       </Card>
 
-      {/* Modal de Confirmação */}
       {clienteParaRecuperar && (
         <Modal
           estaAberto={modalAberto}

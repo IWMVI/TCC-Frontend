@@ -10,7 +10,7 @@ describe('Paginacao', () => {
     onPageChange: jest.fn(),
   };
 
-  it('deve mostrar mensagem de nenhum registro quando totalRegistros for 0', () => {
+  it('deve mostrar mensagem de nenhum registro e controles quando totalRegistros for 0', () => {
     render(
       <Paginacao
         paginaAtual={0}
@@ -21,13 +21,32 @@ describe('Paginacao', () => {
       />
     );
 
-    expect(screen.getByText('Nenhum registro encontrado')).toBeInTheDocument();
+    expect(screen.getByText(/Nenhum registro encontrado/)).toBeInTheDocument();
+    expect(screen.getByText(/10 itens por p/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Página 1' })).toBeInTheDocument();
+    expect(screen.getByTitle('Próxima página')).toBeDisabled();
   });
 
   it('deve mostrar informações de paginação corretas', () => {
     render(<Paginacao {...defaultProps} />);
 
-    expect(screen.getByText('Mostrando 1 a 10 de 50 registros')).toBeInTheDocument();
+    expect(screen.getByText(/Mostrando 1 a 10 de 50 registros/)).toBeInTheDocument();
+    expect(screen.getByText(/10 itens por p/)).toBeInTheDocument();
+  });
+
+  it('deve exibir controles mesmo com uma única página', () => {
+    render(
+      <Paginacao
+        paginaAtual={0}
+        totalPaginas={1}
+        totalRegistros={3}
+        tamanhoPagina={10}
+        onPageChange={jest.fn()}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: 'Página 1' })).toBeInTheDocument();
+    expect(screen.getByTitle('Próxima página')).toBeDisabled();
   });
 
   it('deve chamar onPageChange quando botão de próxima página for clicado', () => {

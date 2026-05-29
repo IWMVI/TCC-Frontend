@@ -1,21 +1,37 @@
+import paginaListagemStyles from '@/interfaces-graficas/estilos/PaginaListagem.module.css';
 import styles from '@/interfaces-graficas/paginas/trajes/listar/ListarTrajes/ListarTrajes.module.css';
 import {TRAJE_CONSTANTS} from '@application/trajes/TrajeDependencies';
+import {trajeEstaAlugado} from '@domain/utils/statusTraje';
 import {AluguelResponse, TrajeResponse} from '@domain/entidades';
 import {AluguelApiRepository} from '@infrastructure/api';
-import {Botao, Busca, Card, Modal, Paginacao, Tabela} from '@interfaces-graficas/componentes';
+import {
+  BadgeStatusValor,
+  Botao,
+  Card,
+  MenuFiltrosLateral,
+  Modal,
+  Paginacao,
+  PainelFiltro,
+  PainelFiltroAcoes,
+  PainelFiltroCampo,
+  PainelFiltroControles,
+  PainelFiltroInput,
+  Tabela,
+} from '@interfaces-graficas/componentes';
 import type {Coluna} from '@interfaces-graficas/componentes/data/Tabela';
 import {ModalVisualizacaoImagem} from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
 import {useTrajes} from '@interfaces-graficas/contextos/ContextoTrajes';
 import {FormularioDevolucao} from '@interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
-import {ArrowLeft, Edit2, ImageIcon, MoreVertical, Trash2} from 'lucide-react';
+import {Edit2, Filter, ImageIcon, MoreVertical, Trash2} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Alert, Dropdown} from 'react-bootstrap';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 export function ListarTrajes() {
-  const navigate = useNavigate();
   const { estado, carregarTrajes, removerTraje, atualizarImagem, removerImagem } = useTrajes();
-  const [termoBusca, setTermoBusca] = useState('');
+  const [painelFiltrosAberto, setPainelFiltrosAberto] = useState(false);
+  const [filtros, setFiltros] = useState({ termo: '' });
+  const [termoAplicado, setTermoAplicado] = useState('');
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [trajeParaExcluir, setTrajeParaExcluir] = useState<TrajeResponse | null>(null);
   const [estaExcluindo, setEstaExcluindo] = useState(false);
@@ -49,16 +65,18 @@ export function ListarTrajes() {
     [carregarTrajes]
   );
 
-  const carregarDadosComDebounce = useMemo(
-    () => {
-      let timeoutId: ReturnType<typeof setTimeout>;
-      return (busca?: string, pagina?: number) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => carregarDados(busca, pagina), TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
-      };
-    },
-    [carregarDados]
-  );
+  function buscarComFiltros() {
+    setTermoAplicado(filtros.termo);
+    setPainelFiltrosAberto(false);
+    carregarDados(filtros.termo || undefined, 0);
+  }
+
+  function limparFiltros() {
+    setFiltros({ termo: '' });
+    setTermoAplicado('');
+    setPainelFiltrosAberto(false);
+    carregarDados(undefined, 0);
+  }
 
   useEffect(() => {
     return () => {
@@ -74,19 +92,6 @@ export function ListarTrajes() {
       carregarTrajes();
     }
   }, [carregarTrajes, inicializou]);
-
-  useEffect(() => {
-    if (!inicializou) return;
-    const timeoutId = setTimeout(() => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      abortControllerRef.current = new AbortController();
-      carregarTrajes(termoBusca || undefined, 0);
-    }, TRAJE_CONSTANTS.DEBOUNCE_DELAY_MS);
-
-    return () => clearTimeout(timeoutId);
-  }, [termoBusca, carregarTrajes, inicializou]);
 
   const abrirModalExclusao = useCallback((traje: TrajeResponse) => {
     setTrajeParaExcluir(traje);
@@ -105,10 +110,10 @@ export function ListarTrajes() {
     try {
       await removerTraje(trajeParaExcluir.id);
       fecharModalExclusao();
-      carregarDados(termoBusca || undefined, estado.paginaAtual);
+      carregarDados(termoAplicado || undefined, estado.paginaAtual);
     } catch {
       fecharModalExclusao();
-      if (trajeParaExcluir.status === 'ALUGADO') {
+      if (trajeEstaAlugado(trajeParaExcluir.status)) {
         setAlertaErro('Não é possível excluir o traje pois ele está alugado no momento. Realize a devolução antes de excluí-lo.');
       } else {
         setAlertaErro('Não foi possível excluir o traje. Tente novamente mais tarde.');
@@ -116,13 +121,13 @@ export function ListarTrajes() {
     } finally {
       setEstaExcluindo(false);
     }
-  }, [trajeParaExcluir, removerTraje, fecharModalExclusao, carregarDados, termoBusca, estado.paginaAtual]);
+  }, [trajeParaExcluir, removerTraje, fecharModalExclusao, carregarDados, termoAplicado, estado.paginaAtual]);
 
   const handlePageChange = useCallback(
     (pagina: number) => {
-      carregarDados(termoBusca || undefined, pagina);
+      carregarDados(termoAplicado || undefined, pagina);
     },
-    [carregarDados, termoBusca]
+    [carregarDados, termoAplicado]
   );
 
   const abrirModalImagem = useCallback((traje: TrajeResponse) => {
@@ -176,7 +181,7 @@ export function ListarTrajes() {
     () => [
       {
         chave: 'imagem' as const,
-        titulo: 'Img',
+        titulo: 'Imagem',
         render: (traje) => (
           <button
             type="button"
@@ -203,10 +208,14 @@ export function ListarTrajes() {
           traje.preco?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '-',
       },
       {
+        chave: 'status',
+        titulo: 'Status',
+        render: (traje) => <BadgeStatusValor status={traje.status} />,
+      },
+      {
 		  chave: 'acoes',
 		  titulo: 'Ações',
 		  width: '80px',
-		  align: 'center' as const,
 		  render: (traje: TrajeResponse) => (
 			  <div className={styles['listar-trajes__acoes']}>
 				  <Dropdown align="end">
@@ -227,7 +236,7 @@ export function ListarTrajes() {
 							  <Edit2 size={14} className={styles['icone-editar']}/>
 							  <span className={styles['acao-texto']}>Editar traje</span>
 						  </Dropdown.Item>
-						  {traje.status === 'ALUGADO' && (
+						  {trajeEstaAlugado(traje.status) && (
 							  <Dropdown.Item onClick={() => abrirDevolucao(traje)}>
 								  <span className={styles['acao-texto']}>Registrar devolução</span>
 							  </Dropdown.Item>
@@ -245,45 +254,50 @@ export function ListarTrajes() {
     [abrirModalImagem, abrirModalExclusao, abrirDevolucao]
   );
 
-  const handleVoltar = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
-
   return (
-    <div className={styles['listar-trajes']}>
-      <header className={styles['listar-trajes__header']}>
-        <div className={styles['listar-trajes__navegacao']}>
-          <button
-            type="button"
-            className={styles['listar-trajes__botao-voltar']}
-            onClick={handleVoltar}
-            title="Voltar para página anterior"
-          >
-            <ArrowLeft size={20} />
-            <span>Voltar</span>
-          </button>
-          <div className={styles['listar-trajes__titulo']}>
-            <h1 className={styles['listar-trajes__titulo-texto']}>Trajes</h1>
-            <p className={styles['listar-trajes__titulo-subtitulo']}>Gerencie os trajes do sistema</p>
-          </div>
+    <div className={paginaListagemStyles['pagina-listagem']} data-pagina-listagem>
+      <header className={paginaListagemStyles['pagina-listagem__header']}>
+        <div className={paginaListagemStyles['pagina-listagem__titulo']}>
+          <h1>Trajes</h1>
+          <p>Gerencie os trajes do sistema</p>
         </div>
-        <div className={styles['listar-trajes__acoes-header']}>
+        <div className={paginaListagemStyles['pagina-listagem__acoes']}>
+          <Botao tipo="secundario" onClick={() => setPainelFiltrosAberto(true)}>
+            <Filter size={16} />
+            Filtros
+          </Botao>
           <Link to={TRAJE_CONSTANTS.ROUTES.CRIAR}>
             <Botao>Novo Traje</Botao>
           </Link>
         </div>
       </header>
 
-      <Card titulo="Lista de Trajes">
-        <div className={styles['listar-trajes__busca']}>
-          <Busca
-            valor={termoBusca}
-            onChange={setTermoBusca}
-            placeholder="Buscar por nome, tamanho ou cor..."
-            onSearch={(valor) => carregarDadosComDebounce(valor || undefined, 0)}
+      <MenuFiltrosLateral
+        aberto={painelFiltrosAberto}
+        onFechar={() => setPainelFiltrosAberto(false)}
+      >
+        <PainelFiltro variante="lateral">
+          <PainelFiltroControles>
+            <PainelFiltroCampo id="filtro-traje-termo" label="Busca">
+              <PainelFiltroInput
+                id="filtro-traje-termo"
+                type="text"
+                value={filtros.termo}
+                placeholder="Nome, tamanho ou cor..."
+                onChange={(e) => setFiltros({ termo: e.target.value })}
+              />
+            </PainelFiltroCampo>
+          </PainelFiltroControles>
+          <PainelFiltroAcoes
+            onBuscar={buscarComFiltros}
+            onLimpar={limparFiltros}
+            carregando={estado.estaCarregando}
           />
-        </div>
-        
+        </PainelFiltro>
+      </MenuFiltrosLateral>
+
+      <Card preencheAltura>
+        <div className={paginaListagemStyles['pagina-listagem__area-card']}>
         {alertaErro && (
             <Alert
                 variant="danger"
@@ -296,11 +310,16 @@ export function ListarTrajes() {
             </Alert>
         )}
 
-        <div className={styles['listar-trajes__tabela-wrapper']}>
-          <Tabela colunas={colunas} dados={estado.trajes} estaCarregando={estado.estaCarregando} />
+        <div className={paginaListagemStyles['pagina-listagem__tabela']}>
+          <Tabela
+            colunas={colunas}
+            dados={estado.trajes}
+            estaCarregando={estado.estaCarregando}
+            linhasPorPagina={estado.tamanhoPagina}
+          />
         </div>
 
-        <div className={styles['listar-trajes__paginacao']}>
+        <div className={paginaListagemStyles['pagina-listagem__paginacao']}>
           <Paginacao
             paginaAtual={estado.paginaAtual}
             totalPaginas={estado.totalPaginas || 1}
@@ -308,6 +327,7 @@ export function ListarTrajes() {
             tamanhoPagina={estado.tamanhoPagina}
             onPageChange={handlePageChange}
           />
+        </div>
         </div>
       </Card>
 
@@ -341,7 +361,7 @@ export function ListarTrajes() {
           onSucesso={() => {
             setModalDevolucaoAberto(false);
             setAluguelParaDevolver(null);
-            carregarDados(termoBusca || undefined, estado.paginaAtual);
+            carregarDados(termoAplicado || undefined, estado.paginaAtual);
           }}
           onCancelar={() => {
             setModalDevolucaoAberto(false);

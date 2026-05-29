@@ -1,25 +1,38 @@
-import {Botao, Busca, Card, Modal, Paginacao, Tabela} from '@/interfaces-graficas/componentes';
+import {
+  Botao,
+  Card,
+  Modal,
+  Paginacao,
+  MenuFiltrosLateral,
+  PainelFiltro,
+  PainelFiltroAcoes,
+  PainelFiltroCampo,
+  PainelFiltroControles,
+  PainelFiltroInput,
+  Tabela,
+} from '@/interfaces-graficas/componentes';
 import {useClientes} from '@/interfaces-graficas/contextos/ContextoClientes';
+import paginaListagemStyles from '@/interfaces-graficas/estilos/PaginaListagem.module.css';
 import styles from '@/interfaces-graficas/paginas/clientes/listar/ListarClientes/ListarClientes.module.css';
 import {mascararCelular, mascararCpfCnpj} from '@/interfaces-graficas/utils/formatacoes';
 import {DeletarClienteUseCase, ListarClientesUseCase} from '@application/clientes';
+import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
 import {ClienteResponse} from '@domain/entidades';
 import {ClienteApiRepository} from '@infrastructure/api';
-import {ArrowLeft, Edit2, MoreVertical, Trash2} from 'lucide-react';
+import {Edit2, Filter, MoreVertical, Trash2} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Alert, Dropdown} from 'react-bootstrap';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const clienteRepositorio = new ClienteApiRepository();
 const listarClientesUseCase = new ListarClientesUseCase(clienteRepositorio);
 const deletarClienteUseCase = new DeletarClienteUseCase(clienteRepositorio);
 
-const TAMANHO_PAGINA_PADRAO = 10;
-
 export function ListarClientes() {
   const { estado, dispatch } = useClientes();
-  const navigate = useNavigate();
-  const [termoBusca, setTermoBusca] = useState('');
+  const [painelFiltrosAberto, setPainelFiltrosAberto] = useState(false);
+  const [filtros, setFiltros] = useState({ termo: '' });
+  const [termoAplicado, setTermoAplicado] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
   const [clienteParaExcluir, setClienteParaExcluir] = useState<ClienteResponse | null>(null);
   const [estaExcluindo, setEstaExcluindo] = useState(false);
@@ -58,9 +71,9 @@ export function ListarClientes() {
           dispatch({
             tipo: 'SET_PAGINACAO',
             payload: {
-              totalPaginas: resultado.totalPages,
+              totalPaginas: Math.max(resultado.totalPages, 1),
               totalRegistros: resultado.totalElements,
-              tamanhoPagina: resultado.size,
+              tamanhoPagina: TAMANHO_PAGINA_PADRAO,
               paginaAtual: resultado.number,
             },
           });
@@ -95,13 +108,18 @@ export function ListarClientes() {
     };
   }, []);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      carregarClientes(termoBusca || undefined, 0);
-    }, 300);
+  function buscarComFiltros() {
+    setTermoAplicado(filtros.termo);
+    setPainelFiltrosAberto(false);
+    carregarClientes(filtros.termo || undefined, 0);
+  }
 
-    return () => clearTimeout(timeoutId);
-  }, [termoBusca, carregarClientes]);
+  function limparFiltros() {
+    setFiltros({ termo: '' });
+    setTermoAplicado('');
+    setPainelFiltrosAberto(false);
+    carregarClientes(undefined, 0);
+  }
 
   function abrirModalExclusao(cliente: ClienteResponse) {
     setClienteParaExcluir(cliente);
@@ -122,7 +140,7 @@ export function ListarClientes() {
       dispatch({ tipo: 'REMOVER_CLIENTE', payload: clienteParaExcluir.id });
       fecharModal();
       // Recarrega a lista após exclusão
-      carregarClientes(termoBusca || undefined, estado.paginaAtual);
+      carregarClientes(termoAplicado || undefined, estado.paginaAtual);
     } catch {
 		fecharModal();
 		setAlertaErro('Não foi possível excluir o cliente. Tente novamente mais tarde.');
@@ -132,11 +150,7 @@ export function ListarClientes() {
   }
 
   function handlePageChange(pagina: number) {
-    carregarClientes(termoBusca || undefined, pagina);
-  }
-
-  function handleVoltar() {
-    navigate(-1);
+    carregarClientes(termoAplicado || undefined, pagina);
   }
 
   const colunas = [
@@ -157,7 +171,6 @@ export function ListarClientes() {
       chave: 'acoes' as keyof ClienteResponse,
       titulo: 'Ações',
 		width: '80px',
-		align: 'center' as const,
       render: (cliente: ClienteResponse) => (
         <div className={styles['listar-clientes__acoes']}>
 			<Dropdown align="end">
@@ -190,24 +203,17 @@ export function ListarClientes() {
   ];
 
   return (
-    <div className={styles['listar-clientes']}>
-      <header className={styles['listar-clientes__header']}>
-        <div className={styles['listar-clientes__navegacao']}>
-          <button
-            type="button"
-            className={styles['listar-clientes__botao-voltar']}
-            onClick={handleVoltar}
-            title="Voltar para página anterior"
-          >
-            <ArrowLeft size={20} />
-            <span>Voltar</span>
-          </button>
-          <div className={styles['listar-clientes__titulo']}>
-            <h1>Clientes</h1>
-            <p>Gerencie os clientes do sistema</p>
-          </div>
+    <div className={paginaListagemStyles['pagina-listagem']} data-pagina-listagem>
+      <header className={paginaListagemStyles['pagina-listagem__header']}>
+        <div className={paginaListagemStyles['pagina-listagem__titulo']}>
+          <h1>Clientes</h1>
+          <p>Gerencie os clientes do sistema</p>
         </div>
-        <div className={styles['listar-clientes__acoes-header']}>
+        <div className={paginaListagemStyles['pagina-listagem__acoes']}>
+          <Botao tipo="secundario" onClick={() => setPainelFiltrosAberto(true)}>
+            <Filter size={16} />
+            Filtros
+          </Botao>
           <Link to="/clientes/excluidos">
             <Botao tipo="secundario">Ver Excluídos</Botao>
           </Link>
@@ -217,19 +223,33 @@ export function ListarClientes() {
         </div>
       </header>
 
-      <Card titulo="Lista de Clientes">
-        <div className={styles.card__conteudo}>
-          <div className={styles.card__corpo}>
-            <div className={styles['listar-clientes__busca']}>
-              <Busca
-                valor={termoBusca}
-                onChange={setTermoBusca}
-                placeholder="Buscar por nome, CPF ou e-mail..."
-                onSearch={(valor) => carregarClientes(valor || undefined, 0)}
+      <MenuFiltrosLateral
+        aberto={painelFiltrosAberto}
+        onFechar={() => setPainelFiltrosAberto(false)}
+      >
+        <PainelFiltro variante="lateral">
+          <PainelFiltroControles>
+            <PainelFiltroCampo id="filtro-cliente-termo" label="Busca">
+              <PainelFiltroInput
+                id="filtro-cliente-termo"
+                type="text"
+                value={filtros.termo}
+                placeholder="Nome, CPF ou e-mail..."
+                onChange={(e) => setFiltros({ termo: e.target.value })}
               />
-            </div>
-			  
-			  {alertaErro && (
+            </PainelFiltroCampo>
+          </PainelFiltroControles>
+          <PainelFiltroAcoes
+            onBuscar={buscarComFiltros}
+            onLimpar={limparFiltros}
+            carregando={estado.estaCarregando}
+          />
+        </PainelFiltro>
+      </MenuFiltrosLateral>
+
+      <Card preencheAltura>
+        <div className={paginaListagemStyles['pagina-listagem__area-card']}>
+            {alertaErro && (
 				  <Alert
 					  variant="danger"
 			          onClose={() => setAlertaErro(null)}
@@ -241,12 +261,16 @@ export function ListarClientes() {
 				  </Alert>
 			  )}
 
-            <div className={styles['listar-clientes__tabela-wrapper']}>
-              <Tabela colunas={colunas} dados={estado.clientes} estaCarregando={estado.estaCarregando} />
+            <div className={paginaListagemStyles['pagina-listagem__tabela']}>
+              <Tabela
+                colunas={colunas}
+                dados={estado.clientes}
+                estaCarregando={estado.estaCarregando}
+                linhasPorPagina={estado.tamanhoPagina}
+              />
             </div>
-          </div>
 
-          <div className={styles['listar-clientes__paginacao-container']}>
+          <div className={paginaListagemStyles['pagina-listagem__paginacao']}>
             <Paginacao
               paginaAtual={estado.paginaAtual}
               totalPaginas={estado.totalPaginas || 1}
