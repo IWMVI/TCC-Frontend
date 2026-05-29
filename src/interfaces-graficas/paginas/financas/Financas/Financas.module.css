@@ -1,0 +1,66 @@
+.financas {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.financas__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.financas__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.financas__campo label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.financas__input {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  font-size: 0.9375rem;
+  background-color: var(--input-background);
+  color: var(--foreground);
+}
+
+.financas__input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(3, 2, 19, 0.1);
+}
+
+.financas__mensagem {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--cor-texto-secundario);
+}
+
+.financas__metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+@container area-conteudo (max-width: 720px) {
+  .financas__metricas {
+    grid-template-columns: 1fr;
+  }
+}
