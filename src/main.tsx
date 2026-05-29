@@ -5,6 +5,7 @@ import App from '@/App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './interfaces-graficas/estilos/global.css';
 import { ProvedorTema } from '@/interfaces-graficas/contextos/ContextoTema';
+import { ProvedorAutenticacao } from '@/interfaces-graficas/contextos/ContextoAutenticacao';
 
 const router = {
   future: {
@@ -16,9 +17,11 @@ const router = {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ProvedorTema>
-      <BrowserRouter {...router}>
-        <App />
-      </BrowserRouter>
+      <ProvedorAutenticacao>
+        <BrowserRouter {...router}>
+          <App />
+        </BrowserRouter>
+      </ProvedorAutenticacao>
     </ProvedorTema>
   </React.StrictMode>
 );
