@@ -1,0 +1,18 @@
+.detalhe__resumo {
+  flex-shrink: 0;
+  padding: 0 0.5rem 0 1rem;
+  min-width: 0;
+}
+
+.detalhe__metricas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+@container area-conteudo (max-width: 560px) {
+  .detalhe__metricas {
+    grid-template-columns: 1fr;
+  }
+}
