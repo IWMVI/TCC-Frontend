@@ -1,12 +1,22 @@
 import {
+  BadgeStatusValor,
   Botao,
   Calendario,
   Card,
   Modal,
   Paginacao,
+  MenuFiltrosLateral,
+  PainelFiltro,
+  PainelFiltroAcoes,
+  PainelFiltroCampo,
+  PainelFiltroControles,
+  PainelFiltroInput,
+  PainelFiltroSelect,
   Tabela,
 } from '@/interfaces-graficas/componentes';
 import { FormularioDevolucao } from '@/interfaces-graficas/paginas/alugueis/devolver/FormularioDevolucao';
+import paginaListagemStyles from '@/interfaces-graficas/estilos/PaginaListagem.module.css';
+import { formatarDataBr } from '@/interfaces-graficas/utils/formatarData';
 import styles from '@/interfaces-graficas/paginas/alugueis/listar/ListarAluguel.module.css';
 import { obterAliasTipoOcasiao } from '@/interfaces-graficas/paginas/alugueis/utils/ocasiao';
 import {
@@ -22,7 +32,6 @@ import { AluguelResponse, StatusAluguel, TipoOcasiao } from '@domain/entidades';
 import { FiltrosAluguel } from '@domain/interfaces';
 import { AluguelApiRepository } from '@infrastructure/api';
 import {
-  ArrowLeft,
   Edit2,
   Eye,
   FileText,
@@ -31,6 +40,7 @@ import {
   RotateCcw,
   Trash2,
 } from 'lucide-react';
+import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Dropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
@@ -40,8 +50,6 @@ const listarAlugueisUseCase = new ListarAlugueisUseCase(aluguelRepositorio);
 const deletarAluguelUseCase = new DeletarAluguelUseCase(aluguelRepositorio);
 const buscarAluguelPorIdUseCase = new BuscarAluguelPorIdUseCase(aluguelRepositorio);
 const gerarContratoUseCase = new GerarContratoAluguelUseCase(aluguelRepositorio);
-
-const TAMANHO_PAGINA_PADRAO = 10;
 
 export function ListarAluguel() {
   const navigate = useNavigate();
@@ -100,9 +108,9 @@ export function ListarAluguel() {
 
       if (!signal.aborted) {
         setAluguel(resultado.content);
-        setTotalPaginas(resultado.totalPages);
+        setTotalPaginas(Math.max(resultado.totalPages, 1));
         setTotalRegistros(resultado.totalElements);
-        setTamanhoPagina(resultado.size);
+        setTamanhoPagina(TAMANHO_PAGINA_PADRAO);
         setPaginaAtual(resultado.number);
       }
     } catch (erro) {
@@ -197,55 +205,35 @@ export function ListarAluguel() {
   }
 
   const colunas = [
-    { chave: 'id' as keyof AluguelResponse, titulo: 'ID', align: 'center' as const },
+    { chave: 'id' as keyof AluguelResponse, titulo: 'ID' },
     {
       chave: 'nomeCliente' as keyof AluguelResponse,
       titulo: 'Nome do Cliente',
-      align: 'center' as const,
       render: (aluguel: AluguelResponse) => aluguel.nomeCliente,
     },
     {
       chave: 'dataRetirada' as keyof AluguelResponse,
       titulo: 'Data Retirada',
-      align: 'center' as const,
-      render: (aluguel: AluguelResponse) =>
-        new Date(aluguel.dataRetirada).toLocaleDateString('pt-BR'),
+      render: (aluguel: AluguelResponse) => formatarDataBr(aluguel.dataRetirada),
     },
     {
       chave: 'dataDevolucao' as keyof AluguelResponse,
       titulo: 'Data de Devolução',
-      align: 'center' as const,
-      render: (aluguel: AluguelResponse) =>
-        new Date(aluguel.dataDevolucao).toLocaleDateString('pt-BR'),
+      render: (aluguel: AluguelResponse) => formatarDataBr(aluguel.dataDevolucao),
     },
     {
       chave: 'valorTotal' as keyof AluguelResponse,
       titulo: 'Valor Total',
-      align: 'center' as const,
       render: (aluguel: AluguelResponse) => `R$ ${aluguel.valorTotal.toFixed(2)}`,
     },
     {
       chave: 'status' as keyof AluguelResponse,
       titulo: 'Status',
-      align: 'center' as const,
-      render: (aluguel: AluguelResponse) => {
-        const classeMap: Record<StatusAluguel, string> = {
-          [StatusAluguel.ATIVO]: styles['status-ativo'],
-          [StatusAluguel.ATRASO]: styles['status-atraso'],
-          [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
-          [StatusAluguel.CANCELADO]: styles['status-cancelado'],
-        };
-        return (
-          <span className={classeMap[aluguel.status] ?? styles['status-ativo']}>
-            {aluguel.status}
-          </span>
-        );
-      },
+      render: (aluguel: AluguelResponse) => <BadgeStatusValor status={aluguel.status} />,
     },
     {
       chave: 'acoes' as keyof AluguelResponse,
       titulo: 'Ações',
-      align: 'center' as const,
       render: (aluguel: AluguelResponse) => (
         <div className={styles['aluguel-acoes']}>
           <Dropdown align="end">
@@ -289,7 +277,7 @@ export function ListarAluguel() {
   ];
 
   return (
-    <div className={styles['listar-aluguel']}>
+    <div className={paginaListagemStyles['pagina-listagem']} data-pagina-listagem>
       {alertaSucesso && (
         <Alert
           variant="success"
@@ -314,24 +302,13 @@ export function ListarAluguel() {
         </Alert>
       )}
 
-      <header className={styles['listar-aluguel__header']}>
-        <div className={styles['listar-aluguel__navegacao']}>
-          <button
-            type="button"
-            className={styles['listar-aluguel__botao-voltar']}
-            onClick={() => navigate(-1)}
-            title="Voltar para página anterior"
-          >
-            <ArrowLeft size={20} />
-            <span>Voltar</span>
-          </button>
-          <div className={styles['listar-aluguel__titulo']}>
-            <h1>Aluguéis</h1>
-            <p>Gerencie os aluguéis do sistema</p>
-          </div>
+      <header className={paginaListagemStyles['pagina-listagem__header']}>
+        <div className={paginaListagemStyles['pagina-listagem__titulo']}>
+          <h1>Aluguéis</h1>
+          <p>Gerencie os aluguéis do sistema</p>
         </div>
-        <div className={styles['listar-aluguel__acoes-header']}>
-          <Botao tipo="secundario" onClick={() => setPainelFiltrosAberto((prev) => !prev)}>
+        <div className={paginaListagemStyles['pagina-listagem__acoes']}>
+          <Botao tipo="secundario" onClick={() => setPainelFiltrosAberto(true)}>
             <Filter size={16} />
             Filtros
           </Botao>
@@ -341,17 +318,15 @@ export function ListarAluguel() {
         </div>
       </header>
 
-      <Card titulo="Lista de Aluguéis">
-        <div className={styles['listar-aluguel__conteudo']}>
-          {/* Task 13.1: Conditional filter panel */}
-          {painelFiltrosAberto && (
-            <div className={styles['painel-filtros']}>
-              <div className={styles['painel-filtros__controles']}>
-                <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-status">Status</label>
-                  <select
+      <MenuFiltrosLateral
+        aberto={painelFiltrosAberto}
+        onFechar={() => setPainelFiltrosAberto(false)}
+      >
+        <PainelFiltro variante="lateral">
+              <PainelFiltroControles>
+                <PainelFiltroCampo id="filtro-status" label="Status">
+                  <PainelFiltroSelect
                     id="filtro-status"
-                    className={styles['filtro-select']}
                     value={filtros.status ?? ''}
                     onChange={(e) =>
                       setFiltros((prev) => ({
@@ -365,15 +340,13 @@ export function ListarAluguel() {
                     <option value={StatusAluguel.ATRASO}>Em Atraso</option>
                     <option value={StatusAluguel.CONCLUIDO}>Concluído</option>
                     <option value={StatusAluguel.CANCELADO}>Cancelado</option>
-                  </select>
-                </div>
+                  </PainelFiltroSelect>
+                </PainelFiltroCampo>
 
-                <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-nomeCliente">Nome do Cliente</label>
-                  <input
+                <PainelFiltroCampo id="filtro-nomeCliente" label="Nome do Cliente">
+                  <PainelFiltroInput
                     id="filtro-nomeCliente"
                     type="text"
-                    className={styles['filtro-input']}
                     value={filtros.nomeCliente ?? ''}
                     placeholder="Ex: João Silva"
                     onChange={(e) =>
@@ -383,9 +356,9 @@ export function ListarAluguel() {
                       }))
                     }
                   />
-                </div>
+                </PainelFiltroCampo>
 
-                <div className={styles['filtro-campo']}>
+                <PainelFiltroCampo>
                   <Calendario
                     id="filtro-dataRetiradaInicio"
                     label="Retirada — início"
@@ -398,9 +371,9 @@ export function ListarAluguel() {
                     }
                     permitirPassado
                   />
-                </div>
+                </PainelFiltroCampo>
 
-                <div className={styles['filtro-campo']}>
+                <PainelFiltroCampo>
                   <Calendario
                     id="filtro-dataRetiradaFim"
                     label="Retirada — fim"
@@ -413,13 +386,11 @@ export function ListarAluguel() {
                     }
                     permitirPassado
                   />
-                </div>
+                </PainelFiltroCampo>
 
-                <div className={styles['filtro-campo']}>
-                  <label htmlFor="filtro-ocasiao">Ocasião</label>
-                  <select
+                <PainelFiltroCampo id="filtro-ocasiao" label="Ocasião">
+                  <PainelFiltroSelect
                     id="filtro-ocasiao"
-                    className={styles['filtro-select']}
                     value={filtros.ocasiao ?? ''}
                     onChange={(e) =>
                       setFiltros((prev) => ({
@@ -434,44 +405,42 @@ export function ListarAluguel() {
                         {obterAliasTipoOcasiao(ocasiao)}
                       </option>
                     ))}
-                  </select>
-                </div>
-              </div>
+                  </PainelFiltroSelect>
+                </PainelFiltroCampo>
+              </PainelFiltroControles>
 
-              <div className={styles['painel-filtros__acoes']}>
-                <Botao tipo="primario" onClick={() => buscarComFiltros(filtros)}>
-                  Buscar
-                </Botao>
-                <Botao
-                  tipo="secundario"
-                  onClick={() => {
-                    const filtrosLimpos: FiltrosAluguel = { status: StatusAluguel.ATIVO };
-                    setFiltros(filtrosLimpos);
-                    buscarComFiltros(filtrosLimpos);
-                  }}
-                >
-                  Limpar Filtros
-                </Botao>
-              </div>
-            </div>
-          )}
-
-          {estaCarregando ? (
-            <p className={styles['listar-aluguel__mensagem']}>Carregando...</p>
-          ) : alugueis.length === 0 ? (
-            <p className={styles['listar-aluguel__mensagem']}>Nenhum aluguel encontrado</p>
-          ) : (
-            <>
-              <Tabela colunas={colunas} dados={alugueis} />
-              <Paginacao
-                paginaAtual={paginaAtual}
-                totalPaginas={totalPaginas}
-                totalRegistros={totalRegistros}
-                tamanhoPagina={tamanhoPagina}
-                onPageChange={(pagina) => carregarAluguel(filtros, pagina)}
+              <PainelFiltroAcoes
+                onBuscar={() => buscarComFiltros(filtros)}
+                onLimpar={() => {
+                  const filtrosLimpos: FiltrosAluguel = { status: StatusAluguel.ATIVO };
+                  setFiltros(filtrosLimpos);
+                  buscarComFiltros(filtrosLimpos);
+                }}
+                carregando={estaCarregando}
               />
-            </>
-          )}
+        </PainelFiltro>
+      </MenuFiltrosLateral>
+
+      <Card preencheAltura>
+        <div className={paginaListagemStyles['pagina-listagem__area-card']}>
+          <div className={paginaListagemStyles['pagina-listagem__tabela']}>
+            <Tabela
+              colunas={colunas}
+              dados={alugueis}
+              estaCarregando={estaCarregando}
+              linhasPorPagina={tamanhoPagina}
+            />
+          </div>
+
+          <div className={paginaListagemStyles['pagina-listagem__paginacao']}>
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalPaginas={totalPaginas}
+              totalRegistros={totalRegistros}
+              tamanhoPagina={tamanhoPagina}
+              onPageChange={(pagina) => carregarAluguel(filtros, pagina)}
+            />
+          </div>
         </div>
       </Card>
 
@@ -503,19 +472,7 @@ export function ListarAluguel() {
                 </h2>
               </div>
               <div className={styles['modal-detalhes-header__acoes']}>
-                {(() => {
-                  const classeMap: Record<StatusAluguel, string> = {
-                    [StatusAluguel.ATIVO]: styles['status-ativo'],
-                    [StatusAluguel.ATRASO]: styles['status-atraso'],
-                    [StatusAluguel.CONCLUIDO]: styles['status-concluido'],
-                    [StatusAluguel.CANCELADO]: styles['status-cancelado'],
-                  };
-                  return (
-                    <span className={classeMap[aluguelDetalhes.status] ?? styles['status-ativo']}>
-                      {aluguelDetalhes.status}
-                    </span>
-                  );
-                })()}
+                <BadgeStatusValor status={aluguelDetalhes.status} />
                 <button
                   type="button"
                   className={styles['modal-detalhes-header__fechar']}
@@ -549,7 +506,7 @@ export function ListarAluguel() {
                     <div className={styles['modal-detalhe-item']}>
                       <span className={styles['modal-detalhe-item__rotulo']}>Data de Retirada</span>
                       <span className={styles['modal-detalhe-item__valor']}>
-                        {new Date(aluguelDetalhes.dataRetirada).toLocaleDateString('pt-BR')}
+                        {formatarDataBr(aluguelDetalhes.dataRetirada)}
                       </span>
                     </div>
                     <div className={styles['modal-detalhe-item']}>
@@ -557,13 +514,13 @@ export function ListarAluguel() {
                         Data de Devolução
                       </span>
                       <span className={styles['modal-detalhe-item__valor']}>
-                        {new Date(aluguelDetalhes.dataDevolucao).toLocaleDateString('pt-BR')}
+                        {formatarDataBr(aluguelDetalhes.dataDevolucao)}
                       </span>
                     </div>
                     <div className={styles['modal-detalhe-item']}>
                       <span className={styles['modal-detalhe-item__rotulo']}>Data do Aluguel</span>
                       <span className={styles['modal-detalhe-item__valor']}>
-                        {new Date(aluguelDetalhes.dataAluguel).toLocaleDateString('pt-BR')}
+                        {formatarDataBr(aluguelDetalhes.dataAluguel)}
                       </span>
                     </div>
                     {aluguelDetalhes.observacoes && (
