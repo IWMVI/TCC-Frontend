@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfirmarCancelarCadastro } from '@/interfaces-graficas/hooks/useConfirmarCancelarCadastro';
 import { Eye, X } from 'lucide-react';
 import { Botao } from '@interfaces-graficas/componentes/base/Botao';
 import { ModalVisualizacaoImagem } from '@interfaces-graficas/componentes/feedback/ModalVisualizacaoImagem';
 import { LoadingState } from '@interfaces-graficas/componentes/feedback/LoadingState';
 import { TrajeRequest } from '@domain/entidades';
 import { enumApiRepository, EnumValues } from '@infrastructure/api';
-import { TRAJE_CONSTANTS } from '@application/trajes/TrajeDependencies';
 import { useFormTraje, formatarValorDigitado, useImageHandler } from '@application/trajes/hooks';
 import styles from '@/interfaces-graficas/paginas/trajes/componentes/FormularioTraje/FormularioTraje.module.css';
 
@@ -49,6 +49,9 @@ export function FormularioTraje({
   onCancel,
 }: Readonly<FormularioTrajeProps>) {
   const navigate = useNavigate();
+  const { solicitarCancelamento, modalConfirmacao } = useConfirmarCancelarCadastro(() => {
+    navigate('/dashboard');
+  });
   const [opcoesEnum, setOpcoesEnum] = useState<EnumValues | null>(null);
   const [modalImagemAberto, setModalImagemAberto] = useState(false);
   const [valorItemDisplay, setValorItemDisplay] = useState('');
@@ -184,8 +187,8 @@ export function FormularioTraje({
       return;
     }
 
-    navigate(TRAJE_CONSTANTS.ROUTES.LISTA);
-  }, [navigate, onCancel]);
+    solicitarCancelamento();
+  }, [onCancel, solicitarCancelamento]);
 
   const mostrarCancelar = !modoModal || Boolean(onCancel);
 
@@ -233,17 +236,8 @@ export function FormularioTraje({
     : opcoesEnum.tipoTraje;
 
   return (
+    <>
     <div className={styles['formulario-traje']}>
-      {!modoModal && (
-        <button
-          className={styles['formulario-traje__voltar']}
-          onClick={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTA)}
-          type="button"
-        >
-          ← Voltar
-        </button>
-      )}
-
       <section className={styles['formulario-traje__cabecalho']}>
         <h1 className={styles['formulario-traje__titulo']}>{titulo}</h1>
       </section>
@@ -407,5 +401,7 @@ export function FormularioTraje({
         }}
       />
     </div>
+    {modalConfirmacao}
+    </>
   );
 }

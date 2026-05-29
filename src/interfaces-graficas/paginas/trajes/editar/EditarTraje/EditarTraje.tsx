@@ -98,6 +98,7 @@ export function EditarTraje() {
       trajeInicial={initialData}
       estaEnviando={estaEnviando}
       erro={erro}
+      onCancel={() => navigate(TRAJE_CONSTANTS.ROUTES.LISTAR)}
       onSubmit={handleSubmit}
     />
   );

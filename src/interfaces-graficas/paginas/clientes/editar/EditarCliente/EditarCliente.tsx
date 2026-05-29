@@ -144,6 +144,7 @@ export function EditarCliente() {
             erro={erro}
             onSubmit={handleSubmit}
             clienteId={id ? Number.parseInt(id, 10) : undefined}
+            onCancel={() => navigate('/clientes/listar')}
         />
     );
 }
