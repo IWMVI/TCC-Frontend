@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { formatarDataBr } from '@/interfaces-graficas/utils/formatarData';
 import styles from '@/interfaces-graficas/componentes/form/Calendario/Calendario.module.css';
 
 interface CalendarioProps {
@@ -307,8 +308,8 @@ export function Calendario({
   );
   const labelAno = mesAtual.getFullYear();
   const valorExibicao = useMemo(
-    () => (selecionada ? new Intl.DateTimeFormat('pt-BR').format(selecionada) : ''),
-    [selecionada]
+    () => (value ? formatarDataBr(value) : ''),
+    [value],
   );
 
   const podeIrMesAnterior = !isMonthBlocked(
