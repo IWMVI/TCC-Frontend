@@ -37,7 +37,6 @@ export function ListarClientes() {
   const [clienteParaExcluir, setClienteParaExcluir] = useState<ClienteResponse | null>(null);
   const [estaExcluindo, setEstaExcluindo] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const jaCarregouRef = useRef(false);
 	const [alertaErro, setAlertaErro] = useState<string | null>(null);
 	
 	useEffect(() => {
@@ -93,10 +92,7 @@ export function ListarClientes() {
 
   // Carregar dados iniciais
   useEffect(() => {
-    if (!jaCarregouRef.current) {
-      jaCarregouRef.current = true;
-      carregarClientes();
-    }
+    carregarClientes();
   }, [carregarClientes]);
 
   // Limpar requisições ao desmontar

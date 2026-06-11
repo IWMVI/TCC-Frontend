@@ -32,14 +32,14 @@ export function CriarCliente({
 		}
 	}, [erro]);
 
-  function voltarParaInicial() {
+  function irParaLista() {
 	  setAlertaSucesso(false);
     if (modoModal && onCancelar) {
       onCancelar();
       return;
     }
 
-    navigate('/dashboard');
+    navigate('/clientes/listar');
   }
 	
 	async function handleSubmit(dados: ClienteRequest): Promise<number | undefined> {
@@ -53,7 +53,7 @@ export function CriarCliente({
       }
 		
 		setAlertaSucesso(true);
-		setTimeout(() => voltarParaInicial(), 2500);
+		setTimeout(() => irParaLista(), 2500);
       return criado.id;
 	} catch {
 		setErro('Não foi possível criar o cliente. Verifique os dados e tente novamente.');
@@ -68,13 +68,13 @@ export function CriarCliente({
 		{alertaSucesso && (
 			<Alert
 				variant="success"
-			    onClose={voltarParaInicial}
+			    onClose={irParaLista}
 			    dismissible
 			    className="alerta-auto"
 			    style={{position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999, minWidth: '300px'}}
 			>
 				<Alert.Heading>Cliente criado!</Alert.Heading>
-				<p>Redirecionando para a página inicial...</p>
+				<p>Redirecionando para a lista de clientes...</p>
 			</Alert>
 		)}
 		
