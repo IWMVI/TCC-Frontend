@@ -9,6 +9,7 @@
     "dev:electron": "vite",
     "build": "tsc && vite build && electron-builder --publish=never",
     "build:vite": "tsc && vite build",
+    "postinstall": "node scripts/fix-electron.js",
     "preview": "vite preview",
     "electron": "electron .",
     "lint": "eslint . --ext ts,tsx",
@@ -90,5 +91,8 @@
       ]
     },
     "publish": null
+  },
+  "allowScripts": {
+    "electron@41.5.0": true
   }
 }
