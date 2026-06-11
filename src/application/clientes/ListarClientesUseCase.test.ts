@@ -150,7 +150,7 @@ describe('ListarClientesUseCase', () => {
       await useCase.executar();
 
       // Assert
-      expect(mockClienteRepositorio.listar).toHaveBeenCalledWith(undefined, undefined, undefined);
+      expect(mockClienteRepositorio.listar).toHaveBeenCalledWith(undefined, 0, 10);
     });
   });
 });

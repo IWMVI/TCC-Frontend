@@ -78,7 +78,7 @@ describe('ListarAlugueisUseCase', () => {
 
       await useCase.executar();
 
-      expect(mockRepositorio.listar).toHaveBeenCalledWith(undefined, undefined, undefined);
+      expect(mockRepositorio.listar).toHaveBeenCalledWith(undefined, 0, 10);
     });
   });
 
@@ -105,8 +105,8 @@ describe('ListarAlugueisUseCase', () => {
 
       expect(mockRepositorio.listarComFiltros).toHaveBeenCalledWith(
         { ocasiao: TipoOcasiao.CASAMENTO, status: StatusAluguel.ATIVO },
-        undefined,
-        undefined,
+        0,
+        10,
       );
     });
 
@@ -118,8 +118,8 @@ describe('ListarAlugueisUseCase', () => {
 
       expect(mockRepositorio.listarComFiltros).toHaveBeenCalledWith(
         { status: StatusAluguel.CONCLUIDO },
-        undefined,
-        undefined,
+        0,
+        10,
       );
     });
   });

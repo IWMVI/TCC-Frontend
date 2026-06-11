@@ -131,7 +131,7 @@ describe('ListarTrajesUseCase', () => {
 
       await useCase.executar();
 
-      expect(mockTrajeRepositorio.listar).toHaveBeenCalledWith(undefined, undefined, undefined);
+      expect(mockTrajeRepositorio.listar).toHaveBeenCalledWith(undefined, 0, 10);
     });
   });
 });
