@@ -6,9 +6,7 @@ import { CriarTrajeUseCase } from '@/application/trajes/CriarTrajeUseCase';
 import { AtualizarTrajeUseCase } from '@/application/trajes/AtualizarTrajeUseCase';
 import { DeletarTrajeUseCase } from '@/application/trajes/DeletarTrajeUseCase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
-
-const trajeRepository: ITrajeRepository = new TrajeApiRepository(API_BASE_URL);
+const trajeRepository: ITrajeRepository = new TrajeApiRepository();
 
 const listarTrajesUseCase = new ListarTrajesUseCase(trajeRepository);
 const buscarTrajePorIdUseCase = new BuscarTrajePorIdUseCase(trajeRepository);
