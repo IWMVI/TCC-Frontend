@@ -21,21 +21,3 @@ export type {
 } from '@/domain/entidades/Aluguel';
 export type { DevolucaoRequest, DevolucaoResponse, ItemDevolucaoRequest } from '@/domain/entidades/Devolucao';
 export { CondicaoTraje } from '@/domain/entidades/Devolucao';
-export type {
-  FuncionarioRequest,
-  FuncionarioResponse,
-  FuncionarioUpdateRequest,
-} from '@/domain/entidades/Funcionario';
-export type {
-  LoginRequest,
-  LoginResponse,
-  RegistrarFuncionarioRequest,
-  SolicitarRecuperacaoSenhaRequest,
-  RedefinirSenhaRequest,
-} from '@/domain/entidades/Auth';
-export type {
-  DashboardResumo,
-  AluguelResumoItem,
-  SerieMensalDashboard,
-} from '@/domain/entidades/Dashboard';
-export type { FinancasResumo, FinancasPorStatus } from '@/domain/entidades/Financas';

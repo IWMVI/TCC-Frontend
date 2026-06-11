@@ -17,10 +17,10 @@ import {
   dataDevolucaoIndisponivel,
   periodosConflitam,
 } from '@/interfaces-graficas/paginas/alugueis/utils/validacaoDatasAluguel';
+import {ArrowLeft} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {Alert} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
-import {useConfirmarCancelarCadastro} from '@/interfaces-graficas/hooks/useConfirmarCancelarCadastro';
 
 const aluguelRepositorio = new AluguelApiRepository();
 const trajeRepositorio = new TrajeApiRepository();
@@ -33,9 +33,6 @@ interface ItemSelecionado {
 
 export function RealizarAluguel() {
   const navigate = useNavigate();
-  const { solicitarCancelamento, modalConfirmacao } = useConfirmarCancelarCadastro(() => {
-    navigate('/dashboard');
-  });
   const [clienteSelecionado, setClienteSelecionado] = useState<ClienteResponse | null>(null);
   const [itensSelecionados, setItensSelecionados] = useState<ItemSelecionado[]>([]);
   const [dataRetirada, setDataRetirada] = useState('');
@@ -68,7 +65,7 @@ export function RealizarAluguel() {
 
   function voltarParaInicial() {
     setAlertaSucesso(false);
-    navigate('/dashboard');
+    navigate('/alugueis');
   }
 
 	function adicionarTraje(traje: Traje) {
@@ -222,6 +219,15 @@ export function RealizarAluguel() {
       )}
 
       <header className={styles.header}>
+        <button
+          type="button"
+          className={styles.botaoVoltar}
+          onClick={() => navigate('/alugueis')}
+          title="Voltar"
+        >
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </button>
         <div className={styles.titulo}>
           <h1>Realizar Aluguel</h1>
           <p>Selecione um cliente e trajes para registrar um novo aluguel</p>
@@ -272,12 +278,11 @@ export function RealizarAluguel() {
           <Botao tipo="primario" onClick={handleRealizarAluguel} disabled={estaEnviando}>
             {estaEnviando ? 'Processando...' : 'Realizar Aluguel'}
           </Botao>
-          <Botao tipo="perigo" onClick={solicitarCancelamento} disabled={estaEnviando}>
+          <Botao tipo="perigo" onClick={() => navigate('/alugueis')} disabled={estaEnviando}>
             Cancelar
           </Botao>
         </div>
       </main>
-      {modalConfirmacao}
     </div>
   );
 }

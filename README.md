@@ -24,10 +24,6 @@ Três domínios principais, todos com CRUD completo, filtros e paginação:
 - **Clientes** — cadastro, edição, listagem com busca, exclusão lógica e recuperação, busca de CEP via viaCEP, registro de medidas masculinas/femininas.
 - **Trajes** — cadastro/edição com upload de imagem, listagem com filtros (tipo, cor, tamanho, status), calendário de disponibilidade.
 - **Aluguéis** — criação com selecionador de trajes (foto + disponibilidade), listagem com filtros (status, cliente, datas, ocasião), edição, **registro de devolução** com condição por traje, **geração de contrato em PDF** (abre em nova aba) e exclusão.
-- **Autenticação** — login com JWT, confirmação de e-mail, rotas protegidas.
-- **Dashboard** — métricas de aluguéis e finanças (ativos, atraso, receita, últimos contratos).
-- **Finanças** — relatório agregado por período (receita, descontos, multas, por status).
-- **Funcionários** — cadastro com envio de link de confirmação por e-mail.
 
 ---
 
@@ -219,23 +215,15 @@ electron/
 
 ## Configuração da API
 
-Defina a URL base no `.env` do frontend:
+Por padrão, os repositórios apontam para `http://localhost:8080`. Os arquivos relevantes:
 
-```env
-VITE_API_BASE_URL=http://localhost:8080
-```
-
-O cliente HTTP compartilhado (`src/infrastructure/api/httpClient.ts`) anexa o token JWT (`localStorage`: `tcc_token`) e redireciona para `/login` em respostas 401.
-
-### Primeiro acesso
-
-Use o administrador criado pelo backend (`ADMIN_EMAIL` / `ADMIN_SENHA`, padrão `admin@locadora.local` / `Admin@123`). Rotas públicas: `/login`, `/confirmar-email`.
+- `src/infrastructure/api/AluguelApiRepository.ts`
+- `src/infrastructure/api/ClienteApiRepository.ts`
+- `src/infrastructure/api/TrajeApiRepository.ts`
+- `src/infrastructure/api/EnumApiRepository.ts`
 
 ### Endpoints consumidos (backend)
 
-- `POST /auth/login`, `GET /auth/confirmar-email`, `POST /auth/reenviar-confirmacao`
-- `GET/POST/PUT/DELETE /funcionarios`
-- `GET /dashboard/resumo`, `GET /financas/resumo`
 - `GET/POST/PUT/DELETE /alugueis` + `/alugueis/{id}/devolucao` + `/alugueis/{id}/contrato` (PDF)
 - `GET/POST/PUT/DELETE /clientes` + `/clientes/{id}/recuperar`
 - `GET/POST/PUT/DELETE /trajes` + `/trajes/{id}/imagem`

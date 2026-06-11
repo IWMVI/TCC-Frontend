@@ -1,18 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
+import { Search, X, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
 import { PeriodoAlugado, Traje } from '@domain/entidades';
 import { ListarTrajesUseCase } from '@application/trajes';
 import { TrajeApiRepository } from '@infrastructure/api';
 import { CriarTraje } from '@/interfaces-graficas/paginas/trajes/criar/CriarTraje/CriarTraje';
-import {
-  Botao,
-  PainelFiltro,
-  PainelFiltroAcoes,
-  PainelFiltroCampo,
-  PainelFiltroControles,
-  PainelFiltroInput,
-} from '@/interfaces-graficas/componentes';
+import { Botao } from '@/interfaces-graficas/componentes';
 import { ModalFormulario } from '@/interfaces-graficas/componentes/feedback/ModalFormulario/ModalFormulario';
 import styles from '@/interfaces-graficas/paginas/alugueis/realizar/componentes/SelecionadorTraje.module.css';
 
@@ -259,8 +252,7 @@ export function SelecionadorTraje({
   onAdicionarTraje,
   onRemoverTraje,
 }: Readonly<Props>) {
-  const [filtros, setFiltros] = useState({ termo: '' });
-  const [termoAplicado, setTermoAplicado] = useState('');
+  const [termoBusca, setTermoBusca] = useState('');
   const [trajes, setTrajes] = useState<Traje[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [trajeSelecionado, setTrajeSelecionado] = useState<Traje | null>(null);
@@ -325,24 +317,17 @@ export function SelecionadorTraje({
     []
   );
 
-  function buscarComFiltros() {
-    setTermoAplicado(filtros.termo);
-    if (filtros.termo.trim()) {
-      void carregarTrajes(filtros.termo);
-    } else {
-      setTrajes([]);
-      setBuscaSemResultados(false);
-      setPeriodosMap({});
-    }
-  }
-
-  function limparFiltros() {
-    setFiltros({ termo: '' });
-    setTermoAplicado('');
-    setTrajes([]);
-    setBuscaSemResultados(false);
-    setPeriodosMap({});
-  }
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (termoBusca) carregarTrajes(termoBusca);
+      else {
+        setTrajes([]);
+        setBuscaSemResultados(false);
+        setPeriodosMap({});
+      }
+    }, 300);
+    return () => clearTimeout(id);
+  }, [termoBusca, carregarTrajes]);
 
   async function handleSelecionarTraje(traje: Traje) {
     setTrajeSelecionado(traje);
@@ -380,32 +365,32 @@ export function SelecionadorTraje({
     setModalCadastroAberto(false);
     setTrajeSelecionado(null);
     setPeriodosAlugados([]);
-    limparFiltros();
+    setTermoBusca('');
+    setTrajes([]);
+    setBuscaSemResultados(false);
+    setPeriodosMap({});
     onAdicionarTraje(traje);
   }
 
-  const exibeResultados = termoAplicado.trim().length > 0 && !trajeSelecionado;
+  const exibeResultados = termoBusca && !trajeSelecionado;
 
   return (
     <div className={styles.selecionadorTraje}>
-      <PainelFiltro>
-        <PainelFiltroControles>
-          <PainelFiltroCampo id="busca-traje" label="Pesquisar traje">
-            <PainelFiltroInput
-              id="busca-traje"
-              type="text"
-              placeholder="Digite o nome do traje..."
-              value={filtros.termo}
-              onChange={(e) => setFiltros({ termo: e.target.value })}
-            />
-          </PainelFiltroCampo>
-        </PainelFiltroControles>
-        <PainelFiltroAcoes
-          onBuscar={buscarComFiltros}
-          onLimpar={limparFiltros}
-          carregando={estaCarregando}
-        />
-      </PainelFiltro>
+      {/* ── Busca ── */}
+      <div className={styles.busca}>
+        <label htmlFor="busca-traje">Pesquisar Traje</label>
+        <div className={styles.inputComIcone}>
+          <input
+            id="busca-traje"
+            type="text"
+            placeholder="Digite o nome do traje..."
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+            className={styles.input}
+          />
+          <Search size={18} className={styles.icone} />
+        </div>
+      </div>
 
       {/* ── Painel de confirmação ── */}
       {trajeSelecionado && (

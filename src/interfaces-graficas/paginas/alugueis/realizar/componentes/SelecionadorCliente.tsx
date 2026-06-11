@@ -1,12 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { Search } from 'lucide-react';
 import { ClienteResponse } from '@domain/entidades';
-import {
-  PainelFiltro,
-  PainelFiltroAcoes,
-  PainelFiltroCampo,
-  PainelFiltroControles,
-  PainelFiltroInput,
-} from '@/interfaces-graficas/componentes';
 import { ListarClientesUseCase } from '@application/clientes';
 import { ClienteApiRepository } from '@infrastructure/api';
 import { CriarCliente } from '@/interfaces-graficas/paginas/clientes/criar/CriarCliente/CriarCliente';
@@ -27,9 +21,8 @@ export function SelecionadorCliente({
   clienteSelecionado,
   onClienteChange,
 }: Readonly<Props>) {
-  const [filtros, setFiltros] = useState({ cpf: '', nome: '' });
-  const [termoAplicadoCpf, setTermoAplicadoCpf] = useState('');
-  const [termoAplicadoNome, setTermoAplicadoNome] = useState('');
+  const [termoBuscaCPF, setTermoBuscaCPF] = useState('');
+  const [termoBuscaNome, setTermoBuscaNome] = useState('');
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [buscaSemResultados, setBuscaSemResultados] = useState(false);
@@ -67,37 +60,37 @@ export function SelecionadorCliente({
     };
   }, []);
 
-  function buscarComFiltros() {
-    if (clienteSelecionado) {
-      return;
-    }
-    setTermoAplicadoCpf(filtros.cpf);
-    setTermoAplicadoNome(filtros.nome);
-    const termo = filtros.cpf || filtros.nome;
-    if (termo) {
-      void carregarClientes(termo);
-    } else {
-      setClientes([]);
-      setBuscaSemResultados(false);
-    }
-  }
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (clienteSelecionado) {
+        return;
+      }
 
-  function limparFiltros() {
-    setFiltros({ cpf: '', nome: '' });
-    setTermoAplicadoCpf('');
-    setTermoAplicadoNome('');
+      if (termoBuscaCPF || termoBuscaNome) {
+        carregarClientes(termoBuscaCPF || termoBuscaNome);
+      } else {
+        setClientes([]);
+        setBuscaSemResultados(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [termoBuscaCPF, termoBuscaNome, clienteSelecionado, carregarClientes]);
+
+  function selecionarCliente(cliente: ClienteResponse) {
+    onClienteChange(cliente);
+    setTermoBuscaCPF('');
+    setTermoBuscaNome('');
     setClientes([]);
     setBuscaSemResultados(false);
   }
 
-  function selecionarCliente(cliente: ClienteResponse) {
-    onClienteChange(cliente);
-    limparFiltros();
-  }
-
   function limparClienteSelecionado() {
     onClienteChange(null);
-    limparFiltros();
+    setTermoBuscaCPF('');
+    setTermoBuscaNome('');
+    setClientes([]);
+    setBuscaSemResultados(false);
   }
 
   function handleCadastroSucesso(cliente: ClienteResponse) {
@@ -135,8 +128,7 @@ export function SelecionadorCliente({
     },
   ];
 
-  const exibeResultados =
-    !clienteSelecionado && (termoAplicadoCpf.length > 0 || termoAplicadoNome.length > 0);
+  const exibeResultados = !clienteSelecionado && (termoBuscaCPF || termoBuscaNome);
   let conteudoResultados: JSX.Element | null = null;
 
   if (estaCarregando) {
@@ -157,41 +149,43 @@ export function SelecionadorCliente({
       </div>
     );
   } else {
-    conteudoResultados = (
-      <Tabela colunas={colunas} dados={clientes} preencherLinhas={false} />
-    );
+    conteudoResultados = <Tabela colunas={colunas} dados={clientes} />;
   }
 
   return (
     <div className={styles.selecionadorCliente}>
       {!clienteSelecionado && (
-        <PainelFiltro>
-          <PainelFiltroControles>
-            <PainelFiltroCampo id="cpf-busca" label="CPF">
-              <PainelFiltroInput
+        <div className={styles.buscas}>
+          <div className={styles.campoBusca}>
+            <label htmlFor="cpf-busca">CPF</label>
+            <div className={styles.inputComIcone}>
+              <input
                 id="cpf-busca"
                 type="text"
                 placeholder="Pesquisar por CPF..."
-                value={filtros.cpf}
-                onChange={(e) => setFiltros((prev) => ({ ...prev, cpf: e.target.value }))}
+                value={termoBuscaCPF}
+                onChange={(e) => setTermoBuscaCPF(e.target.value)}
+                className={styles.input}
               />
-            </PainelFiltroCampo>
-            <PainelFiltroCampo id="nome-busca" label="Nome">
-              <PainelFiltroInput
+              <Search size={18} className={styles.icone} />
+            </div>
+          </div>
+
+          <div className={styles.campoBusca}>
+            <label htmlFor="nome-busca">Nome</label>
+            <div className={styles.inputComIcone}>
+              <input
                 id="nome-busca"
                 type="text"
                 placeholder="Pesquisar por nome..."
-                value={filtros.nome}
-                onChange={(e) => setFiltros((prev) => ({ ...prev, nome: e.target.value }))}
+                value={termoBuscaNome}
+                onChange={(e) => setTermoBuscaNome(e.target.value)}
+                className={styles.input}
               />
-            </PainelFiltroCampo>
-          </PainelFiltroControles>
-          <PainelFiltroAcoes
-            onBuscar={buscarComFiltros}
-            onLimpar={limparFiltros}
-            carregando={estaCarregando}
-          />
-        </PainelFiltro>
+              <Search size={18} className={styles.icone} />
+            </div>
+          </div>
+        </div>
       )}
 
       {clienteSelecionado && (

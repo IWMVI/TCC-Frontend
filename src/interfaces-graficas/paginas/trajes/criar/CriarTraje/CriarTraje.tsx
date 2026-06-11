@@ -1,5 +1,5 @@
 import {FormularioTraje} from '@/interfaces-graficas/paginas/trajes/componentes';
-import {criarTrajeUseCase, trajeRepository} from '@application/trajes';
+import {criarTrajeUseCase, TRAJE_CONSTANTS, trajeRepository} from '@application/trajes';
 import {TrajeRequest, TrajeResponse} from '@domain/entidades';
 import {useEffect, useState} from 'react';
 import {Alert} from 'react-bootstrap';
@@ -35,7 +35,7 @@ export function CriarTraje({
       return;
     }
 
-    navigate('/dashboard');
+    navigate(TRAJE_CONSTANTS.ROUTES.LISTA);
   }
 	
 	async function handleSubmit(dados: TrajeRequest): Promise<number | undefined> {

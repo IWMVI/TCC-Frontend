@@ -1,4 +1,3 @@
-import { TAMANHO_PAGINA_PADRAO } from '@domain/constants/paginacao';
 import { TrajeApiRepository } from '@infrastructure/api';
 import { ITrajeRepository } from '@domain/interfaces';
 import { ListarTrajesUseCase } from '@/application/trajes/ListarTrajesUseCase';
@@ -7,7 +6,9 @@ import { CriarTrajeUseCase } from '@/application/trajes/CriarTrajeUseCase';
 import { AtualizarTrajeUseCase } from '@/application/trajes/AtualizarTrajeUseCase';
 import { DeletarTrajeUseCase } from '@/application/trajes/DeletarTrajeUseCase';
 
-const trajeRepository: ITrajeRepository = new TrajeApiRepository();
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+const trajeRepository: ITrajeRepository = new TrajeApiRepository(API_BASE_URL);
 
 const listarTrajesUseCase = new ListarTrajesUseCase(trajeRepository);
 const buscarTrajePorIdUseCase = new BuscarTrajePorIdUseCase(trajeRepository);
@@ -25,7 +26,7 @@ export {
 };
 
 export const TRAJE_CONSTANTS = {
-  TAMANHO_PAGINA_PADRAO,
+  TAMANHO_PAGINA_PADRAO: 10,
   DEBOUNCE_DELAY_MS: 300,
   ROUTES: {
     LISTAR: '/trajes/listar',
