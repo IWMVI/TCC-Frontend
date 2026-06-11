@@ -1,0 +1,44 @@
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.disponivel {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.alugado {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.ativo {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.atraso {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.concluido {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.cancelado {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.padrao {
+  background-color: #f3f4f6;
+  color: #374151;
+}

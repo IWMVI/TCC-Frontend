@@ -7,6 +7,10 @@
   flex-direction: column;
 }
 
+.card--altura-toda {
+  flex: 1;
+}
+
 .card__header {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--cor-borda);

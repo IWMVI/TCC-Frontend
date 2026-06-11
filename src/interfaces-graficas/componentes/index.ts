@@ -3,7 +3,17 @@ export { Paginacao } from '@/interfaces-graficas/componentes/base/Paginacao/Pagi
 export { CampoFormulario } from '@/interfaces-graficas/componentes/form/CampoFormulario';
 export { Busca } from '@/interfaces-graficas/componentes/form/Busca';
 export {Calendario} from '@/interfaces-graficas/componentes/form/Calendario';
+export { MenuFiltrosLateral } from '@/interfaces-graficas/componentes/form/MenuFiltrosLateral';
+export {
+  PainelFiltro,
+  PainelFiltroAcoes,
+  PainelFiltroCampo,
+  PainelFiltroControles,
+  PainelFiltroInput,
+  PainelFiltroSelect,
+} from '@/interfaces-graficas/componentes/form/PainelFiltro';
 export { Layout, Card } from '@/interfaces-graficas/componentes/layout';
 export { Modal } from '@/interfaces-graficas/componentes/feedback/Modal';
+export { BadgeStatusValor } from '@/interfaces-graficas/componentes/data/BadgeStatusValor';
 export { Tabela } from '@/interfaces-graficas/componentes/data/Tabela';
 export type { Coluna } from '@/interfaces-graficas/componentes/data/Tabela';

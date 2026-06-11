@@ -68,10 +68,10 @@ export function Paginacao({
             value={tamanhoPagina.toString()}
             onChange={(e) => onTamanhoChange(Number(e.target.value))}
           >
-            <option value={5}>5 por p?gina</option>
-            <option value={10}>10 por p?gina</option>
-            <option value={25}>25 por p?gina</option>
-            <option value={50}>50 por p?gina</option>
+            <option value={5}>5 por página</option>
+            <option value={10}>10 por página</option>
+            <option value={25}>25 por página</option>
+            <option value={50}>50 por página</option>
           </select>
         )}
       </div>
@@ -82,8 +82,8 @@ export function Paginacao({
           className={styles.paginacao__botao}
           onClick={() => onPageChange(0)}
           disabled={paginaAtualSegura === 0}
-          title="Primeira p?gina"
-          aria-label="Primeira p?gina"
+          title="Primeira página"
+          aria-label="Primeira página"
         >
           <ChevronsLeft size={16} />
         </button>
@@ -93,8 +93,8 @@ export function Paginacao({
           className={styles.paginacao__botao}
           onClick={() => onPageChange(paginaAtualSegura - 1)}
           disabled={paginaAtualSegura === 0}
-          title="P?gina anterior"
-          aria-label="P?gina anterior"
+          title="Página anterior"
+          aria-label="Página anterior"
         >
           <ChevronLeft size={16} />
         </button>
@@ -106,7 +106,7 @@ export function Paginacao({
               type="button"
               className={`${styles.paginacao__botao} ${num === paginaAtualSegura ? styles['paginacao__botao--ativo'] : ''}`}
               onClick={() => onPageChange(num)}
-              aria-label={`P?gina ${num + 1}`}
+              aria-label={`Página ${num + 1}`}
               aria-current={num === paginaAtualSegura ? 'page' : undefined}
             >
               {num + 1}
@@ -123,8 +123,8 @@ export function Paginacao({
           className={styles.paginacao__botao}
           onClick={() => onPageChange(paginaAtualSegura + 1)}
           disabled={paginaAtualSegura >= totalPaginasEfetivo - 1}
-          title="Pr?xima p?gina"
-          aria-label="Pr?xima p?gina"
+          title="Próxima página"
+          aria-label="Próxima página"
         >
           <ChevronRight size={16} />
         </button>
@@ -134,8 +134,8 @@ export function Paginacao({
           className={styles.paginacao__botao}
           onClick={() => onPageChange(totalPaginasEfetivo - 1)}
           disabled={paginaAtualSegura >= totalPaginasEfetivo - 1}
-          title="?ltima p?gina"
-          aria-label="?ltima p?gina"
+          title="Última página"
+          aria-label="Última página"
         >
           <ChevronsRight size={16} />
         </button>
